@@ -478,7 +478,7 @@ class SamplePropagator(Propagator):
         elif isinstance(layer, int):
             plt.imshow(self.potential[:, :, layer])
         plt.show()
-
+ # test
 
 class LorentzNRotationPropagator(Propagator):
     # Rotate the wavefunction by theta and makes a lorentz transformation on it by beta_lattice
