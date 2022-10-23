@@ -2,9 +2,9 @@
 import numpy as np
 from numpy import pi
 from scipy.integrate import quad_vec
+from scipy.special import jv
 import matplotlib.pyplot as plt
 from typing import Optional, Union, List, Type, Tuple
-from dataclasses import dataclass
 from warnings import warn
 from dataclasses import dataclass
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -379,6 +379,11 @@ class CavityPropagator(Propagator):
                                                           beta_electron=E2beta(input_wave.E0))
         output_wave = propagate_through_potential_slice(input_wave.psi, potential, dz=self.w0 * 3,  # ARBITRARY,
                                                         E0=input_wave.E0)  # Change dz
+        envelope_squared_summed = sum_intensity(A=self.A, w0=self.w0, k_laser=l2k(self.l),
+                                                X=input_wave.coordinates.X_grid, Y=input_wave.coordinates.Y_grid,
+                                                mode='intensity', is_cavity=False)
+        amplitude_reduction_factor = jv(0, potential)
+        output_wave *= amplitude_reduction_factor
         return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
 
     @property
@@ -478,7 +483,6 @@ class SamplePropagator(Propagator):
         elif isinstance(layer, int):
             plt.imshow(self.potential[:, :, layer])
         plt.show()
- # test
 
 class LorentzNRotationPropagator(Propagator):
     # Rotate the wavefunction by theta and makes a lorentz transformation on it by beta_lattice
@@ -538,9 +542,10 @@ second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
 cavity = CavityPropagator(l=532e-9, A=4.3e6, Na=0.2,
                           theta_polarization=0, relativistic_interaction=True)
 
-M = Microscope([dummy_sample, first_lens, cavity, second_lens])
+M = Microscope([dummy_sample, first_lens, first_lorentz, cavity, second_lorentz, second_lens])
 M.take_a_picture(first_wave)
-M.plot_step(0)
+for i in range(len(M.propagators)):
+    M.plot_step(i)
 
 # %% Plot ponderomotive potential at the
 # N_POINTS = 105

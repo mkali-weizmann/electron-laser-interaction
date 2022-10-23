@@ -59,6 +59,20 @@ class ABTransformer(Transformer):
 # %%
 
 import numpy as np
+import matplotlib.pyplot as plt
+def psi(x, y):
+    return x**2 + y
 
-x = np.linspace(-1, 1, 3)
-y = np.linspace(-1, 1, 3)
+def psi_tilde(x, y, theta):
+    x_tilde = x * np.cos(theta) + y * np.sin(theta)
+    y_tilde = y * np.cos(theta) - x * np.sin(theta)
+    return psi(x_tilde, y_tilde)
+x, y = np.linspace(-1, 1, 30), np.linspace(-1, 1, 30)
+
+X, Y = np.meshgrid(x, y)
+
+plt.imshow(psi(x,y))
+plt.show()
+
+plt.imshow(psi(x,y))
+plt.show()
