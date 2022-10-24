@@ -77,8 +77,8 @@ def l2w(l: float) -> float:
     return k2w(k2l(l))
 
 
-def w2l(l: float) -> float:
-    return k2l(k2l(l))
+def w2l(w: float) -> float:
+    return k2l(w2k(w))
 
 
 def p2beta(p: float) -> float:
@@ -109,13 +109,35 @@ def Joules2keV(J: float) -> float:
     return J / 1.602176634e-16
 
 
+def x_R_gaussian(w0: float, l: float) -> float:
+    # l is the wavelength of the laser
+    return pi * w0 ** 2 / l
+
+
+def w_x_gaussian(x: Union[float, np.ndarray], x_R: Optional[float] = None,
+                 w_0: Optional[float] = None, l_laser: Optional[float] = None):
+    # l is the wavelength of the laser
+    if x_R is None:
+        x_R = x_R_gaussian(w_0, l_laser)
+    return w_0 * np.sqrt(1 + (x / x_R) ** 2)
+
+
+def gouy_phase_gaussian(x: Union[float, np.ndarray], x_R: Optional[float] = None,
+                        w_0: Optional[float] = None, l_laser: Optional[float] = None):
+    # l is the wavelength of the laser
+    if x_R is None:
+        x_R = x_R_gaussian(w_0, l_laser)
+    return np.arctan(x / x_R)
+
+
 def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float, np.ndarray],
-                  A, w0: float, k_laser: float,
+                  A, w0: float, l: float,
                   mode: str = "intensity", is_cavity: bool = True) -> Union[np.ndarray, float]:
     # Calculates the electric field of a gaussian beam
-    x_R = k_laser * w0 ** 2 / 2
-    w_x = w0 * np.sqrt(1 + (x / x_R) ** 2)
-    gouy_phase = np.arctan(x / x_R)
+    x_R = x_R_gaussian(w0, l)
+    w_x = w_x_gaussian(x, x_R)
+    gouy_phase = gouy_phase_gaussian(x_R, x)
+    k = l2k(l)
     if isinstance(x, float) and x == 0:
         R_x = 1e10
     elif isinstance(x, np.ndarray):
@@ -123,7 +145,7 @@ def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float
         R_x = x_safe * (1 + (x_R / x_safe) ** 2)
     else:
         R_x = x * (1 + (x_R ** 2 / (x ** 2 + 1e-20)))
-    other_phase = k_laser * x + k_laser * (z ** 2 + y ** 2) / (2 * R_x)
+    other_phase = k * x + k * (z ** 2 + y ** 2) / (2 * R_x)
     envelope = A * (w0 / w_x) * np.exp(-(z ** 2 + y ** 2) / w_x ** 2)
 
     if mode == "intensity":
@@ -144,14 +166,14 @@ def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float
         return total_phase
 
 
-def sum_intensity(A: float, w0: float, k_laser: float,
+def average_intensity(A: float, w0: float, k_laser: float,
                   X: [float, np.ndarray], Y: [float, np.ndarray], mode="intensity", is_cavity=True) -> np.ndarray:
     # Calculates the average intensity of a function over a 2D plane
     def integrand(z_tag):
         return gaussian_beam(X, Y, z_tag, A, w0, k_laser, mode, is_cavity=is_cavity)
 
     integral = quad_vec(integrand, -10 * w0, 10 * w0)  # ARBITRARY - CHANGE THAT WHEN POSSIBLE
-    return integral[0]
+    return integral[0] / (20 * w0)
 
 
 def ASPW_propagation(U_z0: np.ndarray, dxdydz: tuple[float, ...], k: float) -> np.ndarray:
@@ -168,11 +190,11 @@ def ASPW_propagation(U_z0: np.ndarray, dxdydz: tuple[float, ...], k: float) -> n
 
 def propagate_through_potential_slice(incoming_wave: np.ndarray, averaged_potential: np.ndarray,
                                       dz: float, E0) -> np.ndarray:
-    # CHECK THAT THIS CORRESPONDS TO KIRKLAND'S VERSION
+    # CHECK THAT THIS my original version CORRESPONDS TO KIRKLAND'S VERSION
     # V0 = E0 / E_CHARGE
     # dk = V2k(V0) - V2k(V0, averaged_potential)
     # psi_output = incoming_wave * np.exp(-1j * dk * dz)
-    # KIRKLAND'S VERSION:
+    # KIRKLAND'S VERSION: (TWO VERSION AGREE!)
     sigma = beta2gamma(E2beta(E0)) * M_ELECTRON * E_CHARGE / (H_PLANCK ** 2 * E2k(E0))
     psi_output = incoming_wave * np.exp(1j * sigma * dz * averaged_potential)
     return psi_output
@@ -358,17 +380,121 @@ class Microscope:
         plt.show()
 
 
+class CavityDoubleFrequencyPropagator(Propagator):
+    def __init__(self,
+                 l_1: float = 1064 * 1e-9,
+                 l_2: float = 532 * 1e-9,
+                 A_1: float = 1,
+                 A_2: Optional[float] = 1,
+                 Na: float = 0.2,
+                 theta_lattice: float = 0,
+                 theta_polarization: float = 0):
+        self.l_1: float = l_1  # Laser's frequency
+        self.A_1: float = A_1  # Laser's amplitude
+        if A_2 is None:
+            self.A_2: float = A_1 * (l_1 / l_2)
+        else:
+            self.A_2: float = A_2
+        self.Na: float = Na  # Cavity's numerical aperture
+        self.theta_lattice: float = theta_lattice  # cavity's angle with respect to microscope's x-axis. positive
+        # # number means the part of the cavity in the positive x direction is tilted downwards toward the z axis.
+        # in the cavity.
+        self.theta_polarization: float = theta_polarization  # polarization angle of the laser
+
+    @property
+    def beta_lattice(self) -> float:
+        return (self.l_1 - self.l_2) / (self.l_1 + self.l_2) * C_LIGHT
+
+    @property
+    def Gamma_plus(self) -> float:
+        return np.sqrt( (1 + self.beta_lattice) / (1 - self.beta_lattice) )
+
+    @property
+    def Gamma_minus(self) -> float:
+        return np.sqrt( (1 - self.beta_lattice) / (1 + self.beta_lattice) )
+
+    @property
+    def A(self) -> float:
+        return self.A_1 * self.Gamma_plus
+
+    @property
+    def l(self) -> float:
+        return self.l_1 / self.Gamma_plus
+
+    @property
+    def k(self) -> float:
+        return l2k(self.l)
+
+    def phi_0(self, x: np.ndarray, y: np.ndarray, beta_electron: float) -> np.ndarray:
+        x_lattice = x / np.cos(self.theta_lattice)
+        x_R = x_R_gaussian(self.w_0, self.l)
+        w_x = w_x_gaussian(x_lattice, x_R)
+        return (E_CHARGE**2 * self.A**2 * self.w_0**2 * np.sqrt(pi)) /\
+               (H_PLANCK * 4 * np.sqrt(2) * M_ELECTRON * C_LIGHT * beta_electron * beta2gamma(beta_electron) * w_x)\
+               * np.exp(-2 * y ** 2 / w_x ** 2)
+
+    def propagate(self, input_wave: WaveFunction) -> WaveFunction:
+        potential = self.generate_ponderomotive_potential(input_wave.coordinates.grids,
+                                                          beta_electron=E2beta(input_wave.E0))
+        output_wave = propagate_through_potential_slice(input_wave.psi, potential, dz=self.w_0 * 3,  # ARBITRARY,
+                                                        E0=input_wave.E0)  # Change dz
+        envelope_squared_summed = average_intensity(A=self.A, w0=self.w_0, k_laser=l2k(self.l),
+                                                    X=input_wave.coordinates.X_grid, Y=input_wave.coordinates.Y_grid,
+                                                    mode='intensity', is_cavity=False)
+        amplitude_reduction_factor = jv(0, potential)
+        output_wave *= amplitude_reduction_factor
+        return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
+
+    @property
+    def w_0(self) -> float:
+        # The width of the gaussian beam of the first laser
+        return self.l / self.Na
+
+    def w_x(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        # The width of the gaussian beam
+        return self.w_0 * np.sqrt(1 + (x / self.w_0) ** 2)
+
+    def generate_ponderomotive_potential(self, grids, beta_electron: Optional[float] = None):
+        X, Y = grids[0], grids[1]
+        if beta_electron is None and self.theta_polarization is None:  # For the non-relativistic case
+            coefficient = -E_CHARGE ** 2 / (4 * M_ELECTRON * l2w(self.l) ** 2)
+            potential = coefficient * average_intensity(A=self.A, w0=self.w_0, k_laser=l2k(self.l), X=X, Y=Y,
+                                                        mode='intensity', is_cavity=True)
+        elif beta_electron is not None and self.theta_polarization is not None:  # For the relativistic case
+            rho = 1 - 2 * beta_electron ** 2 * (np.cos(self.theta_polarization)) ** 2
+            # envelope_squared_summed = average_intensity(A=self.A, w_0=self.w_0, k_laser=l2k(self.l), X=X, Y=Y,
+            #                                             mode='intensity', is_cavity=False)
+            envelope_squared_summed = E_CHARGE ** 2 * np.sqrt(pi) * self.A ** 2 * self.w_0 ** 2 / (4 * M_ELECTRON * C_LIGHT * beta_electron * beta2gamma(beta_electron) * np.sqrt(2))
+            spatial_cosine = np.cos(2 * l2k(self.l) * X)
+            constants = E_CHARGE ** 2 / (4 * M_ELECTRON * beta2gamma(beta_electron))
+            potential = (1 / 2) * constants * envelope_squared_summed * (1 + rho * spatial_cosine)
+        else:
+            raise ValueError("input both beta_lattice and gamma_lattice for the relativistic case or neither for"
+                             "the non-relativistic case")
+        return potential
+
+    def generate_laser_field(self, x, y, z):
+        field = gaussian_beam(x=x, y=y, z=z, A=self.A, w0=self.w_0, self.l, mode="field", is_cavity=True)
+        return field
+
+    def generate_laser_intensity(self, x, y, z):
+        intensity = gaussian_beam(x=x, y=y, z=z, A=self.A, w0=self.w_0, self.l, mode="field",
+                                  is_cavity=True)
+        return intensity
+
+
 class CavityPropagator(Propagator):
     def __init__(self,
                  l: float = 532 * 1e-9,
                  A: float = 1,
                  Na: float = 0.2,
+                 theta_lattice: float = 0,
                  theta_polarization: float = 0,
                  relativistic_interaction: bool = True):  # Calculate it manually later):
         self.l: float = l  # Laser's frequency
         self.A: float = A  # Laser's amplitude
         self.Na: float = Na  # Cavity's numerical aperture
-        # self.theta_lattice: float = theta_lattice  # cavity's angle with respect to microscope's x-axis. positive
+        self.theta_lattice: float = theta_lattice  # cavity's angle with respect to microscope's x-axis. positive
         # # number means the part of the cavity in the positive x direction is tilted downwards toward the z axis.
         # in the cavity.
         self.theta_polarization: float = theta_polarization  # polarization angle of the laser
@@ -379,9 +505,9 @@ class CavityPropagator(Propagator):
                                                           beta_electron=E2beta(input_wave.E0))
         output_wave = propagate_through_potential_slice(input_wave.psi, potential, dz=self.w0 * 3,  # ARBITRARY,
                                                         E0=input_wave.E0)  # Change dz
-        envelope_squared_summed = sum_intensity(A=self.A, w0=self.w0, k_laser=l2k(self.l),
-                                                X=input_wave.coordinates.X_grid, Y=input_wave.coordinates.Y_grid,
-                                                mode='intensity', is_cavity=False)
+        envelope_squared_summed = average_intensity(A=self.A, w0=self.w0, k_laser=l2k(self.l),
+                                                    X=input_wave.coordinates.X_grid, Y=input_wave.coordinates.Y_grid,
+                                                    mode='intensity', is_cavity=False)
         amplitude_reduction_factor = jv(0, potential)
         output_wave *= amplitude_reduction_factor
         return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
@@ -391,16 +517,21 @@ class CavityPropagator(Propagator):
         # The width of the gaussian beam of the first laser
         return self.l / self.Na
 
+    def w_x(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        # The width of the gaussian beam
+        return self.w0 * np.sqrt(1 + (x / self.w0) ** 2)
+
     def generate_ponderomotive_potential(self, grids, beta_electron: Optional[float] = None):
         X, Y = grids[0], grids[1]
         if beta_electron is None and self.theta_polarization is None:  # For the non-relativistic case
             coefficient = -E_CHARGE ** 2 / (4 * M_ELECTRON * l2w(self.l) ** 2)
-            potential = coefficient * sum_intensity(A=self.A, w0=self.w0, k_laser=l2k(self.l),
-                                                    X=X, Y=Y, mode='intensity', is_cavity=True)
+            potential = coefficient * average_intensity(A=self.A, w0=self.w0, k_laser=l2k(self.l), X=X, Y=Y,
+                                                        mode='intensity', is_cavity=True)
         elif beta_electron is not None and self.theta_polarization is not None:  # For the relativistic case
             rho = 1 - 2 * beta_electron ** 2 * (np.cos(self.theta_polarization)) ** 2
-            envelope_squared_summed = sum_intensity(A=self.A, w0=self.w0, k_laser=l2k(self.l),
-                                                    X=X, Y=Y, mode='intensity', is_cavity=False)
+            # envelope_squared_summed = average_intensity(A=self.A, w_0=self.w_0, k_laser=l2k(self.l), X=X, Y=Y,
+            #                                             mode='intensity', is_cavity=False)
+            envelope_squared_summed = E_CHARGE**2 * np.sqrt(pi) * self.A**2 * self.w0**2 / (4 * M_ELECTRON * C_LIGHT * beta_electron * beta2gamma(beta_electron) * np.sqrt(2))
             spatial_cosine = np.cos(2 * l2k(self.l) * X)
             constants = E_CHARGE ** 2 / (4 * M_ELECTRON * beta2gamma(beta_electron))
             potential = (1 / 2) * constants * envelope_squared_summed * (1 + rho * spatial_cosine)
@@ -410,11 +541,11 @@ class CavityPropagator(Propagator):
         return potential
 
     def generate_laser_field(self, x, y, z):
-        field = gaussian_beam(x=x, y=y, z=z, A=self.A, w0=self.w0, k_laser=l2k(self.l), mode="field", is_cavity=True)
+        field = gaussian_beam(x=x, y=y, z=z, A=self.A, w0=self.w0, self.l, mode="field", is_cavity=True)
         return field
 
     def generate_laser_intensity(self, x, y, z):
-        intensity = gaussian_beam(x=x, y=y, z=z, A=self.A, w0=self.w0, k_laser=l2k(self.l), mode="field",
+        intensity = gaussian_beam(x=x, y=y, z=z, A=self.A, w0=self.w0, self.l, mode="field",
                                   is_cavity=True)
         return intensity
 
@@ -483,6 +614,7 @@ class SamplePropagator(Propagator):
         elif isinstance(layer, int):
             plt.imshow(self.potential[:, :, layer])
         plt.show()
+
 
 class LorentzNRotationPropagator(Propagator):
     # Rotate the wavefunction by theta and makes a lorentz transformation on it by beta_lattice

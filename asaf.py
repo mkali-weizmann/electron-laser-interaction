@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import List
 
 
@@ -60,19 +60,27 @@ class ABTransformer(Transformer):
 
 import numpy as np
 import matplotlib.pyplot as plt
-def psi(x, y):
-    return x**2 + y
+from scipy.special import jv
+# %%
+def f(x, k, A, c):
+    return np.exp(1j*A*np.cos(-k*x + c))
 
-def psi_tilde(x, y, theta):
-    x_tilde = x * np.cos(theta) + y * np.sin(theta)
-    y_tilde = y * np.cos(theta) - x * np.sin(theta)
-    return psi(x_tilde, y_tilde)
-x, y = np.linspace(-1, 1, 30), np.linspace(-1, 1, 30)
+def f_sin(x, k, A, c):
+    return np.exp(1j*A*np.sin(-k*x+np.pi/2 + c))
 
-X, Y = np.meshgrid(x, y)
+def f_approx(x: np.ndarray, k, A, c):
+    qs = np.arange(-50, 50, 1)
+    return sum([jv(q, A) * np.exp(1j*(q*(-k*x-np.pi/2+c))) for q in qs])
 
-plt.imshow(psi(x,y))
-plt.show()
+x = np.linspace(-10, 10, 100)
+k = 0.7
+A = 0.1
+c=0
+f_values = f(x, k, A, c)
+f_sin_values = f_sin(x, k, A, c)
+f_approx_values = f_approx(x, k, A, c)
 
-plt.imshow(psi(x,y))
+plt.plot(x, np.real(f_values), 'r--', linewidth=3)
+plt.plot(x, np.real(f_approx_values), 'b--')
+plt.plot(x, np.real(f_approx_values), 'g.')
 plt.show()
