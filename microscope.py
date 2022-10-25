@@ -387,16 +387,17 @@ class Microscope:
 class CavityDoubleFrequencyPropagator(Propagator):
     def __init__(self,
                  l_1: float = 1064 * 1e-9,
-                 l_2: float = 532 * 1e-9,
+                 l_2: Optional[float] = 532 * 1e-9,
                  A_1: float = 1,
-                 A_2: Optional[float] = None,
+                 A_2: Optional[float] = -1,
                  Na: float = 0.2,
                  theta_lattice: Optional[float] = None,
                  theta_polarization: Optional[float] = None):
 
         self.l_1: float = l_1  # Laser's frequency
         self.A_1: float = A_1  # Laser's amplitude
-        if A_2 is None:
+        if A_2 == -1:  # -1 means that the second laser is defined by the condition for equal amplitudes in the
+            # lattices' frame
             self.A_2: float = A_1 * (l_1 / l_2)
         else:
             self.A_2: float = A_2
@@ -420,31 +421,44 @@ class CavityDoubleFrequencyPropagator(Propagator):
         x_lattice = x / np.cos(theta_lattice)
         x_R = x_R_gaussian(self.w_0, self.l)
         w_x = w_x_gaussian(w_0=self.w_0, x=x_lattice, x_R=x_R)
+        # The next two lines are based on equation e_11 in my lyx file
         constant_coefficients = (E_CHARGE ** 2 * self.w_0 ** 2 * np.sqrt(pi) * self.A ** 2) / \
                                 (H_PLANCK * 4 * np.sqrt(2) * M_ELECTRON * C_LIGHT * beta_electron * beta2gamma(
                                     beta_electron))
-        spatial_envelope = np.exp(np.clip(-2 * y ** 2 / w_x ** 2, a_min=-500, a_max=None)) / w_x  # ARBITRARY CLIPPING FOR STABILLITY
+        spatial_envelope = np.exp(
+            np.clip(-2 * y ** 2 / w_x ** 2, a_min=-500, a_max=None)) / w_x  # ARBITRARY CLIPPING FOR STABILITY
+        if self.A_2 is None:  # For the case of a single laser, add the spatial cosine
+            gouy_phase = gouy_phase_gaussian(x_lattice, x_R, self.w_0)
+            cosine_squared = 4 * np.cos(4 * np.pi * x_lattice / self.l + gouy_phase) ** 2
+            spatial_envelope *= cosine_squared
         return constant_coefficients * spatial_envelope
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         phi_0 = self.phi_0(input_wave.coordinates.X_grid, input_wave.coordinates.Y_grid, E2beta(input_wave.E0))
-        constant_phase_shift = self.constant_phase_shift(phi_0)
-        attenuation_factor = self.attenuation_factor(phi_0)
-        output_wave = input_wave.psi * np.exp(1j * constant_phase_shift) * attenuation_factor
+        phase_shift = self.phase_shift(phi_0)
+        if self.A_2 is not None:
+            attenuation_factor = self.attenuation_factor(phi_0)
+        else:
+            attenuation_factor = 1
+        output_wave = input_wave.psi * np.exp(-1j * phase_shift) * attenuation_factor  # ARBITRARY ARBITRARY - I FIXED
+        # A SIGN MISTAKE BY ADDING A SIGN
         return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
 
-    def constant_phase_shift(self, phi_0: Optional[np.ndarray] = None, X_grid: Optional[np.ndarray] = None,
-                             Y_grid: Optional[np.ndarray] = None, beta_electron: Optional[float] = None):
+    def phase_shift(self, phi_0: Optional[np.ndarray] = None, X_grid: Optional[np.ndarray] = None,
+                    Y_grid: Optional[np.ndarray] = None, beta_electron: Optional[float] = None):
         if phi_0 is None:
             phi_0 = self.phi_0(X_grid, Y_grid, beta_electron)
-        return phi_0 * (2 + (self.Gamma_plus / self.Gamma_minus) ** 2 +
-                        (self.Gamma_minus / self.Gamma_plus) ** 2)
+        if self.A_2 is not None:
+            return phi_0 * (2 + (self.Gamma_plus / self.Gamma_minus) ** 2 +
+                            (self.Gamma_minus / self.Gamma_plus) ** 2)
+        else:
+            return phi_0
 
     def attenuation_factor(self, phi_0: Optional[np.ndarray] = None, X_grid: Optional[np.ndarray] = None,
                            Y_grid: Optional[np.ndarray] = None, beta_electron: Optional[float] = None):
         if phi_0 is None:
             phi_0 = self.phi_0(X_grid, Y_grid, beta_electron)
-        return jv(0, 2 * phi_0)
+        return jv(0, 2 * phi_0) ** 2
 
     @property
     def w_0(self) -> float:
@@ -453,7 +467,10 @@ class CavityDoubleFrequencyPropagator(Propagator):
 
     @property
     def beta_lattice(self) -> float:
-        return (self.l_1 - self.l_2) / (self.l_1 + self.l_2)
+        if self.A_2 is not None:
+            return (self.l_1 - self.l_2) / (self.l_1 + self.l_2)
+        else:
+            return 0
 
     @property
     def Gamma_plus(self) -> float:
@@ -465,11 +482,21 @@ class CavityDoubleFrequencyPropagator(Propagator):
 
     @property
     def A(self) -> float:
-        return self.A_1 * self.Gamma_plus
+        # The effective amplitude of the lattice in the moving frame. in case of a single frequency that is just the
+        # amplitude of the first laser.
+        if self.A_2 is None:
+            return self.A_1
+        else:
+            return self.A_1 * self.Gamma_plus
 
     @property
     def l(self) -> float:
-        return self.l_1 / self.Gamma_plus
+        # The effective wavelength of the lattice in the moving frame. in case of a single frequency that is just
+        # the wavelength of the first laser.
+        if self.l_2 is None:
+            return self.l_1
+        else:
+            return self.l_1 / self.Gamma_plus
 
     @property
     def A_plus(self) -> float:
@@ -627,7 +654,7 @@ class LensPropagator(Propagator):
         self.fft_shift = fft_shift
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
-        psi_FFT = np.fft.fftn(input_wave.psi)
+        psi_FFT = np.fft.fftn(input_wave.psi, norm='ortho')
         fft_freq_x = np.fft.fftfreq(input_wave.psi.shape[0], input_wave.coordinates.dxdydz[0])
         fft_freq_y = np.fft.fftfreq(input_wave.psi.shape[1], input_wave.coordinates.dxdydz[1])
 
@@ -670,6 +697,53 @@ class LensPropagator(Propagator):
 #     M.plot_step(i)
 
 
+# %% make plots of the whole process
+N_POINTS = 105
+input_coordinate_system = CoordinateSystem(lengths=(300e-9, 300e-9), n_points=(N_POINTS, N_POINTS))
+first_wave = WaveFunction(psi=np.ones((N_POINTS, N_POINTS)),
+                          coordinates=input_coordinate_system,
+                          E0=KeV2Joules(300))
+
+dummy_sample = SamplePropagator(dummy_potential='a letter',
+                                axes=tuple([first_wave.coordinates.axes[0],
+                                            first_wave.coordinates.axes[1],
+                                            np.linspace(-5e-9, 5e-9, 10)]))
+first_lens = LensPropagator(focal_length=3.3e-1, fft_shift=True)
+
+second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
+# dummy_sample, first_lens, first_lorentz, cavity, second_lorentz, second_lens
+cavity = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=532e-9, A_1=4.812e-7, A_2=-1, Na=0.05)
+
+M = Microscope([dummy_sample, first_lens, cavity, second_lens])
+
+M.take_a_picture(first_wave)
+M.plot_step(3)
+# M.plot_step(0, title="specimen - input wave (upper) and output (lower) wave", file_name="specimen.png")
+# M.plot_step(1, title="first lens - input wave (upper) and output (lower) wave", file_name="first_lens.png")
+# M.plot_step(2, title="cavity - input wave (upper) and output (lower) wave", file_name="cavity.png")
+# M.plot_step(3, title="second lens wave - input (upper) and output (lower) wave", file_name="second_lens.png")
+#
+# X, Y = M.propagation_steps[2].input_wave.coordinates.X_grid, M.propagation_steps[2].input_wave.coordinates.Y_grid
+# limits = M.propagation_steps[2].input_wave.coordinates.limits
+#
+# phi_0 = cavity.phi_0(X, Y, beta_electron=E2beta(M.propagation_steps[2].input_wave.E0))
+# constant_phase_shift = cavity.phase_shift(phi_0=phi_0, X_grid=X, Y_grid=Y)
+# attenuation_factor = cavity.attenuation_factor(phi_0=phi_0, X_grid=X, Y_grid=Y)
+#
+# plt.imshow(constant_phase_shift, extent=limits)
+# plt.title(r'phase shift')
+# plt.colorbar()
+# plt.savefig(r'Figures\phase_shift.png')
+# plt.show()
+#
+# plt.imshow(attenuation_factor, extent=limits)
+# plt.title(r'attenuation factor')
+# plt.colorbar()
+# plt.savefig(r'Figures\attenuation_factor.png')
+# plt.show()
+
+# for i in range(len(M.propagators)):
+#     M.plot_step(i, title=f'Propagator {i}')
 # %%
 N_POINTS = 105
 input_coordinate_system = CoordinateSystem(lengths=(300e-9, 300e-9), n_points=(N_POINTS, N_POINTS))
@@ -685,57 +759,55 @@ first_lens = LensPropagator(focal_length=3.3e-1, fft_shift=True)
 
 second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
 # dummy_sample, first_lens, first_lorentz, cavity, second_lorentz, second_lens
-cavity = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=532e-9, A_1=4.812e-7, Na=0.05)
+cavity = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=532e-9, A_1=4.812e-7, A_2=-1, Na=0.05)
+single_laser_cavity = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=None, A_1=7.15e-7, A_2=None, Na=0.05)
 
 M = Microscope([dummy_sample, first_lens, cavity, second_lens])
 
 M.take_a_picture(first_wave)
-M.plot_step(0, title="specimen - input wave (upper) and output (lower) wave", file_name="specimen.png")
-M.plot_step(1, title="first lens - input wave (upper) and output (lower) wave", file_name="first_lens.png")
-M.plot_step(2, title="cavity - input wave (upper) and output (lower) wave", file_name="cavity.png")
-M.plot_step(3, title="second lens wave - input (upper) and output (lower) wave", file_name="second_lens.png")
 
-
-X, Y = M.propagation_steps[2].input_wave.coordinates.X_grid, M.propagation_steps[2].input_wave.coordinates.Y_grid
-limits = M.propagation_steps[2].input_wave.coordinates.limits
-
-phi_0 = cavity.phi_0(X, Y, beta_electron=E2beta(M.propagation_steps[2].input_wave.E0))
-constant_phase_shift = cavity.constant_phase_shift(phi_0=phi_0, X_grid=X, Y_grid=Y)
-attenuation_factor = cavity.attenuation_factor(phi_0=phi_0, X_grid=X, Y_grid=Y)
-
-
-plt.imshow(constant_phase_shift, extent=limits)
-plt.title(r'phase shift')
+phase_map = np.angle(M.propagation_steps[0].output_wave.psi)
+plt.title('total phase delay given by the sample in each point in the sample')
+plt.imshow(phase_map - np.max(phase_map), extent=M.propagation_steps[0].output_wave.coordinates.limits)
 plt.colorbar()
-plt.savefig(r'Figures\phase_shift.png')
 plt.show()
 
-plt.imshow(attenuation_factor, extent=limits)
-plt.title(r'attenuation factor')
+plt.imshow(np.abs(np.flip(M.propagation_steps[3].output_wave.psi, axis=(0, 1)))**2, extent=M.propagation_steps[3].output_wave.coordinates.limits)
 plt.colorbar()
-plt.savefig(r'Figures\attenuation_factor.png')
+plt.title('double laser cavity')
 plt.show()
 
+Mb = Microscope([dummy_sample, first_lens, single_laser_cavity, second_lens])
+Mb.take_a_picture(first_wave)
+plt.imshow(np.abs(np.flip(Mb.propagation_steps[3].output_wave.psi, axis=(0, 1)))**2, extent=Mb.propagation_steps[3].output_wave.coordinates.limits)
+plt.colorbar()
+plt.title('single laser cavity')
+plt.show()
 
-# for i in range(len(M.propagators)):
-#     M.plot_step(i, title=f'Propagator {i}')
+Mc = Microscope([dummy_sample, first_lens, second_lens])
+Mc.take_a_picture(first_wave)
+plt.imshow(np.abs(np.flip(Mc.propagation_steps[2].output_wave.psi, axis=(0, 1)))**2, extent=Mb.propagation_steps[2].output_wave.coordinates.limits)
+plt.colorbar()
+plt.title('no cavity')
+plt.show()
+
 
 # %%
 X, Y = M.propagation_steps[2].input_wave.coordinates.X_grid, M.propagation_steps[2].input_wave.coordinates.Y_grid
-N = 200
-As = np.linspace(1e-10, 1e-7, N)
+N = 100
+As = np.linspace(7e-7, 7.5e-7, N)
 phases = np.zeros(N)
 
 for i, A in enumerate(As):
-    cavity = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=532e-9, A_1=A, Na=0.05)
+    cavity = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=None, A_1=A, Na=0.05, A_2=None)
     M = Microscope([dummy_sample, first_lens, cavity])
     last_wave = M.take_a_picture(input_wave=first_wave)
     phi_0 = cavity.phi_0(X, Y, beta_electron=E2beta(M.propagation_steps[2].input_wave.E0))
-    constant_phase_shift = cavity.constant_phase_shift(phi_0=phi_0, X_grid=X, Y_grid=Y)
+    constant_phase_shift = cavity.phase_shift(phi_0=phi_0, X_grid=X, Y_grid=Y)
     phases[i] = constant_phase_shift[52, 52]
 
 plt.plot(As, phases)
-# plt.axhline(3*np.pi/2, color='r')
+plt.axhline(np.pi/2, color='r')
 plt.show()
 
 # %% Plot ponderomotive potential at the
@@ -791,4 +863,3 @@ plt.show()
 # plt.show()
 
 # %% Plot attenuation and phase shift
-
