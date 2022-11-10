@@ -409,35 +409,35 @@ class CavityDoubleFrequencyPropagator(Propagator):
         self.theta_lattice: float = theta_lattice  # cavity_2f's angle with respect to microscope's x-axis. positive
         # # number means the part of the cavity_2f in the positive x direction is tilted downwards toward the z axis.
         # in the cavity_2f.
-        self.theta_polarization: float = theta_polarization  # polarization angle of the laser
+        self.theta_polarization: Optional[float] = theta_polarization  # polarization angle of the laser
 
     def phi_0(self, x: np.ndarray, y: np.ndarray, beta_electron: float) -> np.ndarray:
-        # Gives the phase acquired by a narrow electron beam centered around (x, y) by passing in the cavity_2f.
-        # Does not include the relativistic correction.
-        # According to equation e_10 and equation gaussian_beam_potential_total_phase in my lyx file
-        if self.theta_lattice is None:
-            if self.A_2 is not None:
-                theta_lattice = np.arccos(self.beta_lattice / beta_electron)
+        if self.theta_polarization is None:
+            # Gives the phase acquired by a narrow electron beam centered around (x, y) by passing in the cavity_2f.
+            # Does not include the relativistic correction.
+            # According to equation e_10 and equation gaussian_beam_potential_total_phase in my lyx file
+            if self.theta_lattice is None:
+                theta_lattice = np.arcsin(self.beta_lattice / beta_electron)
             else:
-                theta_lattice = 0
-        else:
-            theta_lattice = self.theta_lattice
-            warn("theta_lattice is not None. Using the value given by the user, Note that the calculations assume"
-                 "that the lattice satisfy cos(theta_lattice) = beta_lattice / beta_electron")
-        x_lattice = x / np.cos(theta_lattice)
-        x_R = x_R_gaussian(self.w_0, self.l)
-        w_x = w_x_gaussian(w_0=self.w_0, x=x_lattice, x_R=x_R)
-        # The next two lines are based on equation e_11 in my lyx file
-        constant_coefficients = (E_CHARGE ** 2 * self.w_0 ** 2 * np.sqrt(pi) * self.A ** 2) / \
-                                (H_BAR * 4 * np.sqrt(2) * M_ELECTRON * C_LIGHT * beta_electron * beta2gamma(
-                                    beta_electron))
-        spatial_envelope = np.exp(
-            np.clip(-2 * y ** 2 / w_x ** 2, a_min=-500, a_max=None)) / w_x  # ARBITRARY CLIPPING FOR STABILITY
-        if self.A_2 is None:  # For the case of a single laser, add the spatial cosine
-            gouy_phase = gouy_phase_gaussian(x_lattice, x_R, self.w_0)
-            cosine_squared = 4 * np.cos(4 * np.pi * x_lattice / self.l + gouy_phase) ** 2
-            spatial_envelope *= cosine_squared
-        return constant_coefficients * spatial_envelope
+                theta_lattice = self.theta_lattice
+                warn("theta_lattice is not None. Using the value given by the user, Note that the calculations assume"
+                     "that the lattice satisfy cos(theta_lattice) = beta_lattice / beta_electron")
+            x_lattice = x / np.cos(theta_lattice)
+            x_R = x_R_gaussian(self.w_0, self.l)
+            w_x = w_x_gaussian(w_0=self.w_0, x=x_lattice, x_R=x_R)
+            # The next two lines are based on equation e_11 in my lyx file
+            constant_coefficients = (E_CHARGE ** 2 * self.w_0 ** 2 * np.sqrt(pi) * self.A ** 2) / \
+                                    (H_BAR * 4 * np.sqrt(2) * M_ELECTRON * C_LIGHT * beta_electron * beta2gamma(
+                                        beta_electron))
+            spatial_envelope = np.exp(  # Shouldn't be here a w_0 term?
+                np.clip(-2 * y ** 2 / w_x ** 2, a_min=-500, a_max=None)) / w_x  # ARBITRARY CLIPPING FOR STABILITY
+            if self.A_2 is None:  # For the case of a single laser, add the spatial cosine
+                gouy_phase = gouy_phase_gaussian(x_lattice, x_R, self.w_0)
+                cosine_squared = 4 * np.cos(4 * np.pi * x_lattice / self.l + gouy_phase) ** 2
+                spatial_envelope *= cosine_squared
+            return constant_coefficients * spatial_envelope
+        else:  # if there is polarization, so we take into account the relativistic correction:
+            raise NotImplementedError("The relativistic correction is not implemented yet")
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         phi_0 = self.phi_0(input_wave.coordinates.X_grid, input_wave.coordinates.Y_grid, E2beta(input_wave.E0))
@@ -469,7 +469,7 @@ class CavityDoubleFrequencyPropagator(Propagator):
     @property
     def w_0(self) -> float:
         # The width of the gaussian beam of the first laser
-        # based on https://www.edmundoptics.com/knowledge-center/application-notes/lasers/gaussian-beam-propagation/
+        # based on https://en.wikipedia.org/wiki/Gaussian_beam
         return self.l / (pi * np.arcsin(self.Na))
 
     @property
