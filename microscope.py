@@ -8,6 +8,7 @@ from typing import Optional, Union, List, Type, Tuple
 from warnings import warn
 from dataclasses import dataclass
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy import integrate
 
 M_ELECTRON = 9.1093837e-31
 C_LIGHT = 299792458
@@ -115,6 +116,14 @@ def x_R_gaussian(w0: float, l: float) -> float:
     return pi * w0 ** 2 / l
 
 
+def NA2w0(NA: float, l: float) -> float:
+    return l / (np.pi * NA)
+
+
+def w02NA(w0: float, l: float) -> float:
+    return l / (np.pi * w0)
+
+
 def w_x_gaussian(w_0: float, x: Union[float, np.ndarray], x_R: Optional[float] = None, l_laser: Optional[float] = None):
     # l is the wavelength of the laser
     if x_R is None:
@@ -131,13 +140,16 @@ def gouy_phase_gaussian(x: Union[float, np.ndarray], x_R: Optional[float] = None
 
 
 def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float, np.ndarray],
-                  A, w_0: float, l: float,
+                  A, lamda: float, w_0: Optional[float] = None, NA: Optional[float] = None,
+                  t: Optional[float, np.ndarray] = None,
                   mode: str = "intensity", is_cavity: bool = True) -> Union[np.ndarray, float]:
+    if w_0 is None:
+        w_0 = NA2w0(NA, lamda)
     # Calculates the electric field of a gaussian beam
-    x_R = x_R_gaussian(w_0, l)
+    x_R = x_R_gaussian(w_0, lamda)
     w_x = w_x_gaussian(w_0=w_0, x=x, x_R=x_R)
     gouy_phase = gouy_phase_gaussian(x, x_R)
-    k = l2k(l)
+    k = l2k(lamda)
     if isinstance(x, float) and x == 0:
         R_x = 1e10
     elif isinstance(x, np.ndarray):
@@ -156,21 +168,79 @@ def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float
 
     elif mode == "field":
         total_phase = other_phase - gouy_phase
-        if is_cavity:
-            return envelope * np.cos(total_phase)
+        if t is not None:
+            time_phase = np.exp(1j * ((C_LIGHT / k) * t))
         else:
-            return envelope * np.exp(1j * total_phase)
+            time_phase = 1
+        if is_cavity:
+            return envelope * np.cos(total_phase) * time_phase
+        else:
+            return envelope * np.exp(1j * total_phase) * time_phase
 
     elif mode == "phase":
         total_phase = other_phase - gouy_phase
-        return total_phase
+        if t is not None:
+            time_phase = (C_LIGHT / k) * t
+        else:
+            time_phase = 0
+        return total_phase + time_phase
+
+
+def rotated_gaussian_beam_Az(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float, np.ndarray],
+                             A, lamda: float, alpha_cavity: float, theta_polarization: float,
+                             w_0: Optional[float] = None, NA: Optional[float] = None,
+                             t: Optional[float, np.ndarray] = None, mode: str = "intensity"
+                             ) -> Union[np.ndarray, float]:
+    return gaussian_beam(x * np.cos(alpha_cavity) - z * np.sin(alpha_cavity), y,
+                         x * np.sin(alpha_cavity) + z * np.cos(alpha_cavity), A=A, lamda=lamda, w_0=w_0, t=t, mode=mode
+                         ) * np.cos(theta_polarization)
+
+
+def A_integrand(Z: np.ndarray,
+                x: np.ndarray,
+                y: np.ndarray,
+                z: np.ndarray,
+                t: np.ndarray,
+                beta_electron: float,
+                NA: float,
+                lamda_1: float,
+                lamda_2: float,
+                alpha_cavity: float,
+                theta_polarization: float = 0,
+                ) -> float:
+    T = (Z - z) / (beta_electron * C_LIGHT) + t
+    A1 = rotated_gaussian_beam_Az(x=x, y=y, z=Z, A=1, lamda=lamda_1, alpha_cavity=alpha_cavity,
+                                  theta_polarization=theta_polarization, NA=NA, t=T, mode="field")
+    A2 = rotated_gaussian_beam_Az(x=x, y=y, z=Z, A=1, lamda=lamda_2, alpha_cavity=alpha_cavity,
+                                  theta_polarization=theta_polarization, NA=NA, t=T, mode="field")
+    jacobian = 1 / (beta_electron * C_LIGHT)
+    return (A1 + A2) * jacobian
+
+
+def G_gause(x: np.ndarray,
+            y: np.ndarray,
+            z: np.float,
+            t: np.ndarray,
+            beta_electron: float,
+            NA: float,
+            lamda_1: float,
+            lamda_2: float,
+            alpha_cavity: float,
+            theta_polarization: float = 0
+            ) -> np.ndarray:
+    integral = integrate.quad_vec(A_integrand,
+                                  - 20 * NA2w0(NA, max(lamda_1, lamda_2)),  # ARBITRARY
+                                  z,
+                                  args=(
+                                  x, y, z, t, beta_electron, NA, lamda_1, lamda_2, alpha_cavity, theta_polarization))
+    return integral[0]
 
 
 def average_intensity(A: float, w0: float, k_laser: float,
                       X: [float, np.ndarray], Y: [float, np.ndarray], mode="intensity", is_cavity=True) -> np.ndarray:
     # Calculates the average intensity of a function over a 2D plane
     def integrand(z_tag):
-        return gaussian_beam(X, Y, z_tag, A, w0, k_laser, mode, is_cavity=is_cavity)
+        return gaussian_beam(X, Y, z_tag, A, w0, k_laser, mode=mode, is_cavity=is_cavity)
 
     integral = quad_vec(integrand, -10 * w0, 10 * w0)  # ARBITRARY - CHANGE THAT WHEN POSSIBLE
     return integral[0] / (20 * w0)
@@ -394,7 +464,7 @@ class CavityDoubleFrequencyPropagator(Propagator):
                  A_1: float = 1,
                  A_2: Optional[float] = -1,
                  Na: float = 0.2,
-                 theta_lattice: Optional[float] = None,
+                 alpha_lattice: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
                  theta_polarization: Optional[float] = None):
 
         self.l_1: float = l_1  # Laser's frequency
@@ -406,7 +476,7 @@ class CavityDoubleFrequencyPropagator(Propagator):
             self.A_2: float = A_2
         self.l_2 = l_2
         self.Na: float = Na  # Cavity's numerical aperture
-        self.theta_lattice: float = theta_lattice  # cavity_2f's angle with respect to microscope's x-axis. positive
+        self.alpha_lattice: float = alpha_lattice  # cavity_2f's angle with respect to microscope's x-axis. positive
         # # number means the part of the cavity_2f in the positive x direction is tilted downwards toward the z axis.
         # in the cavity_2f.
         self.theta_polarization: Optional[float] = theta_polarization  # polarization angle of the laser
@@ -415,13 +485,13 @@ class CavityDoubleFrequencyPropagator(Propagator):
         # Gives the phase acquired by a narrow electron beam centered around (x, y) by passing in the cavity_2f.
         # Does not include the relativistic correction.
         # According to equation e_10 and equation gaussian_beam_potential_total_phase in my lyx file
-        if self.theta_lattice is None:
-            theta_lattice = np.arcsin(self.beta_lattice / beta_electron)
+        if self.alpha_lattice is None:
+            alpha_lattice = np.arcsin(self.beta_lattice / beta_electron)
         else:
-            theta_lattice = self.theta_lattice
-            warn("theta_lattice is not None. Using the value given by the user, Note that the calculations assume"
-                 "that the lattice satisfy cos(theta_lattice) = beta_lattice / beta_electron")
-        x_lattice = x / np.cos(theta_lattice)
+            alpha_lattice = self.alpha_lattice
+            warn("alpha_lattice is not None. Using the value given by the user, Note that the calculations assume"
+                 "that the lattice satisfy cos(alpha_lattice) = beta_lattice / beta_electron")
+        x_lattice = x / np.cos(alpha_lattice)
         x_R = x_R_gaussian(self.w_0, self.l)
         w_x = w_x_gaussian(w_0=self.w_0, x=x_lattice, x_R=x_R)
         # The next two lines are based on equation e_11 in my lyx file
@@ -435,7 +505,6 @@ class CavityDoubleFrequencyPropagator(Propagator):
             cosine_squared = 4 * np.cos(4 * np.pi * x_lattice / self.l + gouy_phase) ** 2
             spatial_envelope *= cosine_squared
         return constant_coefficients * spatial_envelope
-
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         phi_0 = self.phi_0(input_wave.coordinates.X_grid, input_wave.coordinates.Y_grid, E2beta(input_wave.E0))
@@ -462,10 +531,10 @@ class CavityDoubleFrequencyPropagator(Propagator):
                            Y_grid: Optional[np.ndarray] = None, beta_electron: Optional[float] = None):
         if phi_0 is None:
             phi_0 = self.phi_0(X_grid, Y_grid, beta_electron)
-        return jv(0, 2 * phi_0*self.rho(beta_electron)) ** 2
+        return jv(0, 2 * phi_0 * self.rho(beta_electron)) ** 2
 
     def rho(self, beta_electron: float):
-        return 1-2*beta_electron**2*np.cos(self.theta_polarization)**2
+        return 1 - 2 * beta_electron ** 2 * np.cos(self.theta_polarization) ** 2
 
     @property
     def w_0(self) -> float:
@@ -524,13 +593,13 @@ class CavityDoubleFrequencyPropagator(Propagator):
 #                  l: float = 532 * 1e-9,
 #                  A: float = 1,
 #                  Na: float = 0.2,
-#                  theta_lattice: float = 0,
+#                  alpha_lattice: float = 0,
 #                  theta_polarization: float = 0,
 #                  relativistic_interaction: bool = True):  # Calculate it manually later):
 #         self.l: float = l  # Laser's frequency
 #         self.A: float = A  # Laser's amplitude
 #         self.Na: float = Na  # Cavity's numerical aperture
-#         self.theta_lattice: float = theta_lattice  # cavity_2f's angle with respect to microscope's x-axis. positive
+#         self.alpha_lattice: float = alpha_lattice  # cavity_2f's angle with respect to microscope's x-axis. positive
 #         # # number means the part of the cavity_2f in the positive x direction is tilted downwards toward the z axis.
 #         # in the cavity_2f.
 #         self.theta_polarization: float = theta_polarization  # polarization angle of the laser
@@ -680,4 +749,3 @@ class LensPropagator(Propagator):
         new_coordinates = CoordinateSystem(new_axes)
         output_wave = WaveFunction(psi_FFT, new_coordinates, input_wave.E0)
         return output_wave
-
