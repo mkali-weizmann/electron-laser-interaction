@@ -1,4 +1,6 @@
 # %%
+from abc import ABC
+
 import numpy as np
 from numpy import pi
 from scipy.integrate import quad_vec
@@ -140,7 +142,8 @@ def gouy_phase_gaussian(x: Union[float, np.ndarray], x_R: Optional[float] = None
 
 
 def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float, np.ndarray],
-                  A, lamda: float, w_0: Optional[float] = None, NA: Optional[float] = None,
+                  E,  # The amplitude of the electric field, not the potential A.
+                  lamda: float, w_0: Optional[float] = None, NA: Optional[float] = None,
                   t: Optional[float, np.ndarray] = None,
                   mode: str = "intensity", is_cavity: bool = True) -> Union[np.ndarray, float]:
     if w_0 is None:
@@ -150,100 +153,38 @@ def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float
     w_x = w_x_gaussian(w_0=w_0, x=x, x_R=x_R)
     gouy_phase = gouy_phase_gaussian(x, x_R)
     k = l2k(lamda)
-    if isinstance(x, float) and x == 0:
-        R_x = 1e10
-    elif isinstance(x, np.ndarray):
-        x_safe = np.where(x == 0, 1e-10, x)  # ARBITRARY
-        R_x = x_safe * (1 + (x_R / x_safe) ** 2)
-    else:
-        R_x = x * (1 + (x_R ** 2 / (x ** 2 + 1e-20)))
-    other_phase = k * x + k * (z ** 2 + y ** 2) / (2 * R_x)
-    envelope = A * (w_0 / w_x) * np.exp(-(z ** 2 + y ** 2) / w_x ** 2)
+    R_x_inverse = x / (x_R ** 2 + x ** 2)
+    other_phase = k * x + k * (z ** 2 + y ** 2) / 2 * R_x_inverse
+    envelope = E * (w_0 / w_x) * np.exp(-(z ** 2 + y ** 2) / w_x ** 2)
 
     if mode == "intensity":
-        if is_cavity:
+        if is_cavity:  # No time dependence
             return envelope ** 2 * 4 * np.cos(other_phase + gouy_phase) ** 2
         else:
             return envelope ** 2
 
-    elif mode == "field":
+    elif mode in ["field", "potential"]:
         total_phase = other_phase - gouy_phase
         if t is not None:
-            time_phase = np.exp(1j * ((C_LIGHT / k) * t))
+            time_phase = np.exp(1j * ((C_LIGHT * k) * t))
         else:
             time_phase = 1
-        if is_cavity:
-            return envelope * np.cos(total_phase) * time_phase
+        if mode == "potential":  # The ratio between E and A in Gibbs gauge is E=w*A or A=E/w
+            potential_factor = 1 / (C_LIGHT * k)  # == omega
         else:
-            return envelope * np.exp(1j * total_phase) * time_phase
+            potential_factor = 1
+        if is_cavity:
+            return envelope * np.cos(total_phase) * time_phase * potential_factor
+        else:
+            return envelope * np.exp(1j * total_phase) * time_phase * potential_factor
 
     elif mode == "phase":
         total_phase = other_phase - gouy_phase
         if t is not None:
-            time_phase = (C_LIGHT / k) * t
+            time_phase = C_LIGHT * k * t
         else:
             time_phase = 0
         return total_phase + time_phase
-
-
-def rotated_gaussian_beam_Az(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float, np.ndarray],
-                             A, lamda: float, alpha_cavity: float, theta_polarization: float,
-                             w_0: Optional[float] = None, NA: Optional[float] = None,
-                             t: Optional[float, np.ndarray] = None, mode: str = "intensity"
-                             ) -> Union[np.ndarray, float]:
-    return gaussian_beam(x * np.cos(alpha_cavity) - z * np.sin(alpha_cavity), y,
-                         x * np.sin(alpha_cavity) + z * np.cos(alpha_cavity), A=A, lamda=lamda, w_0=w_0, t=t, mode=mode
-                         ) * np.cos(theta_polarization)
-
-
-def A_integrand(Z: np.ndarray,
-                x: np.ndarray,
-                y: np.ndarray,
-                z: np.ndarray,
-                t: np.ndarray,
-                beta_electron: float,
-                NA: float,
-                lamda_1: float,
-                lamda_2: float,
-                alpha_cavity: float,
-                theta_polarization: float = 0,
-                ) -> float:
-    T = (Z - z) / (beta_electron * C_LIGHT) + t
-    A1 = rotated_gaussian_beam_Az(x=x, y=y, z=Z, A=1, lamda=lamda_1, alpha_cavity=alpha_cavity,
-                                  theta_polarization=theta_polarization, NA=NA, t=T, mode="field")
-    A2 = rotated_gaussian_beam_Az(x=x, y=y, z=Z, A=1, lamda=lamda_2, alpha_cavity=alpha_cavity,
-                                  theta_polarization=theta_polarization, NA=NA, t=T, mode="field")
-    jacobian = 1 / (beta_electron * C_LIGHT)
-    return (A1 + A2) * jacobian
-
-
-def G_gause(x: np.ndarray,
-            y: np.ndarray,
-            z: np.float,
-            t: np.ndarray,
-            beta_electron: float,
-            NA: float,
-            lamda_1: float,
-            lamda_2: float,
-            alpha_cavity: float,
-            theta_polarization: float = 0
-            ) -> np.ndarray:
-    integral = integrate.quad_vec(A_integrand,
-                                  - 20 * NA2w0(NA, max(lamda_1, lamda_2)),  # ARBITRARY
-                                  z,
-                                  args=(
-                                  x, y, z, t, beta_electron, NA, lamda_1, lamda_2, alpha_cavity, theta_polarization))
-    return integral[0]
-
-
-def average_intensity(A: float, w0: float, k_laser: float,
-                      X: [float, np.ndarray], Y: [float, np.ndarray], mode="intensity", is_cavity=True) -> np.ndarray:
-    # Calculates the average intensity of a function over a 2D plane
-    def integrand(z_tag):
-        return gaussian_beam(X, Y, z_tag, A, w0, k_laser, mode=mode, is_cavity=is_cavity)
-
-    integral = quad_vec(integrand, -10 * w0, 10 * w0)  # ARBITRARY - CHANGE THAT WHEN POSSIBLE
-    return integral[0] / (20 * w0)
 
 
 def ASPW_propagation(U_z0: np.ndarray, dxdydz: tuple[float, ...], k: float) -> np.ndarray:
@@ -457,94 +398,39 @@ class Microscope:
         plt.show()
 
 
-class CavityDoubleFrequencyPropagator(Propagator):
+class Cavity2FrequenciesPropagator(Propagator):
     def __init__(self,
                  l_1: float = 1064 * 1e-9,
                  l_2: Optional[float] = 532 * 1e-9,
-                 A_1: float = 1,
-                 A_2: Optional[float] = -1,
-                 Na: float = 0.2,
-                 alpha_lattice: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
+                 E_1: float = 1,
+                 E_2: Optional[float] = -1,
+                 NA: float = 0.2,
+                 alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
                  theta_polarization: Optional[float] = None):
 
         self.l_1: float = l_1  # Laser's frequency
-        self.A_1: float = A_1  # Laser's amplitude
-        if A_2 == -1:  # -1 means that the second laser is defined by the condition for equal amplitudes in the
-            # lattices' frame
-            self.A_2: float = A_1 * (l_1 / l_2)
+        self.E_1: float = E_1  # Laser's amplitude
+        if E_2 == -1:
+            # -1 means that the second laser is defined by the condition for equal amplitudes in the lattices' frame
+            self.E_2: float = E_1 * (l_1 / l_2)
         else:
-            self.A_2: float = A_2
+            self.E_2: float = E_2
         self.l_2 = l_2
-        self.Na: float = Na  # Cavity's numerical aperture
-        self.alpha_lattice: float = alpha_lattice  # cavity_2f's angle with respect to microscope's x-axis. positive
+        self.NA: float = NA  # Cavity's numerical aperture
+        self.alpha_cavity: float = alpha_cavity  # cavity_2f's angle with respect to microscope's x-axis. positive
         # # number means the part of the cavity_2f in the positive x direction is tilted downwards toward the z axis.
         # in the cavity_2f.
         self.theta_polarization: Optional[float] = theta_polarization  # polarization angle of the laser
-
-    def phi_0(self, x: np.ndarray, y: np.ndarray, beta_electron: float) -> np.ndarray:
-        # Gives the phase acquired by a narrow electron beam centered around (x, y) by passing in the cavity_2f.
-        # Does not include the relativistic correction.
-        # According to equation e_10 and equation gaussian_beam_potential_total_phase in my lyx file
-        if self.alpha_lattice is None:
-            alpha_lattice = np.arcsin(self.beta_lattice / beta_electron)
-        else:
-            alpha_lattice = self.alpha_lattice
-            warn("alpha_lattice is not None. Using the value given by the user, Note that the calculations assume"
-                 "that the lattice satisfy cos(alpha_lattice) = beta_lattice / beta_electron")
-        x_lattice = x / np.cos(alpha_lattice)
-        x_R = x_R_gaussian(self.w_0, self.l)
-        w_x = w_x_gaussian(w_0=self.w_0, x=x_lattice, x_R=x_R)
-        # The next two lines are based on equation e_11 in my lyx file
-        constant_coefficients = (E_CHARGE ** 2 * self.w_0 ** 2 * np.sqrt(pi) * self.A ** 2) / \
-                                (H_BAR * 4 * np.sqrt(2) * M_ELECTRON * C_LIGHT * beta_electron * beta2gamma(
-                                    beta_electron))
-        spatial_envelope = np.exp(  # Shouldn't be here a w_0 term? No! it is in the previous term.
-            np.clip(-2 * y ** 2 / w_x ** 2, a_min=-500, a_max=None)) / w_x  # ARBITRARY CLIPPING FOR STABILITY
-        if self.A_2 is None:  # For the case of a single laser, add the spatial cosine
-            gouy_phase = gouy_phase_gaussian(x_lattice, x_R, self.w_0)
-            cosine_squared = 4 * np.cos(4 * np.pi * x_lattice / self.l + gouy_phase) ** 2
-            spatial_envelope *= cosine_squared
-        return constant_coefficients * spatial_envelope
-
-    def propagate(self, input_wave: WaveFunction) -> WaveFunction:
-        phi_0 = self.phi_0(input_wave.coordinates.X_grid, input_wave.coordinates.Y_grid, E2beta(input_wave.E0))
-        phase_shift = self.phase_shift(phi_0)
-        if self.A_2 is not None:  # For the case of a double laser:
-            attenuation_factor = self.attenuation_factor(phi_0)
-        else:
-            attenuation_factor = 1
-        output_wave = input_wave.psi * np.exp(-1j * phase_shift) * attenuation_factor  # ARBITRARY ARBITRARY - I FIXED
-        # A SIGN MISTAKE BY ADDING A SIGN
-        return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
-
-    def phase_shift(self, phi_0: Optional[np.ndarray] = None, X_grid: Optional[np.ndarray] = None,
-                    Y_grid: Optional[np.ndarray] = None, beta_electron: Optional[float] = None):
-        if phi_0 is None:
-            phi_0 = self.phi_0(X_grid, Y_grid, beta_electron)
-        if self.A_2 is not None:  # For the case of a double laser:
-            return phi_0 * (2 + (self.Gamma_plus / self.Gamma_minus) ** 2 +
-                            (self.Gamma_minus / self.Gamma_plus) ** 2)
-        else:
-            return phi_0
-
-    def attenuation_factor(self, phi_0: Optional[np.ndarray] = None, X_grid: Optional[np.ndarray] = None,
-                           Y_grid: Optional[np.ndarray] = None, beta_electron: Optional[float] = None):
-        if phi_0 is None:
-            phi_0 = self.phi_0(X_grid, Y_grid, beta_electron)
-        return jv(0, 2 * phi_0 * self.rho(beta_electron)) ** 2
-
-    def rho(self, beta_electron: float):
-        return 1 - 2 * beta_electron ** 2 * np.cos(self.theta_polarization) ** 2
 
     @property
     def w_0(self) -> float:
         # The width of the gaussian beam of the first laser
         # based on https://en.wikipedia.org/wiki/Gaussian_beam
-        return self.l / (pi * np.arcsin(self.Na))
+        return self.l / (pi * np.arcsin(self.NA))
 
     @property
     def beta_lattice(self) -> float:
-        if self.A_2 is not None:
+        if self.E_2 is not None:
             return (self.l_1 - self.l_2) / (self.l_1 + self.l_2)
         else:
             return 0
@@ -561,10 +447,10 @@ class CavityDoubleFrequencyPropagator(Propagator):
     def A(self) -> float:
         # The effective amplitude of the lattice in the moving frame. in case of a single frequency that is just the
         # amplitude of the first laser.
-        if self.A_2 is None:
-            return self.A_1
+        if self.E_2 is None:
+            return self.E_1
         else:
-            return self.A_1 * self.Gamma_plus
+            return self.E_1 * self.Gamma_plus
 
     @property
     def l(self) -> float:
@@ -577,71 +463,143 @@ class CavityDoubleFrequencyPropagator(Propagator):
 
     @property
     def A_plus(self) -> float:
-        return self.A_2 * self.Gamma_plus
+        return self.E_2 * self.Gamma_plus
 
     @property
     def A_minus(self) -> float:
-        return self.A_1 * self.Gamma_minus
+        return self.E_1 * self.Gamma_minus
 
     @property
     def k(self) -> float:
         return l2k(self.l)
 
 
-# class CavityPropagator(Propagator):
-#     def __init__(self,
-#                  l: float = 532 * 1e-9,
-#                  A: float = 1,
-#                  Na: float = 0.2,
-#                  alpha_lattice: float = 0,
-#                  theta_polarization: float = 0,
-#                  relativistic_interaction: bool = True):  # Calculate it manually later):
-#         self.l: float = l  # Laser's frequency
-#         self.A: float = A  # Laser's amplitude
-#         self.Na: float = Na  # Cavity's numerical aperture
-#         self.alpha_lattice: float = alpha_lattice  # cavity_2f's angle with respect to microscope's x-axis. positive
-#         # # number means the part of the cavity_2f in the positive x direction is tilted downwards toward the z axis.
-#         # in the cavity_2f.
-#         self.theta_polarization: float = theta_polarization  # polarization angle of the laser
-#         self.relativistic_interaction: bool = relativistic_interaction
-#
-#     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
-#         potential = self.generate_ponderomotive_potential(input_wave.coordinates.grids,
-#                                                           beta_electron=E2beta(input_wave.E0))
-#         output_wave = propagate_through_potential_slice(input_wave.psi, potential, dz=self.w0 * 3,  # ARBITRARY,
-#                                                         E0=input_wave.E0)  # Change dz
-#         amplitude_reduction_factor = jv(0, potential)
-#         output_wave *= amplitude_reduction_factor
-#         return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
-#
-#     @property
-#     def w0(self) -> float:
-#         # The width of the gaussian beam of the first laser
-#         return self.l / (pi * np.arcsin(self.Na))
-#
-#     def w_x(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-#         # The width of the gaussian beam
-#         return self.w0 * np.sqrt(1 + (x / self.w0) ** 2)
-#
-#     def generate_ponderomotive_potential(self, grids, beta_electron: Optional[float] = None):
-#         X, Y = grids[0], grids[1]
-#         if beta_electron is None and self.theta_polarization is None:  # For the non-relativistic case
-#             coefficient = -E_CHARGE ** 2 / (4 * M_ELECTRON * l2w(self.l) ** 2)
-#             potential = coefficient * average_intensity(A=self.A, w0=self.w0, k_laser=l2k(self.l), X=X, Y=Y,
-#                                                         mode='intensity', is_cavity=True)
-#         elif beta_electron is not None and self.theta_polarization is not None:  # For the relativistic case
-#             rho = 1 - 2 * beta_electron ** 2 * (np.cos(self.theta_polarization)) ** 2
-#             # envelope_squared_summed = average_intensity(A=self.A, w_0=self.w_0, k_laser=l2k(self.l), X=X, Y=Y,
-#             #                                             mode='intensity', is_cavity=False)
-#             envelope_squared_summed = E_CHARGE ** 2 * np.sqrt(pi) * self.A ** 2 * self.w0 ** 2 / (
-#                     4 * M_ELECTRON * C_LIGHT * beta_electron * beta2gamma(beta_electron) * np.sqrt(2))
-#             spatial_cosine = np.cos(2 * l2k(self.l) * X)
-#             constants = E_CHARGE ** 2 / (4 * M_ELECTRON * beta2gamma(beta_electron))
-#             potential = (1 / 2) * constants * envelope_squared_summed * (1 + rho * spatial_cosine)
-#         else:
-#             raise ValueError("input both beta_lattice and gamma_lattice for the relativistic case or neither for"
-#                              "the non-relativistic case")
-#         return potential
+class Cavity2FrequenciesAnalyticalPropagator(Cavity2FrequenciesPropagator):
+    def __init__(self,
+                 l_1: float = 1064 * 1e-9,
+                 l_2: Optional[float] = 532 * 1e-9,
+                 E_1: float = 1,
+                 E_2: Optional[float] = -1,
+                 NA: float = 0.2,
+                 alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
+                 theta_polarization: Optional[float] = None):
+
+        super().__init__(l_1, l_2, E_1, E_2, NA, alpha_cavity, theta_polarization)
+
+    def phi_0(self, x: np.ndarray, y: np.ndarray, beta_electron: float) -> np.ndarray:
+        # Gives the phase acquired by a narrow electron beam centered around (x, y) by passing in the cavity_2f.
+        # Does not include the relativistic correction.
+        # According to equation e_10 and equation gaussian_beam_potential_total_phase in my lyx file
+        if self.alpha_cavity is None:
+            alpha_lattice = np.arcsin(self.beta_lattice / beta_electron)
+        else:
+            alpha_lattice = self.alpha_cavity
+            warn("alpha_cavity is not None. Using the value given by the user, Note that the calculations assume"
+                 "that the lattice satisfy cos(alpha_cavity) = beta_lattice / beta_electron")
+        x_lattice = x / np.cos(alpha_lattice)
+        x_R = x_R_gaussian(self.w_0, self.l)
+        w_x = w_x_gaussian(w_0=self.w_0, x=x_lattice, x_R=x_R)
+        # The next two lines are based on equation e_11 in my lyx file
+        constant_coefficients = (E_CHARGE ** 2 * self.w_0 ** 2 * np.sqrt(pi) * self.A ** 2) / \
+                                (H_BAR * 4 * np.sqrt(2) * M_ELECTRON * C_LIGHT * beta_electron * beta2gamma(
+                                    beta_electron))
+        spatial_envelope = np.exp(  # Shouldn't be here a w_0 term? No! it is in the previous term.
+            np.clip(-2 * y ** 2 / w_x ** 2, a_min=-500, a_max=None)) / w_x  # ARBITRARY CLIPPING FOR STABILITY
+        if self.E_2 is None:  # For the case of a single laser, add the spatial cosine
+            gouy_phase = gouy_phase_gaussian(x_lattice, x_R, self.w_0)
+            cosine_squared = 4 * np.cos(4 * np.pi * x_lattice / self.l + gouy_phase) ** 2
+            spatial_envelope *= cosine_squared
+        return constant_coefficients * spatial_envelope
+
+    def propagate(self, input_wave: WaveFunction) -> WaveFunction:
+        phi_0 = self.phi_0(input_wave.coordinates.X_grid, input_wave.coordinates.Y_grid, E2beta(input_wave.E0))
+        phase_shift = self.phase_shift(phi_0)
+        if self.E_2 is not None:  # For the case of a double laser:
+            attenuation_factor = self.attenuation_factor(phi_0)
+        else:
+            attenuation_factor = 1
+        output_wave = input_wave.psi * np.exp(-1j * phase_shift) * attenuation_factor  # ARBITRARY ARBITRARY - I FIXED
+        # A SIGN MISTAKE BY ADDING A SIGN
+        return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
+
+    def phase_shift(self, phi_0: Optional[np.ndarray] = None, X_grid: Optional[np.ndarray] = None,
+                    Y_grid: Optional[np.ndarray] = None, beta_electron: Optional[float] = None):
+        if phi_0 is None:
+            phi_0 = self.phi_0(X_grid, Y_grid, beta_electron)
+        if self.E_2 is not None:  # For the case of a double laser:
+            return phi_0 * (2 + (self.Gamma_plus / self.Gamma_minus) ** 2 +
+                            (self.Gamma_minus / self.Gamma_plus) ** 2)
+        else:
+            return phi_0
+
+    def attenuation_factor(self, phi_0: Optional[np.ndarray] = None, X_grid: Optional[np.ndarray] = None,
+                           Y_grid: Optional[np.ndarray] = None, beta_electron: Optional[float] = None):
+        if phi_0 is None:
+            phi_0 = self.phi_0(X_grid, Y_grid, beta_electron)
+        return jv(0, 2 * phi_0 * self.rho(beta_electron)) ** 2
+
+    def rho(self, beta_electron: float):
+        return 1 - 2 * beta_electron ** 2 * np.cos(self.theta_polarization) ** 2
+
+
+class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
+    def __init__(self,
+                 l_1: float = 1064 * 1e-9,
+                 l_2: Optional[float] = 532 * 1e-9,
+                 E_1: float = 1,
+                 E_2: Optional[float] = -1,
+                 NA: float = 0.2,
+                 alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
+                 theta_polarization: Optional[float] = None):
+        super().__init__(l_1, l_2, E_1, E_2, NA, alpha_cavity, theta_polarization)
+
+    def rotated_gaussian_beam_Az(self,
+                                 x: [float, np.ndarray],
+                                 y: [float, np.ndarray],
+                                 z: Union[float, np.ndarray],
+                                 t: [float, np.ndarray]) -> Union[np.ndarray, float]:
+
+        x_tilde = x * np.cos(self.alpha_cavity) - z * np.sin(self.alpha_cavity)
+        z_tilde = x * np.sin(self.alpha_cavity) + z * np.cos(self.alpha_cavity)
+        polarization_factor =  np.cos(self.theta_polarization)
+
+        A_1 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_1, lamda=self.l_1, NA=self.NA, t=t,
+                            mode="potential") * polarization_factor
+        A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_2, lamda=self.l_2, NA=self.NA, t=t,
+                            mode="potential") * polarization_factor
+        return A_1 + A_2
+
+    def A_integrand(self, T: np.ndarray,  # Here Z is the integral variable because of equation e_24 in my Lyx file.
+                    x: [float, np.ndarray],
+                    y: [float, np.ndarray],
+                    z: [float, np.ndarray],
+                    t: [float, np.ndarray],
+                    beta_electron: float
+                    ) -> float:
+        T = (Z - z) / (beta_electron * C_LIGHT) + t
+        A_z_rotated = self.rotated_gaussian_beam_Az(x=x, y=y, z=Z, t=T)  # Only the z component of A
+        jacobian = 1 / (beta_electron * C_LIGHT)  # Because we changed from T as an integrand to Z as an integrand
+        return A_z_rotated * jacobian
+
+    def G_gause(self,
+                x: [float, np.ndarray],
+                y: [float, np.ndarray],
+                z: float,
+                t: [float, np.ndarray],
+                beta_electron: float,
+                ) -> np.ndarray:
+        integral = integrate.quad_vec(self.A_integrand,
+                                      - 20 * NA2w0(self.NA, max(self.l_1, self.l_2)),  # ARBITRARY
+                                      z,
+                                      args=(
+                                          x, y, z, t, beta_electron))
+        return integral[0]
+
+
+    def generate_G_lattice
+
+
+
 
 
 class SamplePropagator(Propagator):
