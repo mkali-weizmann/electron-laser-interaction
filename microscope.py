@@ -605,10 +605,12 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                 ) -> np.ndarray:
 
         G = np.zeros_like(A_lattice)
-        for k in np.arange(-(A_lattice.shape[-2] - 1), A_lattice.shape[-1]):
+        for k in np.arange(0, A_lattice.shape[-1]):
             z_indices = np.arange(-min([0, k]), min([A_lattice.shape[-1] - k, A_lattice.shape[-2]]))
             t_indices = z_indices + k
             G[:, :, z_indices, t_indices] = np.cumsum(A_lattice[:, :, z_indices, t_indices], axis=-1)
+        # Skip first elements that where computed using partial diagonals only
+        G = G[:, :, :, G.shape[2]:]
         return G
 
     def phi_integrand(self,
