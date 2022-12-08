@@ -595,23 +595,32 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                            ):
         dt = (z[1] - z[0]) / (C_LIGHT * beta_electron)
         n_t_with_len_z_padding = n_t + 2 * len(z)  # MAKE SURE THERE SHOULDN'T BE A +1 HERE
-        t = np.linspace(0, n_t_with_len_z_padding * dt, n_t_with_len_z_padding)
+        t = np.linspace(t_0, n_t_with_len_z_padding * dt + t_0, n_t_with_len_z_padding)
         X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
         A_lattice = self.rotated_gaussian_beam_Az(X, Y, Z, T)
         return A_lattice
 
-    def G_gauge(self,
-                A_lattice
-                ) -> np.ndarray:
 
-        G = np.zeros_like(A_lattice)
-        for k in np.arange(0, A_lattice.shape[-1]):
-            z_indices = np.arange(-min([0, k]), min([A_lattice.shape[-1] - k, A_lattice.shape[-2]]))
-            t_indices = z_indices + k
-            G[:, :, z_indices, t_indices] = np.cumsum(A_lattice[:, :, z_indices, t_indices], axis=-1)
-        # Skip first elements that where computed using partial diagonals only
-        G = G[:, :, :, G.shape[2]:]
-        return G
+    def shift_A(self, A: np.ndarray):
+        # Accept a 4D array with the (i, j, k, l) element corresponding to the A at (x_i, y_j, z_k, t_l)
+        # And returns a 4D array with the (i, j, k, l) element corresponding to the A at (x_i, y_j, z_k, t_(l+k))
+        # While ommiting columns that don't span the whole time grid (because some diagonals are chopped).
+        # This array corresponds to the values A takes in different x, y, z positions, at the time the electron was in
+        # those positions (so that after stepping in z, we also increase the time by the time it took the electron to
+        # travel that distance).
+        r = np.mod(np.arange(0, -A.shape[-2], -1), A.shape[-1])
+        x_idx, y_idx, z_idx, t_idx = np.ogrid[:A.shape[0], :A.shape[1], :A.shape[2], :A.shape[3]]
+        shifted_t_idx = t_idx - r[:, np.newaxis]
+        shifted_t_idx_mod = np.mod(shifted_t_idx, A.shape[-1])
+        A_shifted = A[x_idx, y_idx, z_idx, shifted_t_idx_mod]
+        A_shifted_full_diagonals = A_shifted[:, :, :, 0:(A.shape[-1] - A.shape[-2] + 1)]
+        return A_shifted_full_diagonals
+
+    def G_gauge(self,
+                A_shifted: np.ndarray,
+                ) -> np.ndarray:
+        return np.cumsum(A_shifted, axis=-2)
+
 
     def phi_integrand(self,
                       x: [float, np.ndarray],
@@ -621,7 +630,8 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                       n_t: int = 0,
                       t_0: float = 0):
         A_z = self.generate_A_lattice(x, y, z, beta_electron, n_t, t_0)
-        G = self.G_gauge(A_z)
+        A_shifted = self.shift_A(A_z)
+        G = self.G_gauge(A_shifted)
         dG_dx = np.gradient(G, x[1] - x[0], axis=0)
         if self.theta_polarization == pi / 2:
             raise NotImplementedError("The case of theta_polarization = pi/2 is not implemented yet")
