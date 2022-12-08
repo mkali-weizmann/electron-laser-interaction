@@ -429,6 +429,11 @@ class Cavity2FrequenciesPropagator(Propagator):
         return self.l / (pi * np.arcsin(self.NA))
 
     @property
+    def w_0_min(self) -> float:
+
+        return min((self.l_1, self.l_2)) / (pi * np.arcsin(self.NA))
+
+    @property  # The velocity at which the standing wave is propagaing
     def beta_lattice(self) -> float:
         if self.E_2 is not None:
             return (self.l_1 - self.l_2) / (self.l_1 + self.l_2)
@@ -558,10 +563,9 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                                  y: [float, np.ndarray],
                                  z: Union[float, np.ndarray],
                                  t: [float, np.ndarray]) -> Union[np.ndarray, float]:
-
         x_tilde = x * np.cos(self.alpha_cavity) - z * np.sin(self.alpha_cavity)
         z_tilde = x * np.sin(self.alpha_cavity) + z * np.cos(self.alpha_cavity)
-        polarization_factor =  np.cos(self.theta_polarization)
+        polarization_factor = np.cos(self.theta_polarization)
 
         A_1 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_1, lamda=self.l_1, NA=self.NA, t=t,
                             mode="potential") * polarization_factor
@@ -569,37 +573,65 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                             mode="potential") * polarization_factor
         return A_1 + A_2
 
-    def A_integrand(self, T: np.ndarray,  # Here Z is the integral variable because of equation e_24 in my Lyx file.
+    def A_integrand(self, Z: np.ndarray,
                     x: [float, np.ndarray],
                     y: [float, np.ndarray],
                     z: [float, np.ndarray],
                     t: [float, np.ndarray],
                     beta_electron: float
                     ) -> float:
-        T = (Z - z) / (beta_electron * C_LIGHT) + t
+        T = (Z - z) / (C_LIGHT * beta_electron) + t
         A_z_rotated = self.rotated_gaussian_beam_Az(x=x, y=y, z=Z, t=T)  # Only the z component of A
-        jacobian = 1 / (beta_electron * C_LIGHT)  # Because we changed from T as an integrand to Z as an integrand
-        return A_z_rotated * jacobian
+        return A_z_rotated
 
-    def G_gause(self,
-                x: [float, np.ndarray],
-                y: [float, np.ndarray],
-                z: float,
-                t: [float, np.ndarray],
-                beta_electron: float,
+    def generate_A_lattice(self,
+                           x: [float, np.ndarray],
+                           y: [float, np.ndarray],
+                           z: [float, np.ndarray],
+                           beta_electron: float,
+                           n_t: int = 0,
+                           # number of extra columns in the time grid, will be in intervals of dz / (beta*c)
+                           t_0: float = 0,
+                           ):
+        dt = (z[1] - z[0]) / (C_LIGHT * beta_electron)
+        n_t_with_len_z_padding = n_t + 2 * len(z)  # MAKE SURE THERE SHOULDN'T BE A +1 HERE
+        t = np.linspace(0, n_t_with_len_z_padding * dt, n_t_with_len_z_padding)
+        X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
+        A_lattice = self.rotated_gaussian_beam_Az(X, Y, Z, T)
+        return A_lattice
+
+    def G_gauge(self,
+                A_lattice
                 ) -> np.ndarray:
-        integral = integrate.quad_vec(self.A_integrand,
-                                      - 20 * NA2w0(self.NA, max(self.l_1, self.l_2)),  # ARBITRARY
-                                      z,
-                                      args=(
-                                          x, y, z, t, beta_electron))
-        return integral[0]
 
+        G = np.zeros_like(A_lattice)
+        for k in np.arange(-(A_lattice.shape[-2] - 1), A_lattice.shape[-1]):
+            z_indices = np.arange(-min([0, k]), min([A_lattice.shape[-1] - k, A_lattice.shape[-2]]))
+            t_indices = z_indices + k
+            G[:, :, z_indices, t_indices] = np.cumsum(A_lattice[:, :, z_indices, t_indices], axis=-1)
+        return G
 
-    def generate_G_lattice
+    def phi_integrand(self,
+                      x: [float, np.ndarray],
+                      y: [float, np.ndarray],
+                      z: [float, np.ndarray],
+                      beta_electron: float,
+                      n_t: int = 0,
+                      t_0: float = 0):
+        A_z = self.generate_A_lattice(x, y, z, beta_electron, n_t, t_0)
+        G = self.G_gauge(A_z)
+        dG_dx = np.gradient(G, x[1] - x[0], axis=0)
+        if self.theta_polarization == pi / 2:
+            raise NotImplementedError("The case of theta_polarization = pi/2 is not implemented yet")
+        A_y = A_z * np.tan(self.theta_polarization)
 
+        return - 1 / H_BAR * E_CHARGE ** 2 / 2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT * \
+               (A_y ** 2 + (1 - beta_electron ** 2) * A_z ** 2 + dG_dx ** 2)
 
-
+    def phi_0(self, x: np.ndarray, y: np.ndarray, beta_electron: float, n_t: int = 0, t_0: float = 0):
+        z = np.linspace(-20 * self.w_0_min, 20 * self.w_0_min, 1000)
+        phi_integrand = self.phi_integrand(x, y, z, beta_electron, n_t=n_t, t_0=t_0)
+        return np.trapz(phi_integrand, z, axis=2)
 
 
 class SamplePropagator(Propagator):
