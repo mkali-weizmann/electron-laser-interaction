@@ -141,7 +141,6 @@ def gouy_phase_gaussian(x: Union[float, np.ndarray], x_R: Optional[float] = None
     return np.arctan(x / x_R)
 
 
-
 def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float, np.ndarray],
                   E,  # The amplitude of the electric field, not the potential A.
                   lamda: float, w_0: Optional[float] = None, NA: Optional[float] = None,
@@ -479,6 +478,10 @@ class Cavity2FrequenciesPropagator(Propagator):
     def k(self) -> float:
         return l2k(self.l)
 
+    @property
+    def min_l(self):
+        return min(self.l_1, self.l_2)
+
 
 class Cavity2FrequenciesAnalyticalPropagator(Cavity2FrequenciesPropagator):
     def __init__(self,
@@ -559,7 +562,16 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                  theta_polarization: Optional[float] = None):
         super().__init__(l_1, l_2, E_1, E_2, NA, alpha_cavity, theta_polarization)
 
-    def rotated_gaussian_beam_Az(self,
+    def propagate(self, input_wave: WaveFunction) -> WaveFunction:
+        w = l2w(self.min_l)
+        t = np.linspace(0, 6*pi / w, 1000)  # ARBITRARY
+        phi_values = self.phi(input_wave.coordinates.X_grid, input_wave.coordinates.Y_grid, t, E2beta(input_wave.E0))
+        zeroth_order_energy_level = self.extract_0_energy_level_amplitude(phi_values)
+        output_wave = input_wave.psi * np.exp(1j * phi_values) * zeroth_order_energy_level
+        return output_wave
+
+
+    def rotated_gaussian_beam_A(self,
                                  x: [float, np.ndarray],
                                  y: [float, np.ndarray],
                                  z: Union[float, np.ndarray],
@@ -569,21 +581,10 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
         polarization_factor = np.cos(self.theta_polarization)
 
         A_1 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_1, lamda=self.l_1, NA=self.NA, t=t,
-                            mode="potential") * polarization_factor
+                            mode="potential")
         A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_2, lamda=self.l_2, NA=self.NA, t=t,
-                            mode="potential") * polarization_factor
+                            mode="potential")
         return A_1 + A_2
-
-    def A_integrand(self, Z: np.ndarray,
-                    x: [float, np.ndarray],
-                    y: [float, np.ndarray],
-                    z: [float, np.ndarray],
-                    t: [float, np.ndarray],
-                    beta_electron: float
-                    ) -> float:
-        T = (Z - z) / (C_LIGHT * beta_electron) + t
-        A_z_rotated = self.rotated_gaussian_beam_Az(x=x, y=y, z=Z, t=T)  # Only the z component of A
-        return A_z_rotated
 
     def generate_A_lattice(self,
                            x: [float, np.ndarray],
@@ -594,10 +595,10 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                            ):
         # This is not the Gaussian beam at x, y, z, t, but the Gaussian beam at x, y, z, t + z/(beta*c)
         X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
-        T += Z / (C_LIGHT * beta_electron) # This makes T be the time of the electron that passed through z_0 at time T
+        T += Z / (C_LIGHT * beta_electron)  # This makes T be the time of the electron that passed through z_0 at time T
         # and then got to Z after extra Z / (beta * c) time.
 
-        A_lattice = self.rotated_gaussian_beam_Az(X, Y, Z, T)
+        A_lattice = self.rotated_gaussian_beam_A(X, Y, Z, T)
         return A_lattice
 
     def G_gauge(self,
@@ -611,20 +612,27 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                       z: [float, np.ndarray],
                       t: [float, np.ndarray],
                       beta_electron: float):
+        # Without the prefactors, this is the integrand of the integral over z of the phase shift.
         A_z = self.generate_A_lattice(x, y, z, t, beta_electron)
         G = self.G_gauge(A_z)
         dG_dx = np.gradient(G, x[1] - x[0], axis=0)
         if self.theta_polarization == pi / 2:
             raise NotImplementedError("The case of theta_polarization = pi/2 is not implemented yet")
         A_y = A_z * np.tan(self.theta_polarization)
+        return A_y ** 2 + (1 - beta_electron ** 2) * A_z ** 2 + dG_dx ** 2
 
-        return - 1 / H_BAR * E_CHARGE ** 2 / 2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT * \
-               (A_y ** 2 + (1 - beta_electron ** 2) * A_z ** 2 + dG_dx ** 2)
-
-    def phi_0(self, x: np.ndarray, y: np.ndarray, beta_electron: float, n_t: int = 0, t_0: float = 0):
+    def phi(self, x: np.ndarray, y: np.ndarray, t: np.ndarray, beta_electron: float):
         z = np.linspace(-20 * self.w_0_min, 20 * self.w_0_min, 1000)
-        phi_integrand = self.phi_integrand(x, y, z, beta_electron, n_t=n_t, t_0=t_0)
-        return np.trapz(phi_integrand, z, axis=2)
+        phi_integrand = self.phi_integrand(x, y, z, t, beta_electron)
+        prefactor = - 1 / H_BAR * E_CHARGE ** 2 / 2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT
+        return np.trapz(phi_integrand, dx= z[1] - z[0], axis=2) * prefactor
+
+    def extract_0_energy_level_amplitude(self, phi_values: np.ndarray):
+        phase_factor = np.exp(1j * phi_values)
+        energy_bands = np.fft.fft(phase_factor, axis=-1)
+        energy_bands_normed = np.abs(energy_bands) ** 2 / np.sum(np.abs(energy_bands) ** 2, axis=2, keepdims=True)
+        zeroth_order_energy_level = np.sum(energy_bands_normed[:, :, [0, 1, -1]], axis=2)  # ARBITRARY
+        return zeroth_order_energy_level
 
 
 class SamplePropagator(Propagator):
