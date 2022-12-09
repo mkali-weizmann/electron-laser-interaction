@@ -141,6 +141,7 @@ def gouy_phase_gaussian(x: Union[float, np.ndarray], x_R: Optional[float] = None
     return np.arctan(x / x_R)
 
 
+
 def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float, np.ndarray],
                   E,  # The amplitude of the electric field, not the potential A.
                   lamda: float, w_0: Optional[float] = None, NA: Optional[float] = None,
@@ -588,50 +589,30 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                            x: [float, np.ndarray],
                            y: [float, np.ndarray],
                            z: [float, np.ndarray],
+                           t: [float, np.ndarray],
                            beta_electron: float,
-                           n_t: int = 0,
-                           # number of extra columns in the time grid, will be in intervals of dz / (beta*c)
-                           t_0: float = 0,
                            ):
-        dt = (z[1] - z[0]) / (C_LIGHT * beta_electron)
-        n_t_with_len_z_padding = n_t + 2 * len(z)  # MAKE SURE THERE SHOULDN'T BE A +1 HERE
-        t = np.linspace(t_0, n_t_with_len_z_padding * dt + t_0, n_t_with_len_z_padding)
+        # This is not the Gaussian beam at x, y, z, t, but the Gaussian beam at x, y, z, t + z/(beta*c)
         X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
+        T += Z / (C_LIGHT * beta_electron) # This makes T be the time of the electron that passed through z_0 at time T
+        # and then got to Z after extra Z / (beta * c) time.
+
         A_lattice = self.rotated_gaussian_beam_Az(X, Y, Z, T)
         return A_lattice
-
-
-    def shift_A(self, A: np.ndarray):
-        # Accept a 4D array with the (i, j, k, l) element corresponding to the A at (x_i, y_j, z_k, t_l)
-        # And returns a 4D array with the (i, j, k, l) element corresponding to the A at (x_i, y_j, z_k, t_(l+k))
-        # While ommiting columns that don't span the whole time grid (because some diagonals are chopped).
-        # This array corresponds to the values A takes in different x, y, z positions, at the time the electron was in
-        # those positions (so that after stepping in z, we also increase the time by the time it took the electron to
-        # travel that distance).
-        r = np.mod(np.arange(0, -A.shape[-2], -1), A.shape[-1])
-        x_idx, y_idx, z_idx, t_idx = np.ogrid[:A.shape[0], :A.shape[1], :A.shape[2], :A.shape[3]]
-        shifted_t_idx = t_idx - r[:, np.newaxis]
-        shifted_t_idx_mod = np.mod(shifted_t_idx, A.shape[-1])
-        A_shifted = A[x_idx, y_idx, z_idx, shifted_t_idx_mod]
-        A_shifted_full_diagonals = A_shifted[:, :, :, 0:(A.shape[-1] - A.shape[-2] + 1)]
-        return A_shifted_full_diagonals
 
     def G_gauge(self,
                 A_shifted: np.ndarray,
                 ) -> np.ndarray:
-        return np.cumsum(A_shifted, axis=-2)
-
+        return np.cumsum(A_shifted, axis=2)
 
     def phi_integrand(self,
                       x: [float, np.ndarray],
                       y: [float, np.ndarray],
                       z: [float, np.ndarray],
-                      beta_electron: float,
-                      n_t: int = 0,
-                      t_0: float = 0):
-        A_z = self.generate_A_lattice(x, y, z, beta_electron, n_t, t_0)
-        A_shifted = self.shift_A(A_z)
-        G = self.G_gauge(A_shifted)
+                      t: [float, np.ndarray],
+                      beta_electron: float):
+        A_z = self.generate_A_lattice(x, y, z, t, beta_electron)
+        G = self.G_gauge(A_z)
         dG_dx = np.gradient(G, x[1] - x[0], axis=0)
         if self.theta_polarization == pi / 2:
             raise NotImplementedError("The case of theta_polarization = pi/2 is not implemented yet")
