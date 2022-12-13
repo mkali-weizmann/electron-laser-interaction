@@ -77,7 +77,8 @@ def G_integral(x, y, z, t):
 
 
 def s(t, n=1000):
-    return np.linspace(min([t_z(-16 * w_0), t - t_z(16 * w_0)]), t, n)
+    # min([t_z(-20 * w_0),
+    return np.linspace(t - t_z(20 * w_0), t, n)
 
 
 def G_discrete_integral(x, y, z, t):
@@ -120,96 +121,123 @@ def G_mine(x, y, z, t):
     return beta * C_LIGHT / omega_l * I_values * y_envelope
 
 
+# def phi(G_function, x, y, t, z_boundaries: Tuple[float, float], n=1000):
+#     z = np.linspace(z_boundaries[0], z_boundaries[1], n)
+#
+#     return
+
 def z_for_loop(x, y, z, t, func):
     results_array = np.zeros_like(z)
-    for i in range(len(z)):
-        results_array[i] = func(x, y, z[i], t)
+    if isinstance(t, float):
+        for i in range(len(z)):
+            results_array[i] = func(x, y, z[i], t)
+    else:
+        for i in range(len(z)):
+            results_array[i] = func(x, y, z[i], t[i])
     return results_array
 
 
 # %%
 # z_array = np.linspace(-5*w_0, 5*w_0, 100)
 
-N = 10000
-results_array = np.zeros((N, 5))
-
-for i in range(N):
-    t_0 = (np.random.random() - 1 / 2) * t_z(6 * w_0)
-    y_0 = (np.random.random() - 1 / 2) * 6 * w_0
-    x_0 = (np.random.random() - 1 / 2) * 6 * w_0
-    z_array = (np.random.random() - 1 / 2) * 6 * w_0
-
-    # G_discrete_integral_values = z_for_loop(x_0, y_0, z_array, t_0, G_discrete_integral)
-    G_discrete_integral_values = G_discrete_integral(x_0, y_0, z_array, t_0)
-    # plt.plot(z_array / w_0, G_discrete_integral_values, '.', label='discrete integral')
-
-    # G_integral_values = z_for_loop(x_0, y_0, z_array, t_0, G_integral)
-    # plt.plot(z_array / w_0, G_integral_values, label='integral')
-
-    # G_mine_values = z_for_loop(x_0, y_0, z_array, t_0, G_mine)
-    # plt.plot(z_array, G_mine_values, '--', label='mine')
-
-    # G_Osip_values = z_for_loop(x_0, y_0, z_array, t_0, G_Osip)
-    G_Osip_values = G_Osip(x_0, y_0, z_array, t_0)
-    # plt.plot(z_array / w_0, G_Osip_values, label='Osip')
-
-    # I_values = z_for_loop(x_0, y_0, z_array, t_0, I)
-    # plt.plot(z_array, I_values, label='I')
-
-    # I_numerical_values = z_for_loop(x_0, y_0, z_array, t_0, I_numerical)
-    # plt.plot(z_array, I_numerical_values, '--', label='I numerical')
-
-    rel_distance = np.abs(G_Osip_values - G_discrete_integral_values)
-    abs_size = np.abs(G_discrete_integral_values)
-
-    # plt.legend()
-    # plt.title(f't_0={t_0 / t_z(w_0):.2f}, x_0={x_0 / w_0:.2f}, y_0={y_0 / w_0:.2f}')
-    # plt.ylim(-5e-24, 5e-24)
-    # print(f't_0 = {t_0 / t_z(w_0):.2f}\nx_0 = {x_0 / w_0:.2f}\ny_0 = {y_0 / w_0:.2f}\n')
-    if not i % 100:
-        print(i, end='\r')
-    # plt.show()
-
-    results_array[i, :] = np.array([x_0, y_0, t_0, rel_distance, abs_size])
-
+# N = 1000
+# results_array = np.zeros((N, 5))
+#
+# for i in range(N):
+#     t_0 = (np.random.random() - 1 / 2) * t_z(6 * w_0)
+#     y_0 = (np.random.random() - 1 / 2) * 6 * w_0
+#     x_0 = (np.random.random() - 1 / 2) * 6 * w_0
+#     z_array = (np.random.random() - 1 / 2) * 6 * w_0
+#
+#     # G_discrete_integral_values = z_for_loop(x_0, y_0, z_array, t_0, G_discrete_integral)
+#     G_discrete_integral_values = G_discrete_integral(x_0, y_0, z_array, t_0)
+#     # plt.plot(z_array / w_0, G_discrete_integral_values, '.', label='discrete integral')
+#
+#     # G_integral_values = z_for_loop(x_0, y_0, z_array, t_0, G_integral)
+#     # plt.plot(z_array / w_0, G_integral_values, label='integral')
+#
+#     # G_mine_values = z_for_loop(x_0, y_0, z_array, t_0, G_mine)
+#     # plt.plot(z_array, G_mine_values, '--', label='mine')
+#
+#     # G_Osip_values = z_for_loop(x_0, y_0, z_array, t_0, G_Osip)
+#     G_Osip_values = G_Osip(x_0, y_0, z_array, t_0)
+#     # plt.plot(z_array / w_0, G_Osip_values, label='Osip')
+#
+#     # I_values = z_for_loop(x_0, y_0, z_array, t_0, I)
+#     # plt.plot(z_array, I_values, label='I')
+#
+#     # I_numerical_values = z_for_loop(x_0, y_0, z_array, t_0, I_numerical)
+#     # plt.plot(z_array, I_numerical_values, '--', label='I numerical')
+#
+#     rel_distance = np.abs(G_Osip_values - G_discrete_integral_values)
+#     abs_size = np.abs(G_discrete_integral_values)
+#
+#     # plt.legend()
+#     # plt.title(f't_0={t_0 / t_z(w_0):.2f}, x_0={x_0 / w_0:.2f}, y_0={y_0 / w_0:.2f}')
+#     # plt.ylim(-5e-24, 5e-24)
+#     # print(f't_0 = {t_0 / t_z(w_0):.2f}\nx_0 = {x_0 / w_0:.2f}\ny_0 = {y_0 / w_0:.2f}\n')
+#     if not i % 100:
+#         print(i, end='\r')
+#     # plt.show()
+#
+#     results_array[i, :] = np.array([x_0, y_0, t_0, rel_distance, abs_size])
+#
+# # %%
+# fig = plt.figure()
+# ax = fig.add_subplot(projection='3d')
+# ax.set_xlabel("x")
+# ax.set_ylabel("y")
+# ax.set_zlabel("t")
+# ax.view_init(30, -30)
+# ax.scatter(xs=results_array[:, 0] / w_0, ys=results_array[:, 1] / w_0, zs=results_array[:, 2] / t_z(w_0),
+#            c=results_array[:, 3], cmap='gray')
+#
+# plt.show()
+# # %%
+# percentile_98_distance = np.percentile(results_array[:, 3], 98)
+# percentile_98_value = np.percentile(results_array[:, 4], 98)
+#
+# plt.hist(results_array[:, 3], bins=100, label='Absolute distance')
+# plt.title('Absolute distance')
+# plt.axvline(percentile_98_distance, color='red', label=f'98% percentile = {percentile_98_distance:.2e}')
+# plt.legend()
+# plt.show()
+#
+# plt.hist(results_array[:, 4], bins=100, label='Absolute value')
+# plt.axvline(percentile_98_value, color='red', label=f'98% percentile = {percentile_98_value:.1e}')
+# plt.axvline(percentile_98_distance, color='green', label=f'98% percentile of distance = {percentile_98_distance:.1e}')
+# plt.title('Absolute value')
+# plt.legend()
+# plt.show()
+#
+#
+# # %%
+# t_0 = 0.94
+# x_0 = 0.14
+# y_0 = -0.54
+# z_0 = 0
+#
+# Z = np.linspace(z_0 - 5 * w_0, z_0, 100)
+#
+# A_z_integrand_values = A_z_integrand_variable_change(Z, x_0 * w_0, y_0 * w_0, z_0 * w_0, t_0 * t_z(w_0))
+# plt.plot(Z, A_z_integrand_values)
+#
+# plt.show()
 # %%
-fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-ax.set_zlabel("t")
-ax.view_init(30, -30)
-ax.scatter(xs=results_array[:, 0] / w_0, ys=results_array[:, 1] / w_0, zs=results_array[:, 2] / t_z(w_0),
-           c=results_array[:, 3], cmap='gray')
-
-plt.show()
-# %%
-percentile_98_distance = np.percentile(results_array[:, 3], 98)
-percentile_98_value = np.percentile(results_array[:, 4], 98)
-
-plt.hist(results_array[:, 3], bins=100, label='Absolute distance')
-plt.title('Absolute distance')
-plt.axvline(percentile_98_distance, color='red', label=f'98% percentile = {percentile_98_distance:.2e}')
+t_0 = 8
+z_max = 3
+x_0 = -1.1
+y_0 = -1
+z = np.linspace(-z_max, z_max, 1000)
+t = (z_max-z) / (C_LIGHT * beta) + t_0
+G_Osip_values = z_for_loop(x_0*w_0, y_0*w_0, z*w_0, t*w_0, G_Osip)
+G_discrete_integral_values = z_for_loop(x_0*w_0, y_0*w_0, z*w_0, t*w_0, G_discrete_integral)
+plt.plot(z, G_Osip_values, label='Osip')
+plt.plot(z, G_discrete_integral_values, label='discrete integral')
+plt.xlabel('z')
+plt.ylabel('G')
 plt.legend()
 plt.show()
 
-plt.hist(results_array[:, 4], bins=100, label='Absolute value')
-plt.axvline(percentile_98_value, color='red', label=f'98% percentile = {percentile_98_value:.1e}')
-plt.axvline(percentile_98_distance, color='green', label=f'98% percentile of distance = {percentile_98_distance:.1e}')
-plt.title('Absolute value')
-plt.legend()
-plt.show()
 
 
-# %%
-t_0 = 0.94
-x_0 = 0.14
-y_0 = -0.54
-z_0 = 0
-
-Z = np.linspace(z_0 - 5 * w_0, z_0, 100)
-
-A_z_integrand_values = A_z_integrand_variable_change(Z, x_0 * w_0, y_0 * w_0, z_0 * w_0, t_0 * t_z(w_0))
-plt.plot(Z, A_z_integrand_values)
-
-plt.show()

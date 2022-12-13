@@ -16,8 +16,8 @@ dummy_sample = SamplePropagator(dummy_potential='letters',
 first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
 
 second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
-cavity_2f = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=532e-9, A_1=3.42e-7, A_2=-1, Na=0.05)
-cavity_1f = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=None, A_1=5.06e-7, A_2=None, Na=0.05)
+cavity_2f = Cavity2FrequenciesAnalyticalPropagator(l_1=1064e-9, l_2=532e-9, E_1=3.42e-7, E_2=-1, NA=0.05)
+cavity_1f = Cavity2FrequenciesAnalyticalPropagator(l_1=1064e-9, l_2=None, E_1=5.06e-7, E_2=None, NA=0.05)
 
 M_2f = Microscope([dummy_sample, first_lens, cavity_2f, second_lens])
 M_2f.take_a_picture(first_wave)
@@ -110,7 +110,7 @@ plt.show()
 #
 # for i, A in enumerate(As):
 #     print(i)
-#     cavity = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=532e-9, A_1=A, Na=0.05, A_2=None)
+#     cavity = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=532e-9, E_1=A, NA=0.05, E_2=None)
 #     M = Microscope([dummy_sample, first_lens, cavity], print_progress=True)
 #     last_wave = M.take_a_picture(input_wave=first_wave)
 #     phi_0 = cavity.phi_0(X, Y, beta_electron=E2beta(M.propagation_steps[2].input_wave.E0))

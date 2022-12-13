@@ -1,31 +1,59 @@
 import numpy as np
-A = np.random.randint(0, 10, (1, 1, 3, 4))
-
-# %%
-r = np.mod(np.arange(0, -A.shape[-2], -1), A.shape[-1])
-x_idx, y_idx, z_idx, t_idx = np.ogrid[:A.shape[0], :A.shape[1], :A.shape[2], :A.shape[3]]
-shifted_t_idx = t_idx - r[:, np.newaxis]
-shifted_t_idx_mod = np.mod(shifted_t_idx, A.shape[-1])
-A_shifted = A[x_idx, y_idx, z_idx, shifted_t_idx_mod]
-A_s_full_diagonals = A_shifted[:, :, :, 0:(A.shape[-1] - A.shape[-2] + 1)]
-
-A_s_partial_diagonals = A_shifted[:, :, :, (A.shape[-1] - A.shape[-2] + 1):]
-A_spd_reverse_rows = A_s_partial_diagonals[:, :, :, ::-1]
-A_spdrr_tril = np.tril(A_spd_reverse_rows, k=-1)
-A_spdrr_triu = np.triu(A_spd_reverse_rows, k=0)
-A_spdrrtl_reordered_rows = A_spdrr_tril[:, :, :, ::-1]
-A_spdrrtu_reordered_rows = A_spdrr_triu[:, :, :, ::-1]
-A_spdrrturr_reversed_columns = A_spdrrtu_reordered_rows[:, :, ::-1, :]
-G_sfd_cumsum = np.cumsum(A_s_full_diagonals, axis=-2)
-G_spdrrtlrr_cumsum = np.cumsum(A_spdrrtl_reordered_rows, axis=-2)
-G_spdrrturrrc_cumsum = np.cumsum(A_spdrrturr_reversed_columns, axis=-2)
-G_spdrrturrrcc_reordered_columns = G_spdrrturrrc_cumsum[:, :, ::-1, :]
-G_shifted = G_sfd_cumsum + G_spdrrtlrr_cumsum + G_spdrrturrrcc_reordered_columns
-
+from microscope import *
 
 
 # %%
-A = np.random.randint(0, 10, (2, 2, 3, 4))
-# %%
+C = Cavity2FrequenciesNumericalPropagator(l_1=1064 * 1e-9,
+                                          l_2=532 * 1e-9,
+                                          E_1=1.725e9,
+                                          E_2=-1,
+                                          NA=0.1,
+                                          n_z=1000,
+                                          n_t=100,
+                                          alpha_cavity=None,  # tilt angle of the lattice (of the cavity)
+                                          theta_polarization=0,
+                                          ignore_past_files=True,
+                                          debug_mode=True,
+                                          z_integral_interval=80e-6)
+n_x = 150
+n_y = 150
+input_coordinate_system = CoordinateSystem(lengths=(150e-6, 30e-6),
+                                           n_points=(n_x, n_y))
+input_wave = WaveFunction(psi=np.ones((n_x, n_y)),
+                          coordinates=input_coordinate_system,
+                          E0=KeV2Joules(300))
 
+output_wave = C.propagate(input_wave)
+# %%
+N = 10
+Es = np.linspace(1.71e9, 1.73e9, N)
+phases = np.zeros(N, dtype=np.complex128)
+
+n_x = 5
+n_y = 5
+input_coordinate_system = CoordinateSystem(lengths=(1e-8, 1e-8),
+                                           n_points=(n_x, n_y))
+input_wave = WaveFunction(psi=np.ones((n_x, n_y)),
+                          coordinates=input_coordinate_system,
+                          E0=KeV2Joules(300))
+
+for i, E in enumerate(Es):
+    print(i)
+    C = Cavity2FrequenciesNumericalPropagator(l_1=1064 * 1e-9,
+                                              l_2=532 * 1e-9,
+                                              E_1=E,
+                                              E_2=-1,
+                                              NA=0.1,
+                                              n_z=1000,
+                                              n_t=100,
+                                              alpha_cavity=None,  # tilt angle of the lattice (of the cavity)
+                                              theta_polarization=0,
+                                              # ignore_past_files=True,
+                                              # debug_mode=True,
+                                              z_integral_interval=80e-6)
+    phase_and_amplitude_mask = C.generate_phase_and_amplitude_mask(input_wave)
+    phases[i] = np.angle(phase_and_amplitude_mask[n_x // 2, n_y // 2])
+plt.plot(Es, phases)
+plt.axhline(-np.pi/2, color='r')
+plt.show()
 

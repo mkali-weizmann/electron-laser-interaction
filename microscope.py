@@ -3,14 +3,13 @@ from abc import ABC
 
 import numpy as np
 from numpy import pi
-from scipy.integrate import quad_vec
 from scipy.special import jv
 import matplotlib.pyplot as plt
-from typing import Optional, Union, List, Type, Tuple
+from typing import Optional, Union, List, Tuple, Callable
 from warnings import warn
 from dataclasses import dataclass
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from scipy import integrate
+import os.path
 
 M_ELECTRON = 9.1093837e-31
 C_LIGHT = 299792458
@@ -19,6 +18,7 @@ E_CHARGE = 1.602176634e-19
 FINE_STRUCTURE_CONST = 7.299e-3
 
 np.seterr(all='raise')
+from matplotlib.widgets import Slider, Button, RadioButtons
 
 
 # %%
@@ -141,10 +141,57 @@ def gouy_phase_gaussian(x: Union[float, np.ndarray], x_R: Optional[float] = None
     return np.arctan(x / x_R)
 
 
+def manipulate_plot(imdata_callable: Callable,
+                    values: Tuple[Tuple[float, float, float], ...],
+                    labels: Optional[Tuple[str, ...]] = None):
+    # from matplotlib import use
+    # use('TkAgg')
+
+    N_params = len(values)
+
+    if labels is None:
+        labels = [f'param{i}' for i in range(N_params)]
+
+    fig, ax = plt.subplots()
+
+    plt.subplots_adjust(left=0.25, bottom=(N_params) * 0.04 + 0.15)
+    initial_data = imdata_callable(*[v[0] for v in values])
+    if initial_data.ndim == 2:
+        img = plt.imshow(initial_data)
+    elif initial_data.ndim == 1:
+        img, = plt.plot(initial_data)
+    else:
+        raise ValueError('imdata_callable must return 1 or 2 dimensional data')
+
+    # axcolor = 'lightgoldenrodyellow'
+    sliders_axes = [plt.axes([0.25, 0.04 * (i + 1), 0.65, 0.03], facecolor=(0.97, 0.97, 0.97)) for i in range(N_params)]
+    sliders = [Slider(ax=sliders_axes[i],
+                      label=labels[i],
+                      valmin=values[i][0],
+                      valmax=values[i][1],
+                      valinit=values[i][0],
+                      valstep=values[i][2]) for i in range(N_params)]
+
+    def update(val):
+        values = [slider.val for slider in sliders]
+        if initial_data.ndim == 2:
+            img.set_data(imdata_callable(*values))
+        else:
+            img.set_ydata(imdata_callable(*values))
+        fig.canvas.draw_idle()
+
+    for slider in sliders:
+        slider.on_changed(update)
+
+    if initial_data.ndim == 2:
+        plt.colorbar(ax=ax)
+    plt.show()
+
+
 def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float, np.ndarray],
                   E,  # The amplitude of the electric field, not the potential A.
                   lamda: float, w_0: Optional[float] = None, NA: Optional[float] = None,
-                  t: Optional[float, np.ndarray] = None,
+                  t: Optional[Union[float, np.ndarray]] = None,
                   mode: str = "intensity", is_cavity: bool = True) -> Union[np.ndarray, float]:
     if w_0 is None:
         w_0 = NA2w0(NA, lamda)
@@ -155,7 +202,7 @@ def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float
     k = l2k(lamda)
     R_x_inverse = x / (x_R ** 2 + x ** 2)
     other_phase = k * x + k * (z ** 2 + y ** 2) / 2 * R_x_inverse
-    envelope = E * (w_0 / w_x) * np.exp(-(z ** 2 + y ** 2) / w_x ** 2)
+    envelope = E * (w_0 / w_x) * np.exp(np.clip(-2 * (y ** 2 + z ** 2) / w_x ** 2, a_min=-500, a_max=None))
 
     if mode == "intensity":
         if is_cavity:  # No time dependence
@@ -417,9 +464,9 @@ class Cavity2FrequenciesPropagator(Propagator):
             self.E_2: float = E_2
         self.l_2 = l_2
         self.NA: float = NA  # Cavity's numerical aperture
-        self.alpha_cavity: float = alpha_cavity  # cavity_2f's angle with respect to microscope's x-axis. positive
-        # # number means the part of the cavity_2f in the positive x direction is tilted downwards toward the z axis.
-        # in the cavity_2f.
+        self.alpha_cavity: Optional[float] = alpha_cavity  # cavity angle with respect to microscope's x-axis. positive
+        # # number means the part of the cavity in the positive x direction is tilted downwards toward the positive z
+        # direction.
         self.theta_polarization: Optional[float] = theta_polarization  # polarization angle of the laser
 
     @property
@@ -482,6 +529,20 @@ class Cavity2FrequenciesPropagator(Propagator):
     def min_l(self):
         return min(self.l_1, self.l_2)
 
+    @property
+    def max_l(self):
+        return max(self.l_1, self.l_2)
+
+    def beta_electron2alpha_cavity(self, beta_electron: Optional[float] = None) -> float:
+        if beta_electron is not None and self.alpha_cavity is None:
+            return np.arcsin(self.beta_lattice / beta_electron)
+        elif beta_electron is None and self.alpha_cavity is None:
+            raise ValueError("Either beta_electron or alpha_cavity must be given")
+        else:
+            warn("alpha_cavity is not None. Using the value given by the user, Note that the calculations assume"
+                 "that the lattice satisfy sin(alpha_cavity) = beta_lattice / beta_electron")
+            return self.alpha_cavity
+
 
 class Cavity2FrequenciesAnalyticalPropagator(Cavity2FrequenciesPropagator):
     def __init__(self,
@@ -499,13 +560,8 @@ class Cavity2FrequenciesAnalyticalPropagator(Cavity2FrequenciesPropagator):
         # Gives the phase acquired by a narrow electron beam centered around (x, y) by passing in the cavity_2f.
         # Does not include the relativistic correction.
         # According to equation e_10 and equation gaussian_beam_potential_total_phase in my lyx file
-        if self.alpha_cavity is None:
-            alpha_lattice = np.arcsin(self.beta_lattice / beta_electron)
-        else:
-            alpha_lattice = self.alpha_cavity
-            warn("alpha_cavity is not None. Using the value given by the user, Note that the calculations assume"
-                 "that the lattice satisfy cos(alpha_cavity) = beta_lattice / beta_electron")
-        x_lattice = x / np.cos(alpha_lattice)
+        alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
+        x_lattice = x / np.cos(alpha_cavity)
         x_R = x_R_gaussian(self.w_0, self.l)
         w_x = w_x_gaussian(w_0=self.w_0, x=x_lattice, x_R=x_R)
         # The next two lines are based on equation e_11 in my lyx file
@@ -559,32 +615,68 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                  E_2: Optional[float] = -1,
                  NA: float = 0.2,
                  alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
-                 theta_polarization: Optional[float] = None):
+                 theta_polarization: Optional[float] = None,
+                 ignore_past_files: bool = False,
+                 debug_mode: bool = False,
+                 n_z: int = 500,  # ARBITRARY,
+                 n_t: int = 100,
+                 z_integral_interval: Optional[float] = None):  # ARBITRARY
         super().__init__(l_1, l_2, E_1, E_2, NA, alpha_cavity, theta_polarization)
+        self.ignore_past_files = ignore_past_files
+        self.n_z = n_z
+        self.n_t = n_t
+        self.debug_mode = debug_mode
+        if z_integral_interval is None:
+            self.z_integral_interval = 30 * self.w_0
+        else:
+            self.z_integral_interval = z_integral_interval
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
-        w = l2w(self.min_l)
-        t = np.linspace(0, 6*pi / w, 1000)  # ARBITRARY
-        phi_values = self.phi(input_wave.coordinates.X_grid, input_wave.coordinates.Y_grid, t, E2beta(input_wave.E0))
-        zeroth_order_energy_level = self.extract_0_energy_level_amplitude(phi_values)
-        output_wave = input_wave.psi * np.exp(1j * phi_values) * zeroth_order_energy_level
-        return output_wave
+        setup_file_path = self.setup_to_path(input_wave=input_wave)
+        # if this setup was calculated once in the past and the user did not ask to ignore past files, load the file
+        if os.path.isfile(setup_file_path) and not self.ignore_past_files:
+            phase_and_amplitude_mask = np.load(setup_file_path)
+        else:
+            phase_and_amplitude_mask = self.generate_phase_and_amplitude_mask(input_wave)
+            np.save(setup_file_path, phase_and_amplitude_mask)
+        output_wave_psi = input_wave.psi * phase_and_amplitude_mask
+        return WaveFunction(output_wave_psi, input_wave.coordinates, input_wave.E0)
 
+    def generate_phase_and_amplitude_mask(self, input_wave: WaveFunction):
+        phi_values = self.phi(input_wave.coordinates.x_axis, input_wave.coordinates.y_axis, E2beta(input_wave.E0))
+        phase_and_amplitude_mask = self.extract_0_energy_level_amplitude(phi_values)
+        return phase_and_amplitude_mask
+
+    def setup_to_path(self, input_wave: WaveFunction) -> str:
+        # This function is used to generate a unique name for each setup, such that we can load previous results if they
+        # exist.
+        path = f'Data Arrays\\Phase Masks\\cavity_2f_l1_{self.l_1 * 1e9:.4g}_l2_{self.l_2 * 1e9:.4g}_' \
+               f'E1_{self.E_1:.4g}_E2_{self.E_2:.4g}_NA_{self.NA * 100:.4g}_' \
+               f'alpha_{self.beta_electron2alpha_cavity(E2beta(input_wave.E0)) * 100:.4g}_' \
+               f'theta_{self.theta_polarization * 100:.4g}_E_{input_wave.E0:.4g}_' \
+               f'Nx_{input_wave.coordinates.x_axis.size}_Ny_{input_wave.coordinates.y_axis.size}_Nz_{self.n_z}_' \
+               f'Nt_{self.n_t}_Xmin_{input_wave.coordinates.limits[0]:.4g}_' \
+               f'Xmax_{input_wave.coordinates.limits[1]:.4g}_Ymin_{input_wave.coordinates.limits[2]:.4g}_' \
+               f'Ymax_{input_wave.coordinates.limits[3]:.4g}_Zminmax_{self.z_integral_interval:.4g}.npy'
+
+        return path
 
     def rotated_gaussian_beam_A(self,
-                                 x: [float, np.ndarray],
-                                 y: [float, np.ndarray],
-                                 z: Union[float, np.ndarray],
-                                 t: [float, np.ndarray]) -> Union[np.ndarray, float]:
-        x_tilde = x * np.cos(self.alpha_cavity) - z * np.sin(self.alpha_cavity)
-        z_tilde = x * np.sin(self.alpha_cavity) + z * np.cos(self.alpha_cavity)
-        polarization_factor = np.cos(self.theta_polarization)
-
+                                x: [float, np.ndarray],
+                                y: [float, np.ndarray],
+                                z: [float, np.ndarray],
+                                t: [float, np.ndarray],
+                                beta_electron: Optional[float] = None
+                                ) -> Union[np.ndarray, float]:
+        alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
+        x_tilde = x * np.cos(alpha_cavity) - z * np.sin(alpha_cavity)
+        z_tilde = x * np.sin(alpha_cavity) + z * np.cos(alpha_cavity)
         A_1 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_1, lamda=self.l_1, NA=self.NA, t=t,
                             mode="potential")
         A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_2, lamda=self.l_2, NA=self.NA, t=t,
                             mode="potential")
-        return A_1 + A_2
+        A = A_1 + A_2
+        return A
 
     def generate_A_lattice(self,
                            x: [float, np.ndarray],
@@ -592,47 +684,109 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                            z: [float, np.ndarray],
                            t: [float, np.ndarray],
                            beta_electron: float,
+                           save_to_file: bool = False
                            ):
-        # This is not the Gaussian beam at x, y, z, t, but the Gaussian beam at x, y, z, t + z/(beta*c)
         X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
-        T += Z / (C_LIGHT * beta_electron)  # This makes T be the time of the electron that passed through z_0 at time T
-        # and then got to Z after extra Z / (beta * c) time.
+        Z += X * np.tan(self.beta_electron2alpha_cavity(beta_electron))  # This make the Z coordinates centered around
+        # the cavity axis - which depend on the angle of the cavity and the x coordinate.
+        T += Z / (C_LIGHT * beta_electron)  # This makes T be the time of the electron that passed through z=0 at
+        # time t and then got to Z after/before Z / (beta * c) time.
 
-        A_lattice = self.rotated_gaussian_beam_A(X, Y, Z, T)
-        return A_lattice
+        A = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
+        if save_to_file:
+            np.save("Data Arrays\\Debugging Arrays\\A.npy", A)
+        # This is not the Gaussian beam at x, y, z, t, but the Gaussian beam at x, y, Z=z+x*tan(alpha), T=t + Z/(beta*c)
+        return A
 
-    def G_gauge(self,
-                A_shifted: np.ndarray,
-                ) -> np.ndarray:
-        return np.cumsum(A_shifted, axis=2)
+    @staticmethod
+    def G_gauge(A_shifted: np.ndarray, dz: float) -> np.ndarray:
+        G_gauge_values = np.cumsum(A_shifted, axis=2) * dz
+
+        return G_gauge_values  # integral over z
 
     def phi_integrand(self,
                       x: [float, np.ndarray],
                       y: [float, np.ndarray],
                       z: [float, np.ndarray],
                       t: [float, np.ndarray],
-                      beta_electron: float):
+                      beta_electron: float,
+                      save_to_file: bool = False):
         # Without the prefactors, this is the integrand of the integral over z of the phase shift.
-        A_z = self.generate_A_lattice(x, y, z, t, beta_electron)
-        G = self.G_gauge(A_z)
+        A = self.generate_A_lattice(x, y, z, t, beta_electron, save_to_file=save_to_file)
+        G = self.G_gauge(A, z[1] - z[0]) * np.cos(self.theta_polarization)  # Cos because this is the z component of A
+        if save_to_file:
+            np.save("Data Arrays\\Debugging Arrays\\G.npy", G)
         dG_dx = np.gradient(G, x[1] - x[0], axis=0)
         if self.theta_polarization == pi / 2:
             raise NotImplementedError("The case of theta_polarization = pi/2 is not implemented yet")
-        A_y = A_z * np.tan(self.theta_polarization)
-        return A_y ** 2 + (1 - beta_electron ** 2) * A_z ** 2 + dG_dx ** 2
+        integrand = (np.abs(A) * np.sin(self.theta_polarization)) ** 2 + \
+                    (1 - beta_electron ** 2) * (
+                            np.clip(np.abs(A), a_min=1e-50, a_max=None) * np.cos(self.theta_polarization)) ** 2 + \
+                    np.clip(np.abs(dG_dx), a_min=1e-50, a_max=None) ** 2
+        return integrand
 
-    def phi(self, x: np.ndarray, y: np.ndarray, t: np.ndarray, beta_electron: float):
-        z = np.linspace(-20 * self.w_0_min, 20 * self.w_0_min, 1000)
-        phi_integrand = self.phi_integrand(x, y, z, t, beta_electron)
-        prefactor = - 1 / H_BAR * E_CHARGE ** 2 / 2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT
-        return np.trapz(phi_integrand, dx= z[1] - z[0], axis=2) * prefactor
+    def phi_single_batch(self, x: np.ndarray, y: np.ndarray, t: np.ndarray, beta_electron: float,
+                         save_to_file: bool = False):
+        z = np.linspace(-self.z_integral_interval, self.z_integral_interval, self.n_z)  # ARBITRARY n_z
+        phi_integrand = self.phi_integrand(x, y, z, t, beta_electron, save_to_file=save_to_file)
+        if save_to_file:
+            np.save("Data Arrays\\Debugging Arrays\\phi_integrand.npy", phi_integrand)
+        prefactor = - 1 / H_BAR * E_CHARGE ** 2 / (2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT)
+        phi_values = prefactor * np.trapz(phi_integrand, dx=z[1] - z[0], axis=2)
+        return phi_values
+
+    def phi(self, x: np.ndarray, y: np.ndarray, beta_electron: float):
+        # This if else clause is for the case of a single laser or a double laser:
+        if self.l_2 is None:  # For the case of a single laser there is no time dependence for the phase mask.
+            t = np.array([0])
+            phi_values = self.phi_single_batch(x, y, t, beta_electron)
+        else:
+            # This whole while loop gymnastics is to make sure that the time step is small enough to avoid arrays that
+            # are too big for the memory of the computer to hold. That is, we divide the calculation into batches
+            # of time steps that are small enough to fit in the memory.
+            grid_size_per_t = len(x) * len(y) * self.n_z
+            grid_size_max = 1e7
+            # The maximal number of time steps that can be calculated in one batch (the total capacity divided by the
+            # size of one time step array), 1 in case of a batch smaller than 1.
+            n_t_batch_max = max(1, int(np.floor(grid_size_max / grid_size_per_t)))
+            total_t_needed = self.n_t  # ARBITRARY
+            phi_values = np.zeros((len(x),
+                                   len(y),
+                                   total_t_needed))
+            # For a complete description of the phase shift it is enough to look at one cycle of field (ignoring global
+            # phase), which is given by delta omega between the lasers (denoted as w):
+            delta_w = np.abs(l2w(self.l_1) - l2w(self.l_2))
+            t = np.linspace(0, 2 * pi / delta_w, total_t_needed)  # ARBITRARY total_t_needed
+            n_t_done = 0
+            last_run_save_to_file = False
+            while n_t_done < total_t_needed:
+                if self.debug_mode:
+                    print('n_t_done = ', n_t_done)
+                    if n_t_done + n_t_batch_max >= total_t_needed:
+                        last_run_save_to_file = True
+                n_t_batch = min(n_t_batch_max, total_t_needed - n_t_done)
+                t_temp = t[n_t_done:n_t_done + n_t_batch]
+                phi_values[:, :, n_t_done:n_t_done + n_t_batch] = self.phi_single_batch(x,
+                                                                                        y,
+                                                                                        t_temp, beta_electron,
+                                                                                        save_to_file=last_run_save_to_file)
+                n_t_done += n_t_batch
+        if self.debug_mode:
+            print('Finished calculating phi for every x, y, z, t')
+            np.save('Data Arrays\\Debugging Arrays\\phi_values.npy', phi_values)
+        return phi_values
 
     def extract_0_energy_level_amplitude(self, phi_values: np.ndarray):
         phase_factor = np.exp(1j * phi_values)
-        energy_bands = np.fft.fft(phase_factor, axis=-1)
-        energy_bands_normed = np.abs(energy_bands) ** 2 / np.sum(np.abs(energy_bands) ** 2, axis=2, keepdims=True)
-        zeroth_order_energy_level = np.sum(energy_bands_normed[:, :, [0, 1, -1]], axis=2)  # ARBITRARY
-        return zeroth_order_energy_level
+        if self.l_2 is None:  # If there is only one mode, then the phase is constant in time and there is no amplitude
+            # modulation.
+            return phase_factor
+        else:
+            energy_bands = np.fft.fft(phase_factor, axis=-1, norm='forward')
+            phase_amplitude_mask = np.sum(energy_bands[:, :, [0, 1, -1]], axis=2)  # ARBITRARY
+            if self.debug_mode:
+                np.save("Data Arrays\\Debugging Arrays\\phase_amplitude_mask.npy", phase_amplitude_mask)
+            return phase_amplitude_mask
 
 
 class SamplePropagator(Propagator):
