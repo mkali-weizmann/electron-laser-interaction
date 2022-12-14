@@ -619,17 +619,12 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                  ignore_past_files: bool = False,
                  debug_mode: bool = False,
                  n_z: int = 500,  # ARBITRARY,
-                 n_t: int = 100,
-                 z_integral_interval: Optional[float] = None):  # ARBITRARY
+                 n_t: int = 100):  # ARBITRARY
         super().__init__(l_1, l_2, E_1, E_2, NA, alpha_cavity, theta_polarization)
         self.ignore_past_files = ignore_past_files
         self.n_z = n_z
         self.n_t = n_t
         self.debug_mode = debug_mode
-        if z_integral_interval is None:
-            self.z_integral_interval = 30 * self.w_0
-        else:
-            self.z_integral_interval = z_integral_interval
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         setup_file_path = self.setup_to_path(input_wave=input_wave)
@@ -650,14 +645,12 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
     def setup_to_path(self, input_wave: WaveFunction) -> str:
         # This function is used to generate a unique name for each setup, such that we can load previous results if they
         # exist.
-        path = f'Data Arrays\\Phase Masks\\cavity_2f_l1_{self.l_1 * 1e9:.4g}_l2_{self.l_2 * 1e9:.4g}_' \
-               f'E1_{self.E_1:.4g}_E2_{self.E_2:.4g}_NA_{self.NA * 100:.4g}_' \
-               f'alpha_{self.beta_electron2alpha_cavity(E2beta(input_wave.E0)) * 100:.4g}_' \
-               f'theta_{self.theta_polarization * 100:.4g}_E_{input_wave.E0:.4g}_' \
-               f'Nx_{input_wave.coordinates.x_axis.size}_Ny_{input_wave.coordinates.y_axis.size}_Nz_{self.n_z}_' \
-               f'Nt_{self.n_t}_Xmin_{input_wave.coordinates.limits[0]:.4g}_' \
-               f'Xmax_{input_wave.coordinates.limits[1]:.4g}_Ymin_{input_wave.coordinates.limits[2]:.4g}_' \
-               f'Ymax_{input_wave.coordinates.limits[3]:.4g}_Zminmax_{self.z_integral_interval:.4g}.npy'
+        path = f'Data Arrays\\Phase Masks\\2f_l1{self.l_1 * 1e9:.4g}_l2{self.l_2 * 1e9:.4g}_' \
+               f'E1{self.E_1:.3g}_E2{self.E_2:.3g}_NA{self.NA * 100:.4g}_' \
+               f'alpha{self.beta_electron2alpha_cavity(E2beta(input_wave.E0)) /2*np.pi * 360:.0f}_' \
+               f'theta{self.theta_polarization * 100:.4g}_E{input_wave.E0:.2g}_' \
+               f'Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nz{self.n_z}_' \
+               f'Nt{self.n_t}_DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}.npy'
 
         return path
 
@@ -669,70 +662,79 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                                 beta_electron: Optional[float] = None
                                 ) -> Union[np.ndarray, float]:
         alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
+
         x_tilde = x * np.cos(alpha_cavity) - z * np.sin(alpha_cavity)
         z_tilde = x * np.sin(alpha_cavity) + z * np.cos(alpha_cavity)
+
         A_1 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_1, lamda=self.l_1, NA=self.NA, t=t,
                             mode="potential")
         A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_2, lamda=self.l_2, NA=self.NA, t=t,
                             mode="potential")
+
         A = A_1 + A_2
+
         return A
 
-    def generate_A_lattice(self,
+    def generate_coordinates_lattice(self,
                            x: [float, np.ndarray],
                            y: [float, np.ndarray],
-                           z: [float, np.ndarray],
                            t: [float, np.ndarray],
-                           beta_electron: float,
-                           save_to_file: bool = False
-                           ):
+                           beta_electron: float):
+        z = np.linspace(-5, 5, self.n_z)  # ARBITRARY this number is in units of spot size
+        # z = np.linspace(-80e-6, 80e-6, self.n_z)  # DELETE ME
         X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
-        Z += X * np.tan(self.beta_electron2alpha_cavity(beta_electron))  # This make the Z coordinates centered around
+        alpha = self.beta_electron2alpha_cavity(beta_electron)
+        Z *= w_x_gaussian(w_0=NA2w0(self.NA, self.min_l), x=X/np.cos(alpha), l_laser=self.min_l) / np.cos(alpha)  # This scales
+        # the z axis to the size of the beam spot_size at each x. x is divided by cos_alpha because the beam is tilted
+        Z -= X * np.tan(alpha)  # This make the Z coordinates centered around
         # the cavity axis - which depend on the angle of the cavity and the x coordinate.
         T += Z / (C_LIGHT * beta_electron)  # This makes T be the time of the electron that passed through z=0 at
         # time t and then got to Z after/before Z / (beta * c) time.
 
-        A = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
-        if save_to_file:
-            np.save("Data Arrays\\Debugging Arrays\\A.npy", A)
-        # This is not the Gaussian beam at x, y, z, t, but the Gaussian beam at x, y, Z=z+x*tan(alpha), T=t + Z/(beta*c)
-        return A
+        return X, Y, Z, T
 
     @staticmethod
-    def G_gauge(A_shifted: np.ndarray, dz: float) -> np.ndarray:
-        G_gauge_values = np.cumsum(A_shifted, axis=2) * dz
+    def G_gauge(A_shifted: np.ndarray, Z: np.ndarray) -> np.ndarray:
+        dZ = Z[:, :, 1, :] - Z[:, :, 0, :]
+        # This dZ assumes different dz for different x's. I use this variating dZ because I want to integrate over, for
+        # example, range of [-4w(x), 4*w(x)] for every x, and the spot size w(x) changes with x.
+        # Since dz does not vary along z, it is enough to take the first two values of dZ.
+        G_gauge_values = np.cumsum(A_shifted, axis=2) * dZ[:, :, np.newaxis, :]
 
         return G_gauge_values  # integral over z
 
     def phi_integrand(self,
                       x: [float, np.ndarray],
                       y: [float, np.ndarray],
-                      z: [float, np.ndarray],
                       t: [float, np.ndarray],
                       beta_electron: float,
                       save_to_file: bool = False):
-        # Without the prefactors, this is the integrand of the integral over z of the phase shift.
-        A = self.generate_A_lattice(x, y, z, t, beta_electron, save_to_file=save_to_file)
-        G = self.G_gauge(A, z[1] - z[0]) * np.cos(self.theta_polarization)  # Cos because this is the z component of A
-        if save_to_file:
-            np.save("Data Arrays\\Debugging Arrays\\G.npy", G)
+        # WITHOUT THE PREFACTORS: this is the integrand of the integral over z of the phase shift.
+        X, Y, Z, T = self.generate_coordinates_lattice(x, y, t, beta_electron)
+        A = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
+        G = self.G_gauge(A, Z) * np.cos(self.theta_polarization)  # Cos because this is the z component of A
         dG_dx = np.gradient(G, x[1] - x[0], axis=0)
+
+        if save_to_file:
+            np.save("Data Arrays\\Debugging Arrays\\A.npy", A)
+            np.save("Data Arrays\\Debugging Arrays\\G.npy", G)
+
         if self.theta_polarization == pi / 2:
             raise NotImplementedError("The case of theta_polarization = pi/2 is not implemented yet")
+
         integrand = (np.abs(A) * np.sin(self.theta_polarization)) ** 2 + \
                     (1 - beta_electron ** 2) * (
                             np.clip(np.abs(A), a_min=1e-50, a_max=None) * np.cos(self.theta_polarization)) ** 2 + \
                     np.clip(np.abs(dG_dx), a_min=1e-50, a_max=None) ** 2
-        return integrand
+        return integrand, Z  # The Z is returned so that it can be used in the integration over z.
 
     def phi_single_batch(self, x: np.ndarray, y: np.ndarray, t: np.ndarray, beta_electron: float,
                          save_to_file: bool = False):
-        z = np.linspace(-self.z_integral_interval, self.z_integral_interval, self.n_z)  # ARBITRARY n_z
-        phi_integrand = self.phi_integrand(x, y, z, t, beta_electron, save_to_file=save_to_file)
+        phi_integrand, Z = self.phi_integrand(x, y, t, beta_electron, save_to_file=save_to_file)
         if save_to_file:
             np.save("Data Arrays\\Debugging Arrays\\phi_integrand.npy", phi_integrand)
         prefactor = - 1 / H_BAR * E_CHARGE ** 2 / (2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT)
-        phi_values = prefactor * np.trapz(phi_integrand, dx=z[1] - z[0], axis=2)
+        phi_values = prefactor * np.trapz(phi_integrand, x=Z, axis=2)
         return phi_values
 
     def phi(self, x: np.ndarray, y: np.ndarray, beta_electron: float):
@@ -756,7 +758,7 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
             # For a complete description of the phase shift it is enough to look at one cycle of field (ignoring global
             # phase), which is given by delta omega between the lasers (denoted as w):
             delta_w = np.abs(l2w(self.l_1) - l2w(self.l_2))
-            t = np.linspace(0, 2 * pi / delta_w, total_t_needed)  # ARBITRARY total_t_needed
+            t = np.linspace(0, 20 * pi / delta_w, total_t_needed)  # ARBITRARY total_t_needed
             n_t_done = 0
             last_run_save_to_file = False
             while n_t_done < total_t_needed:
@@ -894,3 +896,26 @@ class LensPropagator(Propagator):
         new_coordinates = CoordinateSystem(new_axes)
         output_wave = WaveFunction(psi_FFT, new_coordinates, input_wave.E0)
         return output_wave
+
+
+if __name__ == '__main__':
+    C = Cavity2FrequenciesNumericalPropagator(l_1=1064 * 1e-9,
+                                              l_2=532 * 1e-9,
+                                              E_1=3.175e9,
+                                              E_2=-1,
+                                              NA=0.1,
+                                              n_z=800,
+                                              n_t=100,
+                                              alpha_cavity=None,  # tilt angle of the lattice (of the cavity)
+                                              theta_polarization=0,
+                                              ignore_past_files=True,
+                                              debug_mode=True)
+    n_x = 120
+    n_y = 1
+    input_coordinate_system = CoordinateSystem(lengths=(300e-6, 0),
+                                               n_points=(n_x, n_y))
+    input_wave = WaveFunction(psi=np.ones((n_x, n_y)),
+                              coordinates=input_coordinate_system,
+                              E0=KeV2Joules(300))
+
+    output_wave = C.propagate(input_wave)

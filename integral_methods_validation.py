@@ -12,6 +12,9 @@ def plot_3d_complex(x_real, y_complex):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.plot(x_real, np.real(y_complex), np.imag(y_complex))
+    ax.set_xlabel('t')
+    ax.set_ylabel('y_real')
+    ax.set_zlabel('y_imag')
     plt.show()
 
 
