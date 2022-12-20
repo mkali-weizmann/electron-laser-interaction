@@ -87,7 +87,7 @@ def s(t, n=1000):
 def G_discrete_integral(x, y, z, t):
     s_values = s(t)
     A_z_integrand_values = A_z_integrand(s_values, x, y, z, t)
-    return C_LIGHT * beta / omega_l * np.trapz(A_z_integrand_values, s_values)
+    return C_LIGHT * beta / omega_l * np.trapz(A_z_integrand_values, s_values, axis=0)
 
 
 def G_Osip(x, y, z, t):
@@ -138,6 +138,13 @@ def z_for_loop(x, y, z, t, func):
         for i in range(len(z)):
             results_array[i] = func(x, y, z[i], t[i])
     return results_array
+
+
+def phi_integrand(z, x, y, t):
+    G_values = G_discrete_integral(x, y, z, t)
+    A_values = A_z(x, y, z, t)
+    return
+
 
 
 # %%

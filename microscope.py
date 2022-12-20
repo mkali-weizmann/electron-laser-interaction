@@ -20,6 +20,8 @@ FINE_STRUCTURE_CONST = 7.299e-3
 
 np.seterr(all='raise')
 from matplotlib.widgets import Slider, Button, RadioButtons
+
+
 # %%
 # def k2E(k: float) -> float:
 #     return np.sqrt(M_ELECTRON**2 * C_LIGHT**4 + H_BAR**2 * k**2*C_LIGHT**2)
@@ -148,6 +150,12 @@ def gouy_phase_gaussian(x: Union[float, np.ndarray], x_R: Optional[float] = None
     return np.arctan(x / x_R)
 
 
+def R_x_inverse_gaussian(x, x_R=None, l_laser=None, w_0=None):
+    if x_R is None:
+        x_R = x_R_gaussian(w_0, l_laser)
+    return x / (x**2 + x_R ** 2)
+
+
 def manipulate_plot(imdata_callable: Callable,
                     values: Tuple[Tuple[float, float, float], ...],
                     labels: Optional[Tuple[str, ...]] = None):
@@ -206,10 +214,11 @@ def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float
     x_R = x_R_gaussian(w_0, lamda)
     w_x = w_x_gaussian(w_0=w_0, x=x, x_R=x_R)
     gouy_phase = gouy_phase_gaussian(x, x_R)
+    R_x_inverse = R_x_inverse_gaussian(x, x_R)
     k = l2k(lamda)
-    R_x_inverse = x / (x_R ** 2 + x ** 2)
     other_phase = k * x + k * (z ** 2 + y ** 2) / 2 * R_x_inverse
-    envelope = E * (w_0 / w_x) * np.exp(np.clip(-2 * (y ** 2 + z ** 2) / w_x ** 2, a_min=-500, a_max=None))
+    envelope = E * (w_0 / w_x) * np.exp(np.clip(-(y ** 2 + z ** 2) / w_x ** 2, a_min=-500, a_max=None))  # The clipping
+    # is to prevent underflow errors.
 
     if mode == "intensity":
         if is_cavity:  # No time dependence
@@ -224,7 +233,7 @@ def gaussian_beam(x: [float, np.ndarray], y: [float, np.ndarray], z: Union[float
         else:
             time_phase = 1
         if mode == "potential":  # The ratio between E and A in Gibbs gauge is E=w*A or A=E/w
-            potential_factor = 1 / (C_LIGHT * k)  # == omega
+            potential_factor = 1 / (C_LIGHT * k)  # == 1/omega
         else:
             potential_factor = 1
         if is_cavity:
@@ -761,7 +770,7 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
         # exist.
         path = f'Data Arrays\\Phase Masks\\2f_l1{self.l_1 * 1e9:.4g}_l2{self.l_2 * 1e9:.4g}_' \
                f'E1{self.E_1:.3g}_E2{self.E_2:.3g}_NA{self.NA * 100:.4g}_' \
-               f'alpha{self.beta_electron2alpha_cavity(E2beta(input_wave.E0)) /2*np.pi * 360:.0f}_' \
+               f'alpha{self.beta_electron2alpha_cavity(E2beta(input_wave.E0)) / 2 * np.pi * 360:.0f}_' \
                f'theta{self.theta_polarization * 100:.4g}_E{input_wave.E0:.2g}_' \
                f'Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nz{self.n_z}_' \
                f'Nt{self.n_t}_DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}.npy'
@@ -773,8 +782,9 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                                 y: [float, np.ndarray],
                                 z: [float, np.ndarray],
                                 t: [float, np.ndarray],
-                                beta_electron: Optional[float] = None
-                                ) -> Union[np.ndarray, float]:
+                                beta_electron: Optional[float] = None,
+                                return_vector: bool = True) -> Union[np.ndarray, float]:
+
         alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
 
         x_tilde = x * np.cos(alpha_cavity) - z * np.sin(alpha_cavity)
@@ -784,25 +794,39 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                             mode="potential")
         A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_2, lamda=self.l_2, NA=self.NA, t=t,
                             mode="potential")
-        A = A_1 + A_2
 
-        return A
+        # This is not the electric potential, but rather only the amplitude factor that is shared among the different
+        # components of the electromagnetic potential.
+        A_scalar = A_1 + A_2
+
+        # This is the rotated field vector: the vector is achieved by starting with a polarized light in the z axis,
+        # then rotating it in the y-z plane by theta_polarization (from z towards y) and then rotating it in the
+        # z-x plane by alpha_cavity (from x towards z).
+        # (0, 0, 1) -> (0, sin(t), cos(t)) -> (sin(a)cos(t), sin(t), cos(a)cos(t))
+        if not return_vector:
+            return A_scalar
+        else:
+            A_vector = np.stack((-A_scalar * np.cos(self.theta_polarization) * np.sin(alpha_cavity),
+                                 A_scalar * np.sin(self.theta_polarization),
+                                 A_scalar * np.cos(self.theta_polarization) * np.cos(alpha_cavity)),
+                                axis=-1)
+            return A_vector
 
     def generate_coordinates_lattice(self,
-                           x: [float, np.ndarray],
-                           y: [float, np.ndarray],
-                           t: [float, np.ndarray],
-                           beta_electron: float):
-        z = np.linspace(-5, 5, self.n_z)  # ARBITRARY this number is in units of spot size
-        # z = np.linspace(-80e-6, 80e-6, self.n_z)  # DELETE ME
+                                     x: [float, np.ndarray],
+                                     y: [float, np.ndarray],
+                                     t: [float, np.ndarray],
+                                     beta_electron: float):
+        z = np.linspace(-5, 5, self.n_z)  # ARBITRARY those limits are in units of spot size
         X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
-        alpha = self.beta_electron2alpha_cavity(beta_electron)
-        Z *= w_x_gaussian(w_0=NA2w0(self.NA, self.min_l), x=X/np.cos(alpha), l_laser=self.min_l) / np.cos(alpha)  # This scales
+        alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
+        Z *= w_x_gaussian(w_0=NA2w0(self.NA, self.min_l), x=X / np.cos(alpha_cavity), l_laser=self.min_l) / np.cos(
+            alpha_cavity)  # This scales
         # the z axis to the size of the beam spot_size at each x. x is divided by cos_alpha because the beam is tilted
-        Z -= X * np.tan(alpha)  # This make the Z coordinates centered around
+        Z -= X * np.tan(alpha_cavity)  # This make the Z coordinates centered around
         # the cavity axis - which depend on the angle of the cavity and the x coordinate.
         T += Z / (C_LIGHT * beta_electron)  # This makes T be the time of the electron that passed through z=0 at
-        # time t and then got to Z after/before Z / (beta * c) time.
+        # time t and then got to Z after/before: Z/(beta * c) time.
 
         return X, Y, Z, T
 
@@ -811,30 +835,41 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
         dZ = Z[:, :, 1, :] - Z[:, :, 0, :]
         # This dZ assumes different dz for different x's. I use this variating dZ because I want to integrate over, for
         # example, range of [-4w(x), 4*w(x)] for every x, and the spot size w(x) changes with x.
-        # Since dz does not vary along z, it is enough to take the first two values of dZ.
+        # Since dz does not vary along z, it is enough to use the first value of dZ.
         G_gauge_values = np.cumsum(A_shifted, axis=2) * dZ[:, :, np.newaxis, :]
         return G_gauge_values  # integral over z
 
-    def dG_dx(self, X, Y, Z, T, A, beta_electron, save_to_file: bool = False):
-        # This is a temp function which is inefficient and will be replaced in the future. please don't judge.
-        dx = self.min_l / 1000  # ARBITRARY I checked manually, and at around 400 the value of
+    def grad_G(self, X, Y, Z, T, beta_electron, A_z=None, save_to_file: bool = False):
+
+        # You might ask yourself - we already have a lattice full of G values - why not subtract the lattice from
+        # itself to get the gradient? The answer is that the lattice is too sparse to get a good gradient.
+        # It could have been possible in the z axis where we must have dense z values for the later integral, but in the
+        # z axis we also have the time component increasing with Z, so we can't just subtract the lattice from itself.
+
+        dr = self.min_l / 1000  # ARBITRARY I checked manually, and at around 400 the value of
         # the derivative stabilizes, so 1000 is a safe margin.
-        A = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
-        A_dX = self.rotated_gaussian_beam_A(X+dx, Y, Z, T, beta_electron)
-        G = self.G_gauge(A, Z) * np.cos(self.theta_polarization)
-        G_dX = self.G_gauge(A_dX, Z) * np.cos(self.theta_polarization)
-        dG_dx = (G_dX - G) / dx
+
+        z_component_factor = np.cos(self.beta_electron2alpha_cavity(beta_electron)) * np.cos(self.theta_polarization)
+
+        if A_z is None:
+            A_z = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron, return_vector=False) * z_component_factor
+
+        A_z_dX = self.rotated_gaussian_beam_A(X + dr, Y, Z, T, beta_electron, return_vector=False) * z_component_factor
+        A_z_dY = self.rotated_gaussian_beam_A(X, Y + dr, Z, T, beta_electron, return_vector=False) * z_component_factor
+        A_z_dZ = self.rotated_gaussian_beam_A(X, Y, Z + dr, T, beta_electron, return_vector=False) * z_component_factor
+
+        G = self.G_gauge(A_z, Z)
+        G_dX = self.G_gauge(A_z_dX, Z)
+        G_dY = self.G_gauge(A_z_dY, Z)
+        G_dZ = self.G_gauge(A_z_dZ, Z)
+
+        grad_G = np.stack([(G_dX - G) / dr, (G_dY - G) / dr, (G_dZ - G) / dr], axis=-1)
+
         if save_to_file:
             np.save("Data Arrays\\Debugging Arrays\\G.npy", G)
-            np.save("Data Arrays\\Debugging Arrays\\dG_dx.npy", dG_dx)
-        # # In order to subtract two subsequent values of G on close by x values (x and x+dx) we first need to find
-        # # The value of G in (x+dx). The problem is that the Z array is not uniform in x, so we need to interpolate it.
-        # # The interpolation evaluates G(x+dx, z) by interpolating G(x+dx) OVER Z.
-        # G_interpolated = interp1d(Z[:-1, :, :, :], G[1:, :, :, :], axis=2, kind='linear', fill_value='extrapolate')
-        # dG_dx = (G_interpolated(Z[1:, :, :, :]) - G[:-1, :, :, :]) / (X[1, 0, 0, 0] - X[0, 0, 0, 0])  # X array is
-        # # equally spaced on x-axis (the 0 axis of the array) and so the difference between the first two values is
-        # # the same for all x's.
-        return dG_dx
+            np.save("Data Arrays\\Debugging Arrays\\grad_G.npy", grad_G)
+
+        return grad_G
 
     def phi_integrand(self,
                       x: [float, np.ndarray],
@@ -844,21 +879,19 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                       save_to_file: bool = False):
         # WITHOUT THE PREFACTORS: this is the integrand of the integral over z of the phase shift.
         X, Y, Z, T = self.generate_coordinates_lattice(x, y, t, beta_electron)
-        A = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
-        # G = self.G_gauge(A, Z) * np.cos(self.theta_polarization)  # Cos because this is the z component of the vector A
-        dG_dx = self.dG_dx(X, Y, Z, T, A, beta_electron, save_to_file=save_to_file)
+        A_vector = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
+
+        grad_G = self.grad_G(X, Y, Z, T,
+                             A_z=A_vector[:, :, :, :, 2],
+                             beta_electron=beta_electron,
+                             save_to_file=save_to_file)
 
         if save_to_file:
-            np.save("Data Arrays\\Debugging Arrays\\A.npy", A)
+            np.save("Data Arrays\\Debugging Arrays\\A.npy", A_vector)
 
-        if self.theta_polarization == pi / 2:
-            raise NotImplementedError("The case of theta_polarization = pi/2 is not implemented yet")
-
-        integrand = (np.abs(A) * np.sin(self.theta_polarization)) ** 2 + \
-                    (1 - beta_electron ** 2) * (
-                            np.clip(np.abs(A), a_min=1e-50, a_max=None) * np.cos(self.theta_polarization)) ** 2 + \
-                    np.clip(np.abs(dG_dx), a_min=1e-50, a_max=None) ** 2
-        return integrand, Z  # The Z is returned so that it can be used in the integration over z.
+        integrand = np.sum(np.abs(A_vector - grad_G) ** 2, axis=-1) - \
+                    beta_electron ** 2 * np.abs(A_vector[:, :, :, :, 2] - grad_G[:, :, :, :, 2]) ** 2
+        return integrand, Z  # The Z is returned so that it can be used later in the integration of the integrand over z.
 
     def phi_single_batch(self, x: np.ndarray, y: np.ndarray, t: np.ndarray, beta_electron: float,
                          save_to_file: bool = False):
@@ -890,7 +923,7 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
             # phase), which is given by delta omega between the lasers (denoted as w):
             delta_w = np.abs(l2w(self.l_1) - l2w(self.l_2))
             if self.n_t == 3:
-                t = np.array([0, pi / (2*delta_w), pi / delta_w])
+                t = np.array([0, pi / (2 * delta_w), pi / delta_w])
             else:
                 t = np.linspace(0, 20 * pi / delta_w, self.n_t)  # ARBITRARY total_t_needed
             n_t_done = 0
@@ -919,7 +952,7 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
             return phase_factor
         else:
             if self.n_t == 3:
-                phi_0 = 1/2*(phi_values[:, :, 0] + phi_values[:, :, 2])
+                phi_0 = 1 / 2 * (phi_values[:, :, 0] + phi_values[:, :, 2])
                 varphi = np.arctan2(phi_values[:, :, 0] - phi_0, phi_values[:, :, 1] - phi_0)
                 sin_varphi = np.sin(varphi)
                 problematic_elements = np.abs(sin_varphi) < 1e-3
@@ -934,7 +967,7 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                                                (phi_values[:, :, 1] - phi_0) / cos_varphi_no_small_values,
                                                0)
                 A = A_computed_with_sin + A_computed_with_cos
-                phase_and_amplitude_mask = jv(0, A)**2 * np.exp(1j * phi_0)
+                phase_and_amplitude_mask = jv(0, A) * np.exp(1j * phi_0)
             else:
                 # NOT ACCURATE UNLESS N_T IS BIG!
                 energy_bands = np.fft.fft(phase_factor, axis=-1, norm='forward')
@@ -947,13 +980,13 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
 if __name__ == '__main__':
     C = Cavity2FrequenciesNumericalPropagator(l_1=1064 * 1e-9,
                                               l_2=532 * 1e-9,
-                                              E_1=2.24e9,
+                                              E_1=1.621e9,
                                               E_2=-1,
                                               NA=0.1,
                                               n_z=1000,
-                                              n_t=1000,
+                                              n_t=1,
                                               alpha_cavity=None,  # tilt angle of the lattice (of the cavity)
-                                              theta_polarization=np.pi/2,
+                                              theta_polarization=0,
                                               ignore_past_files=True,
                                               debug_mode=True)
     n_x = 1
