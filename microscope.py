@@ -784,7 +784,6 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                             mode="potential")
         A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_2, lamda=self.l_2, NA=self.NA, t=t,
                             mode="potential")
-
         A = A_1 + A_2
 
         return A
@@ -816,21 +815,26 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
         G_gauge_values = np.cumsum(A_shifted, axis=2) * dZ[:, :, np.newaxis, :]
         return G_gauge_values  # integral over z
 
-    def dG_dx(self, X, Y, Z, T, A, beta_electron):
+    def dG_dx(self, X, Y, Z, T, A, beta_electron, save_to_file: bool = False):
         # This is a temp function which is inefficient and will be replaced in the future. please don't judge.
-        dx = self.w_0 / 10
+        dx = self.min_l / 1000  # ARBITRARY I checked manually, and at around 400 the value of
+        # the derivative stabilizes, so 1000 is a safe margin.
+        A = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
         A_dX = self.rotated_gaussian_beam_A(X+dx, Y, Z, T, beta_electron)
-        G_X = self.G_gauge(A, Z) * np.cos(self.theta_polarization)
+        G = self.G_gauge(A, Z) * np.cos(self.theta_polarization)
         G_dX = self.G_gauge(A_dX, Z) * np.cos(self.theta_polarization)
-        dG_dx = (G_dX - G_X) / dx
-        # # In order to subract two subsequent values of G on close by x values (x and x+dx) we first need to find
+        dG_dx = (G_dX - G) / dx
+        if save_to_file:
+            np.save("Data Arrays\\Debugging Arrays\\G.npy", G)
+            np.save("Data Arrays\\Debugging Arrays\\dG_dx.npy", dG_dx)
+        # # In order to subtract two subsequent values of G on close by x values (x and x+dx) we first need to find
         # # The value of G in (x+dx). The problem is that the Z array is not uniform in x, so we need to interpolate it.
         # # The interpolation evaluates G(x+dx, z) by interpolating G(x+dx) OVER Z.
         # G_interpolated = interp1d(Z[:-1, :, :, :], G[1:, :, :, :], axis=2, kind='linear', fill_value='extrapolate')
         # dG_dx = (G_interpolated(Z[1:, :, :, :]) - G[:-1, :, :, :]) / (X[1, 0, 0, 0] - X[0, 0, 0, 0])  # X array is
         # # equally spaced on x-axis (the 0 axis of the array) and so the difference between the first two values is
         # # the same for all x's.
-        return dG_dx, G_X
+        return dG_dx
 
     def phi_integrand(self,
                       x: [float, np.ndarray],
@@ -842,11 +846,10 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
         X, Y, Z, T = self.generate_coordinates_lattice(x, y, t, beta_electron)
         A = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
         # G = self.G_gauge(A, Z) * np.cos(self.theta_polarization)  # Cos because this is the z component of the vector A
-        dG_dx, G = self.dG_dx(X, Y, Z, T, A, beta_electron)
+        dG_dx = self.dG_dx(X, Y, Z, T, A, beta_electron, save_to_file=save_to_file)
 
         if save_to_file:
             np.save("Data Arrays\\Debugging Arrays\\A.npy", A)
-            np.save("Data Arrays\\Debugging Arrays\\G.npy", G)
 
         if self.theta_polarization == pi / 2:
             raise NotImplementedError("The case of theta_polarization = pi/2 is not implemented yet")
@@ -889,7 +892,7 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
             if self.n_t == 3:
                 t = np.array([0, pi / (2*delta_w), pi / delta_w])
             else:
-                t = np.linspace(0, 2 * pi / delta_w, self.n_t)  # ARBITRARY total_t_needed
+                t = np.linspace(0, 20 * pi / delta_w, self.n_t)  # ARBITRARY total_t_needed
             n_t_done = 0
             last_run_save_to_file = False
             while n_t_done < self.n_t:
@@ -944,18 +947,18 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
 if __name__ == '__main__':
     C = Cavity2FrequenciesNumericalPropagator(l_1=1064 * 1e-9,
                                               l_2=532 * 1e-9,
-                                              E_1=2.424e9,
+                                              E_1=2.24e9,
                                               E_2=-1,
                                               NA=0.1,
-                                              n_z=800,
-                                              n_t=3,
+                                              n_z=1000,
+                                              n_t=1000,
                                               alpha_cavity=None,  # tilt angle of the lattice (of the cavity)
-                                              theta_polarization=0,
+                                              theta_polarization=np.pi/2,
                                               ignore_past_files=True,
                                               debug_mode=True)
-    n_x = 200
-    n_y = 200
-    input_coordinate_system = CoordinateSystem(lengths=(300e-6, 30e-6),
+    n_x = 1
+    n_y = 1
+    input_coordinate_system = CoordinateSystem(lengths=(0, 0),
                                                n_points=(n_x, n_y))
     input_wave = WaveFunction(psi=np.ones((n_x, n_y)),
                               coordinates=input_coordinate_system,
@@ -963,3 +966,5 @@ if __name__ == '__main__':
 
     phase_and_amplitude_mask = C.generate_phase_and_amplitude_mask(input_wave)
     print(np.angle(phase_and_amplitude_mask[n_x // 2, n_y // 2]))
+    print(np.abs(phase_and_amplitude_mask[n_x // 2, n_y // 2]))
+
