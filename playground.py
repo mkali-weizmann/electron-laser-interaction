@@ -2,33 +2,6 @@ import numpy as np
 # from numba import jit
 from microscope import *
 
-# @jit
-# def column_wise_interpolation(G: np.ndarray, Z: np.ndarray):
-#     G_tilde = np.zeros(G.shape[0], G.shape[1], G.shape[2]-1, G.shape[3])
-#     for i_x in range(0, Z.shape[0]-1):
-#         for i_y in range(0, Z.shape[1]):
-#             for i_t in range(0, Z.shape[3]):
-#                 G_tilde[i_x, i_y, :, i_t] = np.interp(Z[i_x, i_y, :, i_t], Z[i_x+1, i_y, :, i_t], G[i_x+1, i_y, :, i_t])
-#     return G_tilde
-#
-#
-# def column_wise_interpolation_unverctorized(G: np.ndarray, Z: np.ndarray):
-#     G_tilde = np.zeros(G.shape[0], G.shape[1], G.shape[2]-1, G.shape[3])
-#     for i_x in range(0, Z.shape[0]-1):
-#         for i_y in range(0, Z.shape[1]):
-#             for i_t in range(0, Z.shape[3]):
-#                 G_tilde[i_x, i_y, :, i_t] = np.interp(Z[i_x, i_y, :, i_t], Z[i_x+1, i_y, :, i_t], G[i_x+1, i_y, :, i_t])
-#     return G_tilde
-#
-# # %%
-# x = np.linspace(-150e-6, 150e-6, 100)
-# y = np.linspace(-20e-6, 20e-6, 100)
-# z = np.linspace(-80e-6, 80e-6, 100)
-# t = np.linspace()
-
-
-
-
 # %%  Get amplitude for pi/2 phase shift: DO NOT ERASE
 N = 10
 Es = np.linspace(1e7, 2.4e9, N)

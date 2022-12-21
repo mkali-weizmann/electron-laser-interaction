@@ -24,9 +24,13 @@ E_1 = 6.46e7
 E_2 = E_1 * (l_1 / l_2)
 standard_dviations = 5
 sufficient_lambda_fraction = 0.1
-Z = np.linspace(-standard_dviations * w_0, standard_dviations * w_0, 1000) / np.cos(alpha_cavity)
+z_limit = standard_dviations * w_0
+Z = np.linspace(-z_limit, z_limit, 1000) / np.cos(alpha_cavity)
 prefactor = - 1 / H_BAR * E_CHARGE ** 2 / (2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT)
-
+x_0 = 0
+t_0 = 0
+y_0 = 0
+dr = l_2 / 1000
 
 def z_t(t):
     return beta_electron * C_LIGHT * t
@@ -93,9 +97,9 @@ def rotated_gaussian_beam_A(x: [float, np.ndarray],
         return A_vector
 
 
-def A_z_integrand(Z, x, y, z, t):
-    t_z_values = t_z(z-Z)
-    T = t - t_z_values
+def A_z_integrand(Z, x, y, t):
+    t_z_values = t_z(Z)
+    T = t + t_z_values
     A_z_integrand_values = rotated_gaussian_beam_A(x, y, Z, T)
     return A_z_integrand_values
 
@@ -109,9 +113,9 @@ def Z_z(z):
     return Z_values
 
 
-def G_discrete_integral(x, y, z, t):
-    Z_values = Z_z(z)
-    A_z_integrand_values = A_z_integrand(Z_values, x, y, z, t)[..., 2]
+def G_discrete_integral(z_idx, A_z):
+    Z_values = Z[0:z_idx]
+    A_z_integrand_values = A_z[0:z_idx]
 
     G_values = np.trapz(A_z_integrand_values, Z_values)
 
@@ -122,20 +126,19 @@ def G_discrete_integral(x, y, z, t):
     return G_values
 
 
-def G_Osip(x, y, z, t):
-    return C_LIGHT * beta_electron / omega_l ** 2 * envelope(x, y, z) * x_grating(x, y, z) * np.sin(omega_l * t)
+def phi_integrand(z_idx,
+                  A_integrand_values,
+                  A_z_integrand_values,
+                  A_z_integrand_values_dx,
+                  A_z_integrand_values_dy,
+                  A_z_integrand_values_dz):
 
+    A_values = A_integrand_values[z_idx, :]
 
-def phi_integrand(z, x, y, t):
-    t_of_z = t + t_z(z)
-    dr = l_2 / 1000
-
-    A_values = rotated_gaussian_beam_A(x, y, z, t_of_z, return_vector=True)
-
-    G = G_discrete_integral(x, y, z, t_of_z)
-    G_dx = G_discrete_integral(x + dr, y, z, t_of_z)
-    G_dy = G_discrete_integral(x, y + dr, z, t_of_z)
-    G_dz = G_discrete_integral(x, y, z + dr, t_of_z)
+    G = G_discrete_integral(z_idx, A_z_integrand_values)
+    G_dx = G_discrete_integral(z_idx, A_z_integrand_values_dx)
+    G_dy = G_discrete_integral(z_idx, A_z_integrand_values_dy)
+    G_dz = G_discrete_integral(z_idx+1, A_z_integrand_values_dz)
 
     grad_G = np.stack((G_dx - G, G_dy - G, G_dz - G), axis=-1) / dr
 
@@ -144,32 +147,39 @@ def phi_integrand(z, x, y, t):
     return integrand, A_values, G, grad_G
 
 
-def phi_integrand_array(x, y, t):
+def phi_integrand_array(t):
     # z = standard_dviations * w_0
     # Z = np.arange(start=-z, stop=z, step=l_2 * sufficient_lambda_fraction)
     # Z = np.linspace(start=-z, stop=z, num=1000)
+
+    A_integrand_values = A_z_integrand(Z, x_0, y_0, t)
+    A_z_integrand_values = A_integrand_values[:, 2]
+    A_z_integrand_values_dx = A_z_integrand(Z, x_0+dr, y_0, t)[:, 2]
+    A_z_integrand_values_dy = A_z_integrand(Z, x_0, y_0+dr, t)[:, 2]
+    A_z_integrand_values_dz = A_z_integrand(Z, x_0, y_0, t - t_z(dr))[:, 2]
+
     phi_integrand_array_values = np.zeros(len(Z))
     A_values = np.zeros((len(Z), 3), dtype=np.complex128)
     G_values = np.zeros(len(Z), dtype=np.complex128)
     grad_G = np.zeros((len(Z), 3), dtype=np.complex128)
     for i, z in enumerate(Z):
-        phi_integrand_array_values[i], A_values[i, :], G_values[i], grad_G[i, :] = phi_integrand(Z[i], x, y, t)
+        phi_integrand_array_values[i], A_values[i, :], G_values[i], grad_G[i, :] = phi_integrand(i, A_integrand_values, A_z_integrand_values,A_z_integrand_values_dx, A_z_integrand_values_dy, A_z_integrand_values_dz)
 
     return phi_integrand_array_values, Z
 
 
-def phi_single_t(x, y, t):
-    phi_integrand_array_values, Z = phi_integrand_array(x, y, t)
+def phi_single_t(t):
+    phi_integrand_array_values, Z = phi_integrand_array(t)
     return np.trapz(phi_integrand_array_values, Z, axis=0) * prefactor
 
 
-def phi(x, y, t=None):
+def phi(t=None):
     if t is None:
         t = np.array([0, pi / (2 * delta_omega), pi / delta_omega])
 
     phi_values = np.zeros(len(t))
     for i, T in enumerate(t):
-        phi_values[i] = phi_single_t(x, y, T)
+        phi_values[i] = phi_single_t(T)
     return phi_values, t
 
 
@@ -193,7 +203,7 @@ def extract_amplitude_attenuation(phi_values):
 # t_100 = np.linspace(0, 6 * pi / delta_omega, 100)
 # phi_values_100, t_100 = phi(0, 0, t_100)
 
-phi_values_3, t_3 = phi(0, 0)
+phi_values_3, t_3 = phi()
 
 
 phase_and_amplitude_mask_values_3 = extract_amplitude_attenuation(phi_values_3)

@@ -858,12 +858,12 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
 
         A_z_dX = self.rotated_gaussian_beam_A(X + dr, Y, Z, T, beta_electron, return_vector=False) * z_component_factor
         A_z_dY = self.rotated_gaussian_beam_A(X, Y + dr, Z, T, beta_electron, return_vector=False) * z_component_factor
-        A_z_dZ = self.rotated_gaussian_beam_A(X, Y, Z + dr, T, beta_electron, return_vector=False) * z_component_factor
+        A_z_dZ = self.rotated_gaussian_beam_A(X, Y, Z, T - dr / (beta_electron * C_LIGHT), beta_electron, return_vector=False) * z_component_factor
 
         G = self.G_gauge(A_z, Z)
         G_dX = self.G_gauge(A_z_dX, Z)
         G_dY = self.G_gauge(A_z_dY, Z)
-        G_dZ = self.G_gauge(A_z_dZ, Z)
+        G_dZ = G #self.G_gauge(A_z_dZ, Z) + A_z_dZ * dr
 
         grad_G = np.stack([(G_dX - G) / dr, (G_dY - G) / dr, (G_dZ - G) / dr], axis=-1)
 
@@ -982,18 +982,18 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
 if __name__ == '__main__':
     C = Cavity2FrequenciesNumericalPropagator(l_1=1064 * 1e-9,
                                               l_2=532 * 1e-9,
-                                              E_1=6.46e7,  #1.621e9,
+                                              E_1=1.93e9,
                                               E_2=-1,
                                               NA=0.1,
-                                              n_z=1000,
-                                              n_t=1,
+                                              n_z=200,
+                                              n_t=3,
                                               alpha_cavity=None,  # tilt angle of the lattice (of the cavity)
-                                              theta_polarization=0,
+                                              theta_polarization=np.pi/2,
                                               ignore_past_files=True,
                                               debug_mode=True)
-    n_x = 1
-    n_y = 1
-    input_coordinate_system = CoordinateSystem(lengths=(0, 0),
+    n_x = 400
+    n_y = 100
+    input_coordinate_system = CoordinateSystem(lengths=(350e-6, 50e-6),
                                                n_points=(n_x, n_y))
     input_wave = WaveFunction(psi=np.ones((n_x, n_y)),
                               coordinates=input_coordinate_system,
@@ -1002,4 +1002,8 @@ if __name__ == '__main__':
     phase_and_amplitude_mask = C.generate_phase_and_amplitude_mask(input_wave)
     print(np.angle(phase_and_amplitude_mask[n_x // 2, n_y // 2]))
     print(np.abs(phase_and_amplitude_mask[n_x // 2, n_y // 2]))
+
+
+
+
 
