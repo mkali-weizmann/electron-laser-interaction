@@ -10,6 +10,7 @@ from warnings import warn
 from dataclasses import dataclass
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import os.path
+from scipy import integrate
 from scipy.interpolate import interp1d
 
 M_ELECTRON = 9.1093837e-31
@@ -836,7 +837,8 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
         # This dZ assumes different dz for different x's. I use this variating dZ because I want to integrate over, for
         # example, range of [-4w(x), 4*w(x)] for every x, and the spot size w(x) changes with x.
         # Since dz does not vary along z, it is enough to use the first value of dZ.
-        G_gauge_values = np.cumsum(A_shifted, axis=2) * dZ[:, :, np.newaxis, :]
+        # G_gauge_values = np.cumsum(A_shifted, axis=2) * dZ[:, :, np.newaxis, :]
+        G_gauge_values = integrate.cumtrapz(A_shifted, x=Z, axis=2, initial=0)
         return G_gauge_values  # integral over z
 
     def grad_G(self, X, Y, Z, T, beta_electron, A_z=None, save_to_file: bool = False):
@@ -980,7 +982,7 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
 if __name__ == '__main__':
     C = Cavity2FrequenciesNumericalPropagator(l_1=1064 * 1e-9,
                                               l_2=532 * 1e-9,
-                                              E_1=1.621e9,
+                                              E_1=6.46e7,  #1.621e9,
                                               E_2=-1,
                                               NA=0.1,
                                               n_z=1000,

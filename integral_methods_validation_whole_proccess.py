@@ -12,7 +12,7 @@ l_2 = 532e-9
 k_l = l2k(l_2)
 omega_l = k_l * C_LIGHT
 delta_omega = l2w(l_2) - l2w(l_1)
-beta_electron = 0.7765
+beta_electron = 0.7765254931470489
 gamma = beta2gamma(beta_electron)
 NA = 0.1
 w_0 = l_2 / (pi * NA)
@@ -20,8 +20,8 @@ x_R = x_R_gaussian(w_0, l_2)
 beta_lattice = (l_1 - l_2) / (l_1 + l_2)
 theta_polarization = 0
 alpha_cavity = np.arcsin(beta_lattice / beta_electron)
-E_1 = 1.254e8
-E_2 = E_1 * (l_2 / l_1)
+E_1 = 6.46e7
+E_2 = E_1 * (l_1 / l_2)
 standard_dviations = 5
 sufficient_lambda_fraction = 0.1
 Z = np.linspace(-standard_dviations * w_0, standard_dviations * w_0, 1000) / np.cos(alpha_cavity)
@@ -70,9 +70,9 @@ def rotated_gaussian_beam_A(x: [float, np.ndarray],
     x_tilde = x * np.cos(alpha_cavity) - z * np.sin(alpha_cavity)
     z_tilde = x * np.sin(alpha_cavity) + z * np.cos(alpha_cavity)
 
-    A_1 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=E_1, lamda=l_2, NA=NA, t=t,
+    A_1 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=E_1, lamda=l_1, NA=NA, t=t,
                         mode="potential")
-    A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=E_2, lamda=l_1, NA=NA, t=t,
+    A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=E_2, lamda=l_2, NA=NA, t=t,
                         mode="potential")
 
     # This is not the electric potential, but rather only the amplitude factor that is shared among the different
@@ -94,7 +94,8 @@ def rotated_gaussian_beam_A(x: [float, np.ndarray],
 
 
 def A_z_integrand(Z, x, y, z, t):
-    return 1 / (beta_electron * C_LIGHT) * rotated_gaussian_beam_A(x, y, Z, t - t_z(z-Z))
+    A_z_integrand_values = rotated_gaussian_beam_A(x, y, Z, t - t_z(z-Z))
+    return A_z_integrand_values
 
 
 def Z_z(z):
@@ -102,14 +103,21 @@ def Z_z(z):
     #                  stop=z,
     #                  step=l_2 * sufficient_lambda_fraction)
     # Z_values = np.linspace(z - 2 * standard_dviations * w_0, z, 1000)
-    Z_values = Z[Z < z]
+    Z_values = Z[Z <= z]
     return Z_values
 
 
 def G_discrete_integral(x, y, z, t):
     Z_values = Z_z(z)
     A_z_integrand_values = A_z_integrand(Z_values, x, y, z, t)[..., 2]
-    return C_LIGHT * beta_electron * np.trapz(A_z_integrand_values, Z_values, axis=0)
+
+    G_values = np.trapz(A_z_integrand_values, Z_values)
+
+    # if len(Z_values) < 2:
+    #     return 0
+    # else:
+    #     G_values = np.sum(A_z_integrand_values) * (Z_values[1] - Z_values[0])
+    return G_values
 
 
 def G_Osip(x, y, z, t):
@@ -119,6 +127,9 @@ def G_Osip(x, y, z, t):
 def phi_integrand(z, x, y, t):
     t_of_z = t + t_z(z)
     dr = l_2 / 1000
+
+    A_values = rotated_gaussian_beam_A(x, y, z, t_of_z, return_vector=True)
+
     G = G_discrete_integral(x, y, z, t_of_z)
     G_dx = G_discrete_integral(x + dr, y, z, t_of_z)
     G_dy = G_discrete_integral(x, y + dr, z, t_of_z)
@@ -126,11 +137,9 @@ def phi_integrand(z, x, y, t):
 
     grad_G = np.stack((G_dx - G, G_dy - G, G_dz - G), axis=-1) / dr
 
-    A_values = rotated_gaussian_beam_A(x, y, z, t, return_vector=True)
-
     integrand = np.sum(np.abs(A_values - grad_G)**2) - beta_electron**2 * np.sum(np.abs(A_values[2] - A_values[2])**2)
 
-    return integrand
+    return integrand, A_values, G, grad_G
 
 
 def phi_integrand_array(x, y, t):
@@ -138,8 +147,11 @@ def phi_integrand_array(x, y, t):
     # Z = np.arange(start=-z, stop=z, step=l_2 * sufficient_lambda_fraction)
     # Z = np.linspace(start=-z, stop=z, num=1000)
     phi_integrand_array_values = np.zeros(len(Z))
+    A_values = np.zeros((len(Z), 3), dtype=np.complex128)
+    G_values = np.zeros(len(Z), dtype=np.complex128)
+    grad_G = np.zeros((len(Z), 3), dtype=np.complex128)
     for i, z in enumerate(Z):
-        phi_integrand_array_values[i] = phi_integrand(Z[i], x, y, t)
+        phi_integrand_array_values[i], A_values[i, :], G_values[i], grad_G[i, :] = phi_integrand(Z[i], x, y, t)
 
     return phi_integrand_array_values, Z
 
@@ -157,6 +169,7 @@ def phi(x, y, t=None):
     for i, T in enumerate(t):
         phi_values[i] = phi_single_t(x, y, T)
     return phi_values, t
+
 
 def extract_amplitude_attenuation(phi_values):
     if len(phi_values) == 3:
@@ -190,9 +203,9 @@ print(np.abs(phase_and_amplitude_mask_values_3))
 # print(np.abs(phase_and_amplitude_mask_values_100))
 # print(np.angle(phase_and_amplitude_mask_values_100))
 
-plt.plot(t_3, phi_values_3)
+# plt.plot(t_3, phi_values_3)
 # plt.plot(t_100, phi_values_100)
-plt.show()
+# plt.show()
 
 
 
