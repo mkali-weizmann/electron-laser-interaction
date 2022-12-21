@@ -24,9 +24,13 @@ E_1 = 6.46e7
 E_2 = E_1 * (l_1 / l_2)
 standard_dviations = 5
 sufficient_lambda_fraction = 0.1
-Z = np.linspace(-standard_dviations * w_0, standard_dviations * w_0, 1000) / np.cos(alpha_cavity)
+z_limit = standard_dviations * w_0
+Z = np.linspace(-z_limit, z_limit, 1000) / np.cos(alpha_cavity)
 prefactor = - 1 / H_BAR * E_CHARGE ** 2 / (2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT)
-
+x_0 = 0
+t_0 = 0
+y_0 = 0
+dr = l_2 / 1000
 
 def z_t(t):
     return beta_electron * C_LIGHT * t
@@ -93,12 +97,17 @@ def rotated_gaussian_beam_A(x: [float, np.ndarray],
         return A_vector
 
 
-def A_z_integrand(Z, x, y, z, t):
-    t_z_values = t_z(z-Z)
-    T = t - t_z_values
+def A_z_integrand(Z, x, y, t):
+    t_z_values = t_z(Z)
+    T = t + t_z_values
     A_z_integrand_values = rotated_gaussian_beam_A(x, y, Z, T)
     return A_z_integrand_values
 
+A_integrand_values_global = A_z_integrand(Z, x_0, y_0, t_0)
+A_z_integrand_values_global = A_integrand_values_global[:, 2]
+A_z_integrand_values_global_dx = A_z_integrand(Z, x_0+dr, y_0, t_0)[:, 2]
+A_z_integrand_values_global_dy = A_z_integrand(Z, x_0, y_0+dr, t_0)[:, 2]
+A_z_integrand_values_global_dz = A_z_integrand(Z, x_0, y_0, t_0 - t_z(dr))[:, 2]
 
 def Z_z(z):
     # Z_values = np.arange(start=min(-standard_dviations * w_0, z - standard_dviations * w_0),
@@ -109,9 +118,9 @@ def Z_z(z):
     return Z_values
 
 
-def G_discrete_integral(x, y, z, t):
-    Z_values = Z_z(z)
-    A_z_integrand_values = A_z_integrand(Z_values, x, y, z, t)[..., 2]
+def G_discrete_integral(z_idx, A_z):
+    Z_values = Z[0:z_idx]
+    A_z_integrand_values = A_z[0:z_idx]
 
     G_values = np.trapz(A_z_integrand_values, Z_values)
 
@@ -122,20 +131,14 @@ def G_discrete_integral(x, y, z, t):
     return G_values
 
 
-def G_Osip(x, y, z, t):
-    return C_LIGHT * beta_electron / omega_l ** 2 * envelope(x, y, z) * x_grating(x, y, z) * np.sin(omega_l * t)
+def phi_integrand(z_idx):
 
+    A_values = A_integrand_values_global[z_idx, :]
 
-def phi_integrand(z, x, y, t):
-    t_of_z = t + t_z(z)
-    dr = l_2 / 1000
-
-    A_values = rotated_gaussian_beam_A(x, y, z, t_of_z, return_vector=True)
-
-    G = G_discrete_integral(x, y, z, t_of_z)
-    G_dx = G_discrete_integral(x + dr, y, z, t_of_z)
-    G_dy = G_discrete_integral(x, y + dr, z, t_of_z)
-    G_dz = G_discrete_integral(x, y, z + dr, t_of_z)
+    G = G_discrete_integral(z_idx, A_z_integrand_values_global)
+    G_dx = G_discrete_integral(z_idx, A_z_integrand_values_global_dx)
+    G_dy = G_discrete_integral(z_idx, A_z_integrand_values_global_dy)
+    G_dz = G_discrete_integral(z_idx+1, A_z_integrand_values_global_dz)
 
     grad_G = np.stack((G_dx - G, G_dy - G, G_dz - G), axis=-1) / dr
 
@@ -153,7 +156,7 @@ def phi_integrand_array(x, y, t):
     G_values = np.zeros(len(Z), dtype=np.complex128)
     grad_G = np.zeros((len(Z), 3), dtype=np.complex128)
     for i, z in enumerate(Z):
-        phi_integrand_array_values[i], A_values[i, :], G_values[i], grad_G[i, :] = phi_integrand(Z[i], x, y, t)
+        phi_integrand_array_values[i], A_values[i, :], G_values[i], grad_G[i, :] = phi_integrand(i)
 
     return phi_integrand_array_values, Z
 
