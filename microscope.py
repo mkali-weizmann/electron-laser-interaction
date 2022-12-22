@@ -154,7 +154,7 @@ def gouy_phase_gaussian(x: Union[float, np.ndarray], x_R: Optional[float] = None
 def R_x_inverse_gaussian(x, x_R=None, l_laser=None, w_0=None):
     if x_R is None:
         x_R = x_R_gaussian(w_0, l_laser)
-    return x / (x**2 + x_R ** 2)
+    return x / (x ** 2 + x_R ** 2)
 
 
 def manipulate_plot(imdata_callable: Callable,
@@ -676,9 +676,11 @@ class Cavity2FrequenciesAnalyticalPropagator(Cavity2FrequenciesPropagator):
                  E_2: Optional[float] = -1,
                  NA: float = 0.2,
                  alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
-                 theta_polarization: Optional[float] = None):
+                 theta_polarization: Optional[float] = None,
+                 debug_mode: bool = False):
 
         super().__init__(l_1, l_2, E_1, E_2, NA, alpha_cavity, theta_polarization)
+        self.debug_mode = debug_mode
 
     def phi_0(self, x: np.ndarray, y: np.ndarray, beta_electron: float) -> np.ndarray:
         # Gives the phase acquired by a narrow electron beam centered around (x, y) by passing in the cavity_2f.
@@ -818,9 +820,25 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                                      y: [float, np.ndarray],
                                      t: [float, np.ndarray],
                                      beta_electron: float):
-        z = np.linspace(-5, 5, self.n_z)  # ARBITRARY those limits are in units of spot size
-        X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
+        integral_limit_in_spot_size_units = 5
         alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
+
+        max_z_integration_interval = w_x_gaussian(w_0=NA2w0(self.NA, self.max_l),
+                                                  x=np.max(np.abs(x)) / np.cos(alpha_cavity),
+                                                  l_laser=self.max_l) / np.cos(alpha_cavity) * \
+                                     (2 * integral_limit_in_spot_size_units)
+        required_n_z_for_integration_over_maximal_interval = int(max_z_integration_interval / (1/(1+1/beta_electron) * self.min_l))
+        # The denominator is chosen such that the G_gauge function is accurate. In general the spacing dz should be
+        # around the effective wavelength that is seen by the passing electron. The effective wavelength is (
+        # 1+1/beta) * l. This is because: cos(kx) * cos(wt) -> cos(kx) * cos(w * (x/(beta*c))) = cos(kx) * cos(
+        # k/beta * x) = 1/2 * ( cos((1+1/beta)kx) + cos((1-1/beta)kx)
+
+        z = np.linspace(-integral_limit_in_spot_size_units,
+                        integral_limit_in_spot_size_units,
+                        required_n_z_for_integration_over_maximal_interval)
+
+        X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
+
         Z *= w_x_gaussian(w_0=NA2w0(self.NA, self.min_l), x=X / np.cos(alpha_cavity), l_laser=self.min_l) / np.cos(
             alpha_cavity)  # This scales
         # the z axis to the size of the beam spot_size at each x. x is divided by cos_alpha because the beam is tilted
@@ -858,12 +876,13 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
 
         A_z_dX = self.rotated_gaussian_beam_A(X + dr, Y, Z, T, beta_electron, return_vector=False) * z_component_factor
         A_z_dY = self.rotated_gaussian_beam_A(X, Y + dr, Z, T, beta_electron, return_vector=False) * z_component_factor
-        A_z_dZ = self.rotated_gaussian_beam_A(X, Y, Z, T - dr / (beta_electron * C_LIGHT), beta_electron, return_vector=False) * z_component_factor
+        A_z_dZ = self.rotated_gaussian_beam_A(X, Y, Z, T - dr / (beta_electron * C_LIGHT), beta_electron,
+                                              return_vector=False) * z_component_factor
 
         G = self.G_gauge(A_z, Z)
         G_dX = self.G_gauge(A_z_dX, Z)
         G_dY = self.G_gauge(A_z_dY, Z)
-        G_dZ = G #self.G_gauge(A_z_dZ, Z) + A_z_dZ * dr
+        G_dZ = self.G_gauge(A_z_dZ, Z) + A_z_dZ * dr
 
         grad_G = np.stack([(G_dX - G) / dr, (G_dY - G) / dr, (G_dZ - G) / dr], axis=-1)
 
@@ -929,18 +948,18 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
             else:
                 t = np.linspace(0, 20 * pi / delta_w, self.n_t)  # ARBITRARY total_t_needed
             n_t_done = 0
-            last_run_save_to_file = False
+            first_run_save_to_file = True
             while n_t_done < self.n_t:
                 if self.debug_mode:
                     print('n_t_done = ', n_t_done)
-                    if n_t_done + n_t_batch_max >= self.n_t:
-                        last_run_save_to_file = True
+
                 n_t_batch = min(n_t_batch_max, self.n_t - n_t_done)
                 t_temp = t[n_t_done:n_t_done + n_t_batch]
                 phi_values[:, :, n_t_done:n_t_done + n_t_batch] = self.phi_single_batch(x,
                                                                                         y,
                                                                                         t_temp, beta_electron,
-                                                                                        save_to_file=last_run_save_to_file)
+                                                                                        save_to_file=first_run_save_to_file)
+                first_run_save_to_file = False
                 n_t_done += n_t_batch
         if self.debug_mode:
             print('Finished calculating phi for every x, y, z, t')
@@ -985,15 +1004,15 @@ if __name__ == '__main__':
                                               E_1=1.93e9,
                                               E_2=-1,
                                               NA=0.1,
-                                              n_z=200,
-                                              n_t=3,
+                                              n_z=800,
+                                              n_t=50,
                                               alpha_cavity=None,  # tilt angle of the lattice (of the cavity)
-                                              theta_polarization=np.pi/2,
+                                              theta_polarization=np.pi / 2,
                                               ignore_past_files=True,
                                               debug_mode=True)
-    n_x = 400
-    n_y = 100
-    input_coordinate_system = CoordinateSystem(lengths=(350e-6, 50e-6),
+    n_x = 200
+    n_y = 1
+    input_coordinate_system = CoordinateSystem(lengths=(350e-6, 0),  # 50e-6
                                                n_points=(n_x, n_y))
     input_wave = WaveFunction(psi=np.ones((n_x, n_y)),
                               coordinates=input_coordinate_system,
@@ -1002,8 +1021,3 @@ if __name__ == '__main__':
     phase_and_amplitude_mask = C.generate_phase_and_amplitude_mask(input_wave)
     print(np.angle(phase_and_amplitude_mask[n_x // 2, n_y // 2]))
     print(np.abs(phase_and_amplitude_mask[n_x // 2, n_y // 2]))
-
-
-
-
-
