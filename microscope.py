@@ -744,11 +744,9 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
                  theta_polarization: Optional[float] = None,
                  ignore_past_files: bool = False,
                  debug_mode: bool = False,
-                 n_z: int = 500,  # ARBITRARY,
                  n_t: int = 3):  # ARBITRARY
         super().__init__(l_1, l_2, E_1, E_2, NA, alpha_cavity, theta_polarization)
         self.ignore_past_files = ignore_past_files
-        self.n_z = n_z
         self.n_t = n_t
         self.debug_mode = debug_mode
 
@@ -765,163 +763,39 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
 
     def generate_phase_and_amplitude_mask(self, input_wave: WaveFunction):
         phi_values = self.phi(input_wave.coordinates.x_axis, input_wave.coordinates.y_axis, E2beta(input_wave.E0))
-        phase_and_amplitude_mask = self.extract_0_energy_level_amplitude(phi_values)
+        phase_and_amplitude_mask = self.extract_0th_energy_level_amplitude(phi_values)
         return phase_and_amplitude_mask
 
-    def setup_to_path(self, input_wave: WaveFunction) -> str:
-        # This function is used to generate a unique name for each setup, such that we can load previous results if they
-        # exist.
-        path = f'Data Arrays\\Phase Masks\\2f_l1{self.l_1 * 1e9:.4g}_l2{self.l_2 * 1e9:.4g}_' \
-               f'E1{self.E_1:.3g}_E2{self.E_2:.3g}_NA{self.NA * 100:.4g}_' \
-               f'alpha{self.beta_electron2alpha_cavity(E2beta(input_wave.E0)) / 2 * np.pi * 360:.0f}_' \
-               f'theta{self.theta_polarization * 100:.4g}_E{input_wave.E0:.2g}_' \
-               f'Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nz{self.n_z}_' \
-               f'Nt{self.n_t}_DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}.npy'
-
-        return path
-
-    def rotated_gaussian_beam_A(self,
-                                x: [float, np.ndarray],
-                                y: [float, np.ndarray],
-                                z: [float, np.ndarray],
-                                t: [float, np.ndarray],
-                                beta_electron: Optional[float] = None,
-                                return_vector: bool = True) -> Union[np.ndarray, float]:
-
-        alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
-
-        x_tilde = x * np.cos(alpha_cavity) - z * np.sin(alpha_cavity)
-        z_tilde = x * np.sin(alpha_cavity) + z * np.cos(alpha_cavity)
-
-        A_1 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_1, lamda=self.l_1, NA=self.NA, t=t,
-                            mode="potential")
-        A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_2, lamda=self.l_2, NA=self.NA, t=t,
-                            mode="potential")
-
-        # This is not the electric potential, but rather only the amplitude factor that is shared among the different
-        # components of the electromagnetic potential.
-        A_scalar = A_1 + A_2
-
-        # This is the rotated field vector: the vector is achieved by starting with a polarized light in the z axis,
-        # then rotating it in the y-z plane by theta_polarization (from z towards y) and then rotating it in the
-        # z-x plane by alpha_cavity (from x towards z).
-        # (0, 0, 1) -> (0, sin(t), cos(t)) -> (sin(a)cos(t), sin(t), cos(a)cos(t))
-        if not return_vector:
-            return A_scalar
+    def extract_0th_energy_level_amplitude(self, phi_values: np.ndarray):
+        phase_factor = np.exp(1j * phi_values)
+        if self.l_2 is None:  # If there is only one mode, then the phase is constant in time and there is no amplitude
+            # modulation.
+            return phase_factor
         else:
-            A_vector = np.stack((-A_scalar * np.cos(self.theta_polarization) * np.sin(alpha_cavity),
-                                 A_scalar * np.sin(self.theta_polarization),
-                                 A_scalar * np.cos(self.theta_polarization) * np.cos(alpha_cavity)),
-                                axis=-1)
-            return A_vector
-
-    def generate_coordinates_lattice(self,
-                                     x: [float, np.ndarray],
-                                     y: [float, np.ndarray],
-                                     t: [float, np.ndarray],
-                                     beta_electron: float):
-        integral_limit_in_spot_size_units = 5
-        alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
-
-        max_z_integration_interval = w_x_gaussian(w_0=NA2w0(self.NA, self.max_l),
-                                                  x=np.max(np.abs(x)) / np.cos(alpha_cavity),
-                                                  l_laser=self.max_l) / np.cos(alpha_cavity) * \
-                                     (2 * integral_limit_in_spot_size_units)
-        required_n_z_for_integration_over_maximal_interval = int(max_z_integration_interval / (1/(1+1/beta_electron) * self.min_l))
-        # The denominator is chosen such that the G_gauge function is accurate. In general the spacing dz should be
-        # around the effective wavelength that is seen by the passing electron. The effective wavelength is (
-        # 1+1/beta) * l. This is because: cos(kx) * cos(wt) -> cos(kx) * cos(w * (x/(beta*c))) = cos(kx) * cos(
-        # k/beta * x) = 1/2 * ( cos((1+1/beta)kx) + cos((1-1/beta)kx)
-
-        z = np.linspace(-integral_limit_in_spot_size_units,
-                        integral_limit_in_spot_size_units,
-                        required_n_z_for_integration_over_maximal_interval)
-
-        X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
-
-        Z *= w_x_gaussian(w_0=NA2w0(self.NA, self.min_l), x=X / np.cos(alpha_cavity), l_laser=self.min_l) / np.cos(
-            alpha_cavity)  # This scales
-        # the z axis to the size of the beam spot_size at each x. x is divided by cos_alpha because the beam is tilted
-        Z -= X * np.tan(alpha_cavity)  # This make the Z coordinates centered around
-        # the cavity axis - which depend on the angle of the cavity and the x coordinate.
-        T += Z / (C_LIGHT * beta_electron)  # This makes T be the time of the electron that passed through z=0 at
-        # time t and then got to Z after/before: Z/(beta * c) time.
-
-        return X, Y, Z, T
-
-    @staticmethod
-    def G_gauge(A_shifted: np.ndarray, Z: np.ndarray) -> np.ndarray:
-        dZ = Z[:, :, 1, :] - Z[:, :, 0, :]
-        # This dZ assumes different dz for different x's. I use this variating dZ because I want to integrate over, for
-        # example, range of [-4w(x), 4*w(x)] for every x, and the spot size w(x) changes with x.
-        # Since dz does not vary along z, it is enough to use the first value of dZ.
-        # G_gauge_values = np.cumsum(A_shifted, axis=2) * dZ[:, :, np.newaxis, :]
-        G_gauge_values = integrate.cumtrapz(A_shifted, x=Z, axis=2, initial=0)
-        return G_gauge_values  # integral over z
-
-    def grad_G(self, X, Y, Z, T, beta_electron, A_z=None, save_to_file: bool = False):
-
-        # You might ask yourself - we already have a lattice full of G values - why not subtract the lattice from
-        # itself to get the gradient? The answer is that the lattice is too sparse to get a good gradient.
-        # It could have been possible in the z axis where we must have dense z values for the later integral, but in the
-        # z axis we also have the time component increasing with Z, so we can't just subtract the lattice from itself.
-
-        dr = self.min_l / 1000  # ARBITRARY I checked manually, and at around 400 the value of
-        # the derivative stabilizes, so 1000 is a safe margin.
-
-        z_component_factor = np.cos(self.beta_electron2alpha_cavity(beta_electron)) * np.cos(self.theta_polarization)
-
-        if A_z is None:
-            A_z = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron, return_vector=False) * z_component_factor
-
-        A_z_dX = self.rotated_gaussian_beam_A(X + dr, Y, Z, T, beta_electron, return_vector=False) * z_component_factor
-        A_z_dY = self.rotated_gaussian_beam_A(X, Y + dr, Z, T, beta_electron, return_vector=False) * z_component_factor
-        A_z_dZ = self.rotated_gaussian_beam_A(X, Y, Z, T - dr / (beta_electron * C_LIGHT), beta_electron,
-                                              return_vector=False) * z_component_factor
-
-        G = self.G_gauge(A_z, Z)
-        G_dX = self.G_gauge(A_z_dX, Z)
-        G_dY = self.G_gauge(A_z_dY, Z)
-        G_dZ = self.G_gauge(A_z_dZ, Z) + A_z_dZ * dr
-
-        grad_G = np.stack([(G_dX - G) / dr, (G_dY - G) / dr, (G_dZ - G) / dr], axis=-1)
-
-        if save_to_file:
-            np.save("Data Arrays\\Debugging Arrays\\G.npy", G)
-            np.save("Data Arrays\\Debugging Arrays\\grad_G.npy", grad_G)
-
-        return grad_G
-
-    def phi_integrand(self,
-                      x: [float, np.ndarray],
-                      y: [float, np.ndarray],
-                      t: [float, np.ndarray],
-                      beta_electron: float,
-                      save_to_file: bool = False):
-        # WITHOUT THE PREFACTORS: this is the integrand of the integral over z of the phase shift.
-        X, Y, Z, T = self.generate_coordinates_lattice(x, y, t, beta_electron)
-        A_vector = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
-
-        grad_G = self.grad_G(X, Y, Z, T,
-                             A_z=A_vector[:, :, :, :, 2],
-                             beta_electron=beta_electron,
-                             save_to_file=save_to_file)
-
-        if save_to_file:
-            np.save("Data Arrays\\Debugging Arrays\\A.npy", A_vector)
-
-        integrand = np.sum(np.abs(A_vector - grad_G) ** 2, axis=-1) - \
-                    beta_electron ** 2 * np.abs(A_vector[:, :, :, :, 2] - grad_G[:, :, :, :, 2]) ** 2
-        return integrand, Z  # The Z is returned so that it can be used later in the integration of the integrand over z.
-
-    def phi_single_batch(self, x: np.ndarray, y: np.ndarray, t: np.ndarray, beta_electron: float,
-                         save_to_file: bool = False):
-        phi_integrand, Z = self.phi_integrand(x, y, t, beta_electron, save_to_file=save_to_file)
-        if save_to_file:
-            np.save("Data Arrays\\Debugging Arrays\\phi_integrand.npy", phi_integrand)
-        prefactor = - 1 / H_BAR * E_CHARGE ** 2 / (2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT)
-        phi_values = prefactor * np.trapz(phi_integrand, x=Z, axis=2)
-        return phi_values
+            if self.n_t == 3:
+                phi_0 = 1 / 2 * (phi_values[:, :, 0] + phi_values[:, :, 2])
+                varphi = np.arctan2(phi_values[:, :, 0] - phi_0, phi_values[:, :, 1] - phi_0)
+                sin_varphi = np.sin(varphi)
+                problematic_elements = np.abs(sin_varphi) < 1e-3
+                sin_varphi_no_small_values = np.where(problematic_elements, 1, sin_varphi)  # The clipping value will
+                # not affect the result.
+                cos_varphi_no_small_values = np.where(problematic_elements, np.cos(varphi), 1)
+                A_computed_with_sin = np.where(problematic_elements,
+                                               0,
+                                               (phi_values[:, :, 0] - phi_0) / sin_varphi_no_small_values
+                                               )
+                A_computed_with_cos = np.where(problematic_elements,
+                                               (phi_values[:, :, 1] - phi_0) / cos_varphi_no_small_values,
+                                               0)
+                A = A_computed_with_sin + A_computed_with_cos
+                phase_and_amplitude_mask = jv(0, A) * np.exp(1j * phi_0)
+            else:
+                # NOT ACCURATE UNLESS N_T IS BIG!
+                energy_bands = np.fft.fft(phase_factor, axis=-1, norm='forward')
+                phase_and_amplitude_mask = energy_bands[:, :, 0]
+            if self.debug_mode:
+                np.save("Data Arrays\\Debugging Arrays\\phase_amplitude_mask.npy", phase_and_amplitude_mask)
+            return phase_and_amplitude_mask
 
     def phi(self, x: np.ndarray, y: np.ndarray, beta_electron: float):
         # This if else clause is for the case of a single laser or a double laser:
@@ -966,36 +840,164 @@ class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
             np.save('Data Arrays\\Debugging Arrays\\phi_values.npy', phi_values)
         return phi_values
 
-    def extract_0_energy_level_amplitude(self, phi_values: np.ndarray):
-        phase_factor = np.exp(1j * phi_values)
-        if self.l_2 is None:  # If there is only one mode, then the phase is constant in time and there is no amplitude
-            # modulation.
-            return phase_factor
+    def phi_single_batch(self, x: np.ndarray, y: np.ndarray, t: np.ndarray, beta_electron: float,
+                         save_to_file: bool = False):
+        phi_integrand, Z = self.phi_integrand(x, y, t, beta_electron, save_to_file=save_to_file)
+        if save_to_file:
+            np.save("Data Arrays\\Debugging Arrays\\phi_integrand.npy", phi_integrand)
+        prefactor = - 1 / H_BAR * E_CHARGE ** 2 / (2 * M_ELECTRON * beta2gamma(beta_electron) * beta_electron * C_LIGHT)
+        phi_values = prefactor * np.trapz(phi_integrand, x=Z, axis=2)
+        return phi_values
+
+    def phi_integrand(self,
+                      x: [float, np.ndarray],
+                      y: [float, np.ndarray],
+                      t: [float, np.ndarray],
+                      beta_electron: float,
+                      save_to_file: bool = False):
+        # WITHOUT THE PREFACTORS: this is the integrand of the integral over z of the phase shift.
+        X, Y, Z, T = self.generate_coordinates_lattice(x, y, t, beta_electron)
+        A_vector = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron)
+
+        grad_G = self.grad_G(X, Y, Z, T,
+                             A_z=A_vector[:, :, :, :, 2],
+                             beta_electron=beta_electron,
+                             save_to_file=save_to_file)
+
+        if save_to_file:
+            np.save("Data Arrays\\Debugging Arrays\\A.npy", A_vector)
+
+        integrand = np.sum(np.abs(A_vector - grad_G) ** 2, axis=-1) - \
+                    beta_electron ** 2 * np.abs(A_vector[:, :, :, :, 2] - grad_G[:, :, :, :, 2]) ** 2
+        return integrand, Z  # The Z is returned so that it can be used later in the integration of the integrand over z.
+
+    def generate_coordinates_lattice(self,
+                                     x: [float, np.ndarray],
+                                     y: [float, np.ndarray],
+                                     t: [float, np.ndarray],
+                                     beta_electron: float):
+        integral_limit_in_spot_size_units = 5
+        alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
+
+        max_z_integration_interval = w_x_gaussian(w_0=NA2w0(self.NA, self.max_l),
+                                                  x=np.max(np.abs(x)) / np.cos(alpha_cavity),
+                                                  l_laser=self.max_l) / np.cos(alpha_cavity) * \
+                                     (2 * integral_limit_in_spot_size_units)
+        required_n_z_for_integration_over_maximal_interval = int(max_z_integration_interval / (1/(1+1/beta_electron) * self.min_l))
+        # The denominator is chosen such that the G_gauge function is accurate. In general the spacing dz should be
+        # around the effective wavelength that is seen by the passing electron. The effective wavelength is (
+        # 1+1/beta) * l. This is because: cos(kx) * cos(wt) -> cos(kx) * cos(w * (x/(beta*c))) = cos(kx) * cos(
+        # k/beta * x) = 1/2 * ( cos((1+1/beta)kx) + cos((1-1/beta)kx)
+
+        z = np.linspace(-integral_limit_in_spot_size_units,
+                        integral_limit_in_spot_size_units,
+                        required_n_z_for_integration_over_maximal_interval)
+
+        X, Y, Z, T = np.meshgrid(x, y, z, t, indexing='ij')
+
+        Z *= w_x_gaussian(w_0=NA2w0(self.NA, self.min_l), x=X / np.cos(alpha_cavity), l_laser=self.min_l) / np.cos(
+            alpha_cavity)  # This scales the z axis to the size of the beam spot_size at each x. x is divided by
+        # cos_alpha because the beam is tilted, and so does the spot size itself.
+        Z -= X * np.tan(alpha_cavity)  # This make the Z coordinates centered around
+        # the cavity axis - which depend on the angle of the cavity and the x coordinate.
+        T += Z / (C_LIGHT * beta_electron)  # This makes T be the time of the electron that passed through z=0 at
+        # time t and then got to Z after/before: Z/(beta * c) time. (that is, t=t(z))
+
+        return X, Y, Z, T
+
+    def rotated_gaussian_beam_A(self,
+                                x: [float, np.ndarray],
+                                y: [float, np.ndarray],
+                                z: [float, np.ndarray],
+                                t: [float, np.ndarray],
+                                beta_electron: Optional[float] = None,
+                                return_vector: bool = True) -> Union[np.ndarray, float]:
+
+        alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
+
+        x_tilde = x * np.cos(alpha_cavity) - z * np.sin(alpha_cavity)
+        z_tilde = x * np.sin(alpha_cavity) + z * np.cos(alpha_cavity)
+
+        A_1 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_1, lamda=self.l_1, NA=self.NA, t=t,
+                            mode="potential")
+        A_2 = gaussian_beam(x=x_tilde, y=y, z=z_tilde, E=self.E_2, lamda=self.l_2, NA=self.NA, t=t,
+                            mode="potential")
+
+        # This is not the electric potential, but rather only the amplitude factor that is shared among the different
+        # components of the electromagnetic potential. each component is multiplied by the corresponding trigonometric
+        # functions, depending on the polarization, and the tilt of the cavity.
+        A_scalar = A_1 + A_2
+
+        # This is the rotated field vector: the vector is achieved by starting with a polarized light in the z axis,
+        # then rotating it in the y-z plane by theta_polarization (from z towards y) and then rotating it in the
+        # z-x plane by alpha_cavity (from x towards z).
+        # (0, 0, 1) -> (0, sin(t), cos(t)) -> (sin(a)cos(t), sin(t), cos(a)cos(t))
+        if not return_vector:
+            return A_scalar
         else:
-            if self.n_t == 3:
-                phi_0 = 1 / 2 * (phi_values[:, :, 0] + phi_values[:, :, 2])
-                varphi = np.arctan2(phi_values[:, :, 0] - phi_0, phi_values[:, :, 1] - phi_0)
-                sin_varphi = np.sin(varphi)
-                problematic_elements = np.abs(sin_varphi) < 1e-3
-                sin_varphi_no_small_values = np.where(problematic_elements, 1, sin_varphi)  # The clipping value will
-                # not affect the result.
-                cos_varphi_no_small_values = np.where(problematic_elements, np.cos(varphi), 1)
-                A_computed_with_sin = np.where(problematic_elements,
-                                               0,
-                                               (phi_values[:, :, 0] - phi_0) / sin_varphi_no_small_values
-                                               )
-                A_computed_with_cos = np.where(problematic_elements,
-                                               (phi_values[:, :, 1] - phi_0) / cos_varphi_no_small_values,
-                                               0)
-                A = A_computed_with_sin + A_computed_with_cos
-                phase_and_amplitude_mask = jv(0, A) * np.exp(1j * phi_0)
-            else:
-                # NOT ACCURATE UNLESS N_T IS BIG!
-                energy_bands = np.fft.fft(phase_factor, axis=-1, norm='forward')
-                phase_and_amplitude_mask = energy_bands[:, :, 0]
-            if self.debug_mode:
-                np.save("Data Arrays\\Debugging Arrays\\phase_amplitude_mask.npy", phase_and_amplitude_mask)
-            return phase_and_amplitude_mask
+            A_vector = np.stack((-A_scalar * np.cos(self.theta_polarization) * np.sin(alpha_cavity),
+                                 A_scalar * np.sin(self.theta_polarization),
+                                 A_scalar * np.cos(self.theta_polarization) * np.cos(alpha_cavity)),
+                                axis=-1)
+            return A_vector
+
+    def grad_G(self, X, Y, Z, T, beta_electron, A_z=None, save_to_file: bool = False):
+
+        # You might ask yourself - we already have a lattice full of G values - why not subtract the lattice from
+        # itself to get the gradient? The answer is that the lattice is too sparse to get a good gradient.
+        # It could have been possible in the z axis where we must have dense z values for the later integral, but in the
+        # z axis we also have the time component increasing with Z, so subtracting the lattice from itself will give
+        # dG=G(z+dz, t(z+dz))-G(z, t(z)), while we want dG=G(z+dz, t(z))-G(z, t(z))-G
+
+        dr = self.min_l / 1000  # ARBITRARY I checked manually, and at around 400 the value of
+        # the derivative stabilizes, so 1000 is a safe margin. Anyway I don't think we are not close to precision
+        # error problems.
+
+        z_component_factor = np.cos(self.beta_electron2alpha_cavity(beta_electron)) * np.cos(self.theta_polarization)
+
+        if A_z is None:
+            A_z = self.rotated_gaussian_beam_A(X, Y, Z, T, beta_electron, return_vector=False) * z_component_factor
+
+        # The values of a shifted a bit:
+        A_z_dX = self.rotated_gaussian_beam_A(X + dr, Y, Z, T, beta_electron, return_vector=False) * z_component_factor
+        A_z_dY = self.rotated_gaussian_beam_A(X, Y + dr, Z, T, beta_electron, return_vector=False) * z_component_factor
+        A_z_dZ = self.rotated_gaussian_beam_A(X, Y, Z, T - dr / (beta_electron * C_LIGHT), beta_electron,
+                                              return_vector=False) * z_component_factor
+
+        G = self.G_gauge(A_z, Z)
+        G_dX = self.G_gauge(A_z_dX, Z)
+        G_dY = self.G_gauge(A_z_dY, Z)
+        G_dZ = self.G_gauge(A_z_dZ, Z) + A_z_dZ * dr
+
+        grad_G = np.stack([(G_dX - G) / dr, (G_dY - G) / dr, (G_dZ - G) / dr], axis=-1)
+
+        if save_to_file:
+            np.save("Data Arrays\\Debugging Arrays\\G.npy", G)
+            np.save("Data Arrays\\Debugging Arrays\\grad_G.npy", grad_G)
+
+        return grad_G
+
+    @staticmethod
+    def G_gauge(A_shifted: np.ndarray, Z: np.ndarray) -> np.ndarray:
+        dZ = Z[:, :, 1, :] - Z[:, :, 0, :]
+        # This dZ assumes different dz for different x's. I use this variating dZ because I want to integrate over, for
+        # example, range of [-4w(x), 4*w(x)] for every x, and the spot size w(x) changes with x.
+        # Since dz does not vary along z, it is enough to use the first value of dZ.
+        # G_gauge_values = np.cumsum(A_shifted, axis=2) * dZ[:, :, np.newaxis, :]
+        G_gauge_values = integrate.cumtrapz(A_shifted, x=Z, axis=2, initial=0)
+        return G_gauge_values  # integral over z
+
+    def setup_to_path(self, input_wave: WaveFunction) -> str:
+        # This function is used to generate a unique name for each setup, such that we can load previous results if they
+        # exist.
+        path = f'Data Arrays\\Phase Masks\\2f_l1{self.l_1 * 1e9:.4g}_l2{self.l_2 * 1e9:.4g}_' \
+               f'E1{self.E_1:.3g}_E2{self.E_2:.3g}_NA{self.NA * 100:.4g}_' \
+               f'alpha{self.beta_electron2alpha_cavity(E2beta(input_wave.E0)) / 2 * np.pi * 360:.0f}_' \
+               f'theta{self.theta_polarization * 100:.4g}_E{input_wave.E0:.2g}_' \
+               f'Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nz{self.n_z}_' \
+               f'Nt{self.n_t}_DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}.npy'
+
+        return path
 
 
 if __name__ == '__main__':
