@@ -1,0 +1,4542 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+% Necessary Commands:
+\usepackage{autobreak}
+\usepackage{relsize}
+% Set vertical space before and after dislpay equations to be longer for better redability:
+\AtBeginDocument{\setlength\abovedisplayskip{12pt}}
+\AtBeginDocument{\setlength\belowdisplayskip{12pt}}
+\AtBeginDocument{\setlength\belowdisplayshortskip{12pt}}
+\AtBeginDocument{\setlength\belowdisplayshortskip{12pt}}
+
+% Set space between words to be wider:
+\spaceskip=1.3\fontdimen2\font plus 1\fontdimen3\font minus 1.5\fontdimen4\font
+
+% Convert the Lyx colors into more pleasent colors:
+\usepackage{xcolor}
+\definecolor{blue}{RGB}{14,107,217}
+\definecolor{green}{RGB}{0,158,40}
+\definecolor{red}{RGB}{235,16,16}
+\definecolor{brown}{RGB}{164,66,0}
+\definecolor{orange}{RGB}{231,135,26}
+\definecolor{purple}{RGB}{94,53,177}
+
+% Convert the QED Symbol at the end of proofs to a solid black square (credit: Yakir Oz):
+\usepackage{amssymb}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+% Make the layout more similar to Hebrew Article, which I am more used to:
+\renewcommand*{\@seccntformat}[1]{\hspace{0.5cm}\csname the#1\endcsname\hspace{0.5cm}} 
+\usepackage{titlesec}
+\titleformat{\section}{\fontsize{20}{20}\bfseries}{\thesection}{10pt}{}
+\titleformat{\subsection}{\fontsize{15}{15}\bfseries}{\thesubsection}{10pt}{}
+\titleformat{\subsubsection}{\bfseries}{\thesubsubsection}{10pt}{}
+
+% Create disjoint union symbols:
+\makeatletter
+\def\moverlay{\mathpalette\mov@rlay}
+\def\mov@rlay#1#2{\leavevmode\vtop{%
+   \baselineskip\z@skip \lineskiplimit-\maxdimen
+   \ialign{\hfil$\m@th#1##$\hfil\cr#2\crcr}}}
+\newcommand{\charfusion}[3][\mathord]{
+    #1{\ifx#1\mathop\vphantom{#2}\fi
+        \mathpalette\mov@rlay{#2\cr#3}
+      }
+    \ifx#1\mathop\expandafter\displaylimits\fi}
+\makeatother
+\newcommand{\cupdot}{\charfusion[\mathbin]{\cup}{\cdot}}
+\newcommand{\bigcupdot}{\charfusion[\mathop]{\bigcup}{\cdot}}
+
+\newcommand{\kaliLargeLand}{\mathop{\mathlarger{\mathlarger{\mathlarger{\land}}}}}
+\end_preamble
+\use_default_options true
+\begin_modules
+theorems-ams
+\end_modules
+\maintain_unincluded_children false
+\begin_local_layout
+Style Section
+	Font
+	  Series     Medium
+	  Shape      Smallcaps
+	  Size       Larger
+	  Series     Bold
+	EndFont
+	TocLevel 1
+End
+
+
+Style Section*
+	Font
+	  Series     Medium
+	  Shape      Smallcaps
+	  Size      Larger
+	  Series     Bold
+	EndFont
+End
+
+
+Style Solution
+
+	LabelString           "פיתרון: "
+End
+
+
+Style Notation
+
+	LabelString           "סימון  \thetheorem: "
+End
+
+Style Theorem
+
+	LabelString           "משפט \thetheorem: "
+End
+
+Style Property
+
+	LabelString           "תזכורת: "
+End
+\end_local_layout
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "David"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing onehalf
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1cm
+\topmargin 2cm
+\rightmargin 1cm
+\bottommargin 3cm
+\headheight 0cm
+\headsep 0cm
+\footskip 2cm
+\secnumdepth -2
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation 0bp
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "C:/Users/michaeka/OneDrive - weizmann.ac.il/Templates/MacrosEnglish.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Doublebox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+\begin_inset space \space{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+
+\size giant
+Readme File
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+
+\size larger
+Michael Kali - michael.kali@weizmann.ac.il
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+today
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset space \space{}
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This file contains the derivations used in the 
+\family typewriter
+microscope.py
+\family default
+ file for simulating a microscope with 2 frequencies cavity.
+ the code is available here:
+\bar under
+\color blue
+
+\begin_inset CommandInset href
+LatexCommand href
+name "https://github.com/mkali-weizmann/phase-plate"
+target "https://github.com/mkali-weizmann/phase-plate"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+An expanded version of Osip's Article (Relativistic ponderomotive potential):
+\end_layout
+
+\begin_layout Subsubsection
+Find the phase shift using the field in the electron's rest frame 
+\begin_inset Formula $S^{\prime}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Start with the Schrodinger equation:
+\begin_inset Formula 
+\[
+\frac{d}{dt}\psi\stackrel{\text{Schrodinger Eq.}}{=}\frac{i}{\hbar}\kaliHemiltonian{\color{lightgray}\ \backslash\intop dt}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\psi\left(t\right)\stackrel{\text{Schrodinger Eq.}}{=}e^{\frac{i}{\hbar}\intop\kaliHemiltonian dt^{\prime}}\psi\left(0\right)=e^{\frac{i}{\hbar}\intop\left[\frac{1}{2}mv^{\prime2}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{r}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot\boldsymbol{v}^{\prime}\left(t^{\prime}\right)\right]dt^{\prime}}\psi\left(0\right)
+\]
+
+\end_inset
+
+And so the total phase acquired is:
+\begin_inset Formula 
+\begin{equation}
+\phi\left(t\right)=\frac{1}{\hbar}\intop\left[\frac{1}{2}mv^{\prime2}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{r}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot\boldsymbol{v}^{\prime}\left(t^{\prime}\right)\right]dt^{\prime}\label{eq:e_13}
+\end{equation}
+
+\end_inset
+
+Since we are in Gibbs gauge, and 
+\begin_inset Formula $A_{0}=0$
+\end_inset
+
+, the electric field is:
+\begin_inset Formula 
+\[
+\boldsymbol{E}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)\stackrel{\text{Wikipedia says there is a minus here}}{=}-\frac{\partial}{\partial t}\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
+\]
+
+\end_inset
+
+And the force:
+\begin_inset Formula 
+\[
+\boldsymbol{F}^{\prime}=-e\boldsymbol{E}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)=e\frac{\partial}{\partial t}\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And so 
+\begin_inset Formula 
+\[
+\Delta\boldsymbol{p}=\intop_{0}^{t^{\prime}}F^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime\prime}\right)dt^{\prime\prime}=e\intop_{0}^{t^{\prime}}\frac{\partial}{\partial t}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime\prime}\right)dt^{\prime\prime}=e\boldsymbol{A^{\prime}}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
+\]
+
+\end_inset
+
+And the velocity:
+\begin_inset Formula 
+\[
+\boldsymbol{v}\left(t^{\prime}\right)=\frac{\Delta\boldsymbol{p}}{m}=\frac{e}{m}\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plugging this velocity into 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_13"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+, we get:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\phi\left(t\right) & =\frac{1}{\hbar}\intop_{0}^{t}\left[\frac{1}{2}m{\color{brown}v^{\prime2}}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{r}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot{\color{brown}\boldsymbol{v}^{\prime}\left(t^{\prime}\right)}\right]dt^{\prime}\nonumber \\
+ & =\frac{1}{\hbar}\intop_{0}^{t}\left[\frac{1}{2}m\left({\color{brown}\frac{e}{m}A^{\prime}\left(\boldsymbol{x}_{0},t^{\prime}\right)}\right)^{2}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0},t^{\prime}\right)\cdot\left({\color{brown}\frac{e}{m}A^{\prime}\left(\boldsymbol{x}_{0},t^{\prime}\right)}\right)\right]dt^{\prime}\nonumber \\
+ & =\frac{1}{\hbar}\intop_{0}^{t}\left[\frac{1}{2}{\color{brown}\frac{e^{2}}{m}A^{2}\left(\boldsymbol{x}_{0},t^{\prime}\right)}-\frac{e^{2}}{m}\boldsymbol{A}^{\prime2}\left(\boldsymbol{x}_{0},t^{\prime}\right)\cdot\right]dt^{\prime}\nonumber \\
+ & =-\frac{1}{\hbar}\intop_{0}^{t}\frac{e^{2}}{2m}\boldsymbol{A}^{\prime2}\left(\boldsymbol{x}_{0},t^{\prime}\right)dt^{\prime}\label{eq:e_15}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Convert 
+\begin_inset Formula $\boldsymbol{A}^{\prime}$
+\end_inset
+
+ from electron's frame to 
+\begin_inset Formula $\boldsymbol{A}$
+\end_inset
+
+ in lab's frame preserving Gibbs gauge:
+\end_layout
+
+\begin_layout Standard
+Let us denote the field in coulomb gauge in the electron's frame with 
+\begin_inset Formula $A^{\prime}$
+\end_inset
+
+, the field in the lab frame after Lorentz transformation from the electron's
+ frame with 
+\begin_inset Formula $\tilde{A}$
+\end_inset
+
+, the field in the lab's frame and in coulomb gauge with 
+\begin_inset Formula $A$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $A^{\prime}$
+\end_inset
+
+ and 
+\begin_inset Formula $A$
+\end_inset
+
+ are in coulomb gauge (Gibbs gauge, in particular), we have: 
+\begin_inset Formula $A_{0}=0=\tilde{A}_{0}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Let us express everything in terms of 
+\begin_inset Formula $\left(\tilde{A}_{0},\tilde{A}\right)$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\Phi^{\prime}=0 & =\frac{\gamma}{c}\tilde{A_{0}}-\gamma\beta\tilde{A}_{z}\label{eq:S_1}\\
+\boldsymbol{A}_{\perp}^{\prime} & =\tilde{\boldsymbol{A}}_{\perp}\nonumber \\
+A_{z}^{\prime} & =-\frac{\gamma}{c}\beta\tilde{A_{0}}+\gamma\tilde{A}_{z}=-\frac{\gamma}{\cancel{c}}\beta^{2}\cancel{c}\tilde{A}_{z}+\gamma\tilde{A}_{z}=\gamma\left(1-\beta^{2}\right)\tilde{A}_{z}=\frac{\left(1-\beta^{2}\right)}{\sqrt{1-\beta^{2}}}\tilde{A}_{z}=\sqrt{1-\beta^{2}}\tilde{A}_{z}=\frac{1}{\gamma}\tilde{A}_{z}\label{eq:e_14}\\
+\boldsymbol{A} & =\tilde{\boldsymbol{A}}+\nabla G\Rightarrow\nonumber \\
+{\color{gray}A_{z}} & {\color{gray}=\tilde{A}_{z}+\partial_{z}G}\label{eq:S_4}\\
+{\color{gray}A_{x}} & {\color{gray}=\tilde{A}_{x}+\partial_{x}G}\nonumber \\
+{\color{gray}A_{y}} & {\color{gray}=\tilde{A}_{y}+\partial_{y}G}\nonumber \\
+A_{0} & =\tilde{A}_{0}-\partial_{t}G=0\label{eq:S_5}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Given an electromagnetic vector potential:
+\begin_inset Formula 
+\[
+\left(\tilde{A}_{0},\boldsymbol{\tilde{A}}\right)
+\]
+
+\end_inset
+
+Any gauge will be of the form:
+\begin_inset Formula 
+\begin{align*}
+\tilde{\boldsymbol{A}} & \rightarrow\boldsymbol{A}=\tilde{\boldsymbol{A}}+\nabla G\\
+\tilde{A}_{0} & \rightarrow A_{0}=\tilde{A}_{0}-\partial_{t}G
+\end{align*}
+
+\end_inset
+
+If we want to make 
+\begin_inset Formula $\tilde{A_{0}}$
+\end_inset
+
+ vanish then we get an equation on 
+\begin_inset Formula $G$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{equation}
+\partial_{t}G\stackrel{\left({\color{blue}\ref{eq:S_5}}\right)}{=}\tilde{A}_{0}\tag{S5}\label{eq:e_22}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $\left(\tilde{A}_{0},\tilde{\boldsymbol{A}}\right)$
+\end_inset
+
+ was itself achieved by Lorentz transforming a coulomb gauged vector potential:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\tilde{A}_{0}\stackrel{\left({\color{blue}\ref{eq:S_1}}\right)}{=}\beta c\tilde{A}_{z}\tag{S1}\label{eq:e_23}
+\end{equation}
+
+\end_inset
+
+Substituting the result from 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_22"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ to 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_23"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+
+\begin_inset Formula 
+\[
+A_{z}\stackrel{\left({\color{blue}\ref{eq:S_4}}\right)}{=}\partial_{z}G+\tilde{A}_{z}{\color{lightgray}\ \backslash-\partial_{z}G}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(A_{z}-\partial_{z}G\right)\stackrel{\left({\color{blue}\ref{eq:S_4}}\right)}{=}\tilde{A}_{z}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\partial_{t}G\stackrel{\left(S5\right)}{=}\tilde{A_{0}}\stackrel{\left(S1\right)}{=}\beta c\tilde{A}_{z}\stackrel{\left(S4\right)}{=}\beta c\left(A_{z}-\partial_{z}G\right){\color{lightgray}\ \backslash+\beta c\partial_{z}G}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\left[\partial_{t}+\beta c\partial_{z}\right]G=\beta cA_{z}\kaliV\label{eq:e_12}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Guess solution of the form:
+\begin_inset Formula 
+\[
+G\left(\boldsymbol{x},t\right)=c\beta\intop_{-\infty}^{t}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Let's verify that this solution works:
+\end_layout
+
+\begin_layout Standard
+Define:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{t}\left(t^{\prime}\right)=A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)
+\]
+
+\end_inset
+
+And get:
+\begin_inset Formula 
+\begin{align}
+{\color{teal}\frac{\partial}{\partial t}\left(c\beta\intop_{-\infty}^{t}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}\right)}=\nonumber \\
+= & \frac{\partial}{\partial t}\left(c\beta\intop_{-\infty}^{t}f_{t}\left(t^{\prime}\right)dt^{\prime}\right)\nonumber \\
+= & c\beta\frac{\partial}{\partial t}\left(\intop_{-\infty}^{t}f_{t}\left(t^{\prime}\right)dt^{\prime}\right)\nonumber \\
+= & c\beta\lim_{dt\rightarrow0}\left(\intop_{-\infty}^{t+dt}f_{t+dt}\left(t^{\prime}\right)dt^{\prime}-\intop_{-\infty}^{t}f_{t}\left(t^{\prime}\right)dt^{\prime}\right):dt\nonumber \\
+= & c\beta\lim_{dt\rightarrow0}\left({\color{red}\intop_{t}^{t+dt}f_{t+dt}\left(t^{\prime}\right)dt^{\prime}}+{\color{green}\intop_{-\infty}^{t}f_{t+dt}\left(t^{\prime}\right)dt^{\prime}}-{\color{blue}\intop_{-\infty}^{t}f_{t}\left(t^{\prime}\right)dt^{\prime}}\right):dt\nonumber \\
+= & c\beta\lim_{dt\rightarrow0}\left({\color{gray}\underset{f_{t+dt}\left(t^{\prime}\right)\cdot dt}{\underbrace{{\normalcolor {\color{red}\intop_{t}^{t+dt}f_{t+dt}\left(t^{\prime}\right)dt^{\prime}}}}}}+\intop_{-\infty}^{t}{\color{gray}\underset{\frac{d}{dt}f_{t}\left(t^{\prime}\right)\cdot dt}{\underbrace{{\normalcolor \left({\color{green}f_{t+dt}\left(t^{\prime}\right)}-{\color{blue}f_{t}\left(t^{\prime}\right)}\right)}}}}dt^{\prime}\right):dt\nonumber \\
+= & c\beta\lim_{dt\rightarrow0}\left({\color{red}f_{t+dt}\left(t\right)\cdot\cancel{dt}}+\intop_{-\infty}^{t}\frac{d}{dt}f_{t}\left(t^{\prime}\right)\cdot\cancel{dt}dt^{\prime}\right):\cancel{dt}\nonumber \\
+= & c\beta\lim_{dt\rightarrow0}\left(f_{t+\cancel{dt}}\left(t\right)+\intop_{-\infty}^{t}\frac{d}{dt}f_{t}\left(t^{\prime}\right)dt^{\prime}\right)\nonumber \\
+= & c\beta\lim_{dt\rightarrow0}\left(f_{t}\left(t\right)+\intop_{-\infty}^{t}\frac{d}{dt}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}\right)\nonumber \\
+= & c\beta\left(A_{z}\left(z,t\right)+\intop_{-\infty}^{t}\frac{\partial}{\partial z}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)\cdot{\color{gray}\underset{-c\beta}{\underbrace{{\normalcolor \frac{d}{dt}\left(z-c\beta\left(t-t^{\prime}\right)\right)}}}}dt^{\prime}\right)\nonumber \\
+= & c\beta\left(A_{z}\left(z,t\right)+\intop_{-\infty}^{t}\frac{\partial}{\partial z}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)\left(-c\beta\right)dt^{\prime}\right)\nonumber \\
+= & {\color{teal}c\beta\left(A_{z}\left(z,t\right)-\beta c\intop_{-\infty}^{t}\frac{\partial}{\partial z}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}\right)}\label{eq:infi_proof}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+{\color{brown}\frac{\partial}{\partial z}G}=\frac{\partial}{\partial z}\left(c\beta\intop_{-\infty}^{t}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}\right)={\color{brown}c\beta\intop_{-\infty}^{t}\frac{\partial}{\partial z}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plugging in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_12"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+, we see indeed that:
+\begin_inset Formula 
+\[
+{\color{teal}\partial_{t}G}+{\color{brown}\beta c\frac{\partial}{\partial z}G}={\color{teal}c\beta\left(A_{z}\left(z,t\right)-\cancel{\beta c\intop_{-\infty}^{t}\frac{\partial}{\partial z}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}}\right)}+\cancel{{\color{brown}\left(c\beta\right)^{2}\intop_{-\infty}^{t}\frac{\partial}{\partial z}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}}}=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+{\color{teal}\partial_{t}G}+{\color{brown}\beta c\frac{\partial}{\partial z}G}=c\beta A_{z}\left(z,t\right)\kaliV
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Proof's of Osip's approximation for 
+\begin_inset Formula $G$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+First, let us rewrite the the integral of 
+\begin_inset Formula $G$
+\end_inset
+
+ as such:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\nicefrac{G}{\beta c}=\intop_{-\infty}^{t}A_{z}\left(z-\beta c\left(t-T\right),T\right)dT
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+Z & =z-\beta c\left(t-T\right) & \frac{1}{\beta c}dZ & =dT & T=t & \iff Z=z\label{eq:e_24}\\
+T & =\frac{Z-z}{\beta c}+t\nonumber 
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\nicefrac{G}{\beta c}=\intop_{-\infty}^{t}A_{z}\left(z-\beta c\left(t-T\right),T\right)dT=\frac{1}{\beta c}\intop_{-\infty}^{z}A_{z}\left(Z,\frac{Z-z}{\beta c}+t\right)dZ
+\]
+
+\end_inset
+
+With the frequency:
+\begin_inset Formula 
+\begin{align*}
+\cos\left(\omega T\right) & =\cos\left(\omega\left(\frac{Z-z}{\beta c}+t\right)\right)\Rightarrow & \tilde{k} & =\frac{\omega}{\beta c}=\frac{k_{L}}{\beta} & \varphi_{z,t} & =\omega\left(t-\frac{z}{\beta c}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now, let us show that 
+\begin_inset Formula $G\approx\beta c\intop_{0}^{t}A\left(z,t^{\prime}\right)dt^{\prime}=A_{\text{envelope}}\left(z\right)\cdot\sin\left(\omega t\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We will show it by looking at 
+\begin_inset Formula $\frac{\partial\nicefrac{G}{\beta c}}{\partial t}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\nicefrac{G}{\beta c}}{\partial t}\stackrel{{\color{blue}\eqref{eq:infi_proof}}}{=}A_{z}\left(z,t\right)-\beta c\intop_{-\infty}^{t}\frac{\partial}{\partial z}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}=A_{z}\left(z,t\right)-\beta c\intop_{-\infty}^{t}A^{\prime}\left(z-\beta c\left(t-t^{\prime}\right)\right)\cos\left(\omega t^{\prime}\right)dt^{\prime}=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+={\color{green}A_{z}\left(z,t\right)}-\cancel{\frac{\beta c}{\beta c}}{\color{red}\intop_{-\infty}^{z}A^{\prime}\left(Z\right)\cos\left(\frac{k}{\beta}\left(Z-z\right)+\omega t\right)dZ}=
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And so since 
+\begin_inset Formula $G\left(z,t\right)=\intop_{-\infty}^{t}\frac{\partial}{\partial t^{\prime}}G\left(z,t^{\prime}\right)dt^{\prime}$
+\end_inset
+
+, we want to show that just the second term is much smaller than the first
+ term:
+\begin_inset Formula 
+\[
+G\left(z,t\right)=\intop_{-\infty}^{t}\frac{\partial}{\partial t^{\prime}}G\left(z,t^{\prime}\right)dt^{\prime}=\overset{\kaliV}{{\color{green}\intop_{-\infty}^{t}A_{z}\left(z,t^{\prime}\right)dt^{\prime}}}-{\color{red}\intop_{0}^{t}\intop_{-\infty}^{z}A^{\prime}\left(Z\right)\cos\left(\frac{k}{\beta}\left(Z-z\right)+\omega t^{\prime}\right)dZdt^{\prime}}=
+\]
+
+\end_inset
+
+Continuing only with the second element:
+\begin_inset Formula 
+\[
+=-{\color{red}\intop_{-\infty}^{z}A^{\prime}\left(Z\right)\intop_{0}^{t}\cos\left(\frac{k}{\beta}\left(Z-z\right)+\omega t^{\prime}\right)dt^{\prime}dZ}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=-\frac{1}{\omega}\intop_{-\infty}^{z}{\color{gray}\underset{=\frac{Z}{\sigma^{2}}A\left(Z\right)}{\underbrace{{\normalcolor A^{\prime}\left(Z\right)}}}}\sin\left(\frac{k}{\beta}Z-\frac{k}{\beta}z+t\right)dZ
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=-\frac{1}{\omega}\intop_{-\infty}^{z}\frac{{\color{gray}\overset{\approx\cancel{w}}{\overbrace{{\normalcolor Z}}}}}{w^{\cancel{2}}}A\left(Z\right)\sin\left(\frac{k}{\beta}Z-\frac{k}{\beta}z+t\right)dZ
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\approx-\frac{1}{\omega w}{\color{gray}\underset{}{\underbrace{{\normalcolor \intop_{-\infty}^{z}A\left(Z\right)\sin\left(\frac{k}{\beta}Z-\frac{k}{\beta}z+t\right)dZ}}}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\beta\cancel{c}\stackrel{?}{\ll}-\omega w=\cancel{c}kw
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\beta\stackrel{?}{\ll}kw=\frac{2\cancel{k}}{\cancel{k}NA}=\frac{2}{NA}\kaliV
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Coming back to the main discussion:
+\end_layout
+
+\begin_layout Standard
+The Field in the laboratory frame before gauging it back is:
+\begin_inset Formula 
+\begin{alignat*}{3}
+\boldsymbol{A}_{\perp}^{\prime}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & = & \begin{pmatrix}A_{x}^{\prime}\\
+A_{y}^{\prime}
+\end{pmatrix}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & = & \begin{pmatrix}\tilde{A}_{x}\\
+\tilde{A}_{y}
+\end{pmatrix}\left(\boldsymbol{x},t\right) & =\tilde{\boldsymbol{A}}_{\perp}\left(\boldsymbol{x},t\right)\\
+A_{\parallel}^{\prime}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & = & A_{z}^{\prime}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & = & \frac{1}{\gamma}\tilde{A}_{z}\left(\boldsymbol{x},t\right) & =\frac{1}{\gamma}\tilde{A}_{\parallel}\left(\boldsymbol{x},t\right)\\
+0 & = & A_{0}^{\prime} & = & \frac{\gamma}{c}\tilde{\Phi}\left(\boldsymbol{x},t\right) & -\gamma\beta\tilde{A}_{z}
+\end{alignat*}
+
+\end_inset
+
+And
+\begin_inset Formula 
+\begin{align*}
+\boldsymbol{A} & =\tilde{\boldsymbol{A}}+\nabla G\\
+\Phi & =\tilde{\Phi}-\partial_{t}G
+\end{align*}
+
+\end_inset
+
+So we get:
+\begin_inset Formula 
+\begin{align}
+\boldsymbol{A}^{\prime2} & =A_{x}^{\prime2}+A_{z}^{\prime2}+A_{z}^{\prime2}\nonumber \\
+ & =\tilde{A}_{x}^{2}+\tilde{A}_{z}^{2}+\frac{1}{\gamma^{2}}\tilde{A}_{z}^{2}\nonumber \\
+ & ={\color{green}\tilde{A}_{x}^{2}+\tilde{A}_{z}^{2}+\tilde{A}_{z}^{2}}+\left(\frac{1}{\gamma^{2}}-1\right)\tilde{A}_{z}^{2}\nonumber \\
+ & ={\color{green}\tilde{A}^{2}}+\left(\left(\cancel{1}-{\color{blue}\beta^{2}}\right)-\cancel{1}\right)\tilde{A}_{z}^{2}\nonumber \\
+ & ={\color{green}\tilde{A}^{2}}-{\color{blue}\beta^{2}\tilde{A}_{z}^{2}}\nonumber \\
+\boldsymbol{A}^{\prime2} & ={\color{green}\left(\boldsymbol{A}-\nabla G\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}-\partial_{z}G\right)^{2}}\label{eq:e_16}
+\end{align}
+
+\end_inset
+
+And so substituting 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_15"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ into 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_16"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we get:
+\begin_inset Formula 
+\begin{align*}
+\phi\left(t\right) & \stackrel{{\color{blue}\eqref{eq:e_15}}}{=}-\frac{1}{\hbar}\intop_{0}^{t}\frac{e^{2}}{2m}\boldsymbol{A}^{\prime2}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)dt^{\prime}\\
+ & =-\frac{1}{\hbar}\intop_{0}^{t}\frac{e^{2}}{2m}\left({\color{green}\left(\boldsymbol{A}\left(x,y,z\left(t\right),t\right)-\nabla G\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(x,y,z\left(t\right),t\right)-\partial_{z}G\right)^{2}}\right)\left(\frac{1}{\gamma}dt\right)
+\end{align*}
+
+\end_inset
+
+Setting 
+\begin_inset Formula 
+\begin{align*}
+z\left(t\right) & =z_{0}+\beta ct\iff dt=\frac{1}{\beta c}dz & t\left(z\right) & =\frac{z-z_{0}}{\beta c}
+\end{align*}
+
+\end_inset
+
+we get:
+\begin_inset Formula 
+\[
+\phi\left(t\right)=-\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\left(\boldsymbol{A}\left(\boldsymbol{x},t\left(z\right)\right)-\nabla G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(\boldsymbol{x},t\left(z\right)\right)-\partial_{z}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And for the special case of 
+\begin_inset Formula $G$
+\end_inset
+
+ with gradient only in the 
+\begin_inset Formula $\hat{x}$
+\end_inset
+
+ direction (which we will later find out is the case) and for 
+\begin_inset Formula $A_{x}=0$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align}
+\phi\left(t\right) & =-\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\cancel{A_{x}^{2}}+\cancel{2A_{x}\partial_{x}G}+\left(\partial_{x}G\right)^{2}+A_{y}^{2}+A_{z}^{2}}-{\color{blue}\beta^{2}A_{z}^{2}+\cancel{2A_{z}\partial_{z}G}-\cancel{\left(\partial_{z}G\right)^{2}}}\right)dz\nonumber \\
+ & =-\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left(A_{y}^{2}+\left(1-{\color{blue}\beta^{2}}\right)A_{z}^{2}+\left(\partial_{x}G\right)^{2}\right)dz\nonumber \\
+ & =-\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left(A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)+\left(1-{\color{blue}\beta^{2}}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)+\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}\right)dz\label{eq:e_18}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Fitting a vector potential 
+\begin_inset Formula $\boldsymbol{A}$
+\end_inset
+
+ in the lab frame to the Gaussian beam standing wave:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+\boldsymbol{A}=A\left(y,z\right)e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)-\omega t\right)}\begin{pmatrix}0\\
+0\\
+\sin\theta e^{-i\varepsilon}\\
+\cos\theta
+\end{pmatrix}
+\]
+
+\end_inset
+
+Deriving it by time, we get:
+\begin_inset Formula 
+\begin{align*}
+\boldsymbol{E}=-\frac{\partial}{\partial t}\boldsymbol{A} & =A\left(y,z\right)e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)-\omega t\right)}\cdot\begin{pmatrix}0\\
+\sin\theta e^{-i\varepsilon}\\
+\cos\theta
+\end{pmatrix}\\
+\boldsymbol{E} & =\omega A\left(y,z\right)e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)-\omega t\right)}\cdot\begin{pmatrix}0\\
+\sin\theta e^{-i\varepsilon}\\
+\cos\theta
+\end{pmatrix}
+\end{align*}
+
+\end_inset
+
+And so we see that setting 
+\begin_inset Formula $A\left(y,z\right)=\frac{1}{\omega}A\frac{w_{0}}{w\left(x\right)}e^{-\frac{\left(y^{2}+z^{2}\right)}{\sigma^{2}}}$
+\end_inset
+
+ will result in the correct field.
+\begin_inset Formula 
+\[
+\boldsymbol{E}=A\frac{w_{0}}{w\left(x\right)}e^{-\frac{\left(y^{2}+z^{2}\right)}{\sigma^{2}}}e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)-\omega t\right)}\begin{pmatrix}0\\
+\sin\theta e^{-i\varepsilon}\\
+\cos\theta
+\end{pmatrix}\kaliV
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+It satisfies the gibbs condition of 
+\begin_inset Formula $A_{0}=0$
+\end_inset
+
+ by definition.
+\end_layout
+
+\begin_layout Plain Layout
+And the divergence:
+\begin_inset Formula 
+\begin{align*}
+\nabla\cdot\boldsymbol{A} & =\begin{pmatrix}\frac{\partial}{\partial x}\\
+\frac{\partial}{\partial y}\\
+\frac{\partial}{\partial z}
+\end{pmatrix}\begin{pmatrix}0\\
+A\frac{w_{0}}{w\left(x\right)}e^{-\frac{\left(y^{2}+z^{2}\right)}{\sigma^{2}}}e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)-\omega t\right)}\cdot\sin\theta e^{-i\varepsilon}\\
+A\left(y,z\right)e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)-\omega t\right)}\cdot\cos\theta
+\end{pmatrix}=\\
+ & =\left[\partial_{y}A\left(y,z\right)\right]\cdot e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)-\omega t\right)}\cdot\sin\theta e^{-i\varepsilon}+\left[\partial_{z}A\left(y,z\right)\right]\left(y,z\right)e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)-\omega t\right)}\cdot\cos\theta\ll\boldsymbol{B}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+we can't say about anything which is not dimensionless that it is close
+ to 
+\begin_inset Formula $0$
+\end_inset
+
+, but we can say that it is much closer to 
+\begin_inset Formula $0$
+\end_inset
+
+ comparing to another physical value with the same dimensions.
+\end_layout
+
+\begin_layout Plain Layout
+Since the sizes of the terms are in the order of magnitude of 
+\begin_inset Formula $\partial_{y}A\left(y,z\right)$
+\end_inset
+
+ which is much smaller then 
+\begin_inset Formula ${\color{brown}k_{l}\cdot A\left(y,z\right)}$
+\end_inset
+
+ (the derivative with respect to 
+\begin_inset Formula $x$
+\end_inset
+
+), we get that this divergence is much smaller then 
+\begin_inset Formula $B$
+\end_inset
+
+ (which has the same units), and therefore close to 
+\begin_inset Formula $0$
+\end_inset
+
+.
+ (because 
+\begin_inset Formula $B_{z}$
+\end_inset
+
+, for example, has the term 
+\begin_inset Formula $\partial_{x}A\left(y,z\right)\cdot e^{\ldots}={\color{brown}ik_{l}A\left(y,z\right)}e^{\ldots}$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Plain Layout
+Given this 
+\begin_inset Formula $A$
+\end_inset
+
+, the 
+\begin_inset Formula $G$
+\end_inset
+
+ function will be:
+\begin_inset Formula 
+\begin{align*}
+G & =c\beta\intop_{-\infty}^{t}A_{z}\left(\boldsymbol{x}-\beta c\left(t-T\right)\hat{z},T\right)dT\\
+ & =c\beta\intop_{-\infty}^{t}\left[{\color{gray}\underset{^{\text{amplitude only}}}{\underbrace{{\normalcolor A}}}}\left(x,y,z-\beta c\left(t-T\right)\right)e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)-\omega T\right)}\cdot\cos\theta\right]dT\\
+ & =A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{\sigma^{2}\left(x\right)}}\frac{1}{\omega}c\beta e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)}\cdot\cos\theta\cdot{\color{gray}\underset{I\left(x,y,z,t\right)}{\underbrace{{\normalcolor \intop_{-\infty}^{t}\left[e^{-\frac{\left(z-\beta c\left(t-T\right)\right)^{2}}{\sigma^{2}\left(x\right)}}\cos\left(\omega T\right)\right]dT}}}}\\
+ & =A\frac{w_{0}}{w\left(x\right)}\frac{1}{\omega}c\beta\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}+\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{A}=A\frac{w_{0}}{w\left(x\right)}e^{-\frac{\left(y^{2}+z^{2}\right)}{w^{2}\left(x\right)}}\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\begin{pmatrix}0\\
+0\\
+\sin\theta\cos\left(\omega t-\varepsilon\right)\\
+\cos\theta\cos\left(\omega t\right)
+\end{pmatrix}
+\]
+
+\end_inset
+
+differentiate it by time, we get:
+\begin_inset Formula 
+\[
+\boldsymbol{E}=-\frac{\partial}{\partial t}\boldsymbol{A}=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{E}=\omega A\frac{w_{0}}{w\left(x\right)}e^{-\frac{\left(y^{2}+z^{2}\right)}{w^{2}\left(x\right)}}\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\begin{pmatrix}0\\
+\sin\theta\sin\left(\omega t-\varepsilon\right)\\
+\cos\theta\sin\left(\omega t\right)
+\end{pmatrix}\kaliV
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Does it satisfies the gibbs gauge conditions?
+\end_layout
+
+\begin_layout Standard
+It satisfies the gibbs condition of 
+\begin_inset Formula $A_{0}=0$
+\end_inset
+
+ by definition.
+\end_layout
+
+\begin_layout Standard
+And the divergence:
+\begin_inset Formula 
+\begin{align*}
+\nabla\cdot\boldsymbol{A} & =\begin{pmatrix}\frac{\partial}{\partial x}\\
+\frac{\partial}{\partial y}\\
+\frac{\partial}{\partial z}
+\end{pmatrix}\begin{pmatrix}0\\
+A\left(y,z\right)\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\sin\theta\cos\left(\omega t-\varepsilon\right)\\
+A\left(y,z\right)\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\cos\theta\cos\left(\omega t\right)
+\end{pmatrix}=\\
+ & =\left[\partial_{y}A\left(y,z\right)\right]\cdot\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\sin\theta\cos\left(\omega t-\varepsilon\right)+\left[\partial_{z}A\left(y,z\right)\right]\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\cos\theta\cos\left(\omega t\right)\ll\boldsymbol{B}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+we can't say about anything which is not dimensionless that it is close
+ to 
+\begin_inset Formula $0$
+\end_inset
+
+, but we can say that it is much closer to 
+\begin_inset Formula $0$
+\end_inset
+
+ comparing to another physical value with the same dimensions.
+\end_layout
+
+\begin_layout Standard
+Since the sizes of the terms are in the order of magnitude of 
+\begin_inset Formula $\partial_{y}A\left(y,z\right)$
+\end_inset
+
+ which is much smaller then 
+\begin_inset Formula ${\color{brown}k_{l}\cdot A\left(y,z\right)}$
+\end_inset
+
+ (the derivative with respect to 
+\begin_inset Formula $x$
+\end_inset
+
+), we get that this divergence is much smaller
+\end_layout
+
+\begin_layout Standard
+then 
+\begin_inset Formula $B$
+\end_inset
+
+ (which has the same units), and therefore close to 
+\begin_inset Formula $0$
+\end_inset
+
+.
+ (because 
+\begin_inset Formula $B_{z}$
+\end_inset
+
+, for example, has the term 
+\begin_inset Formula $\partial_{x}A\left(y,z\right)\cdot\cos\ldots={\color{brown}k_{l}A\left(y,z\right)}\sin\ldots$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Paragraph
+Going back to the main discussion:
+\end_layout
+
+\begin_layout Standard
+Given this 
+\begin_inset Formula $A$
+\end_inset
+
+, the 
+\begin_inset Formula $G$
+\end_inset
+
+ function will be:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+G & \equiv\beta c\intop_{-\infty}^{t}A_{z}\left(\boldsymbol{x}-\beta c\left(t-T\right)\hat{z},T\right)dT\\
+ & =\beta c\intop_{-\infty}^{t}\left[{\color{gray}\underset{^{\text{amplitude}}}{\underbrace{{\normalcolor A}}}}\left(x,y,z-\beta c\left(t-T\right)\right)\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\cos\theta\cos\left(\omega T\right)\right]dT\\
+ & =A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\frac{1}{\omega}c\beta\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\cos\theta\cdot{\color{gray}\underset{I\left(x,y,z,t\right)}{\underbrace{{\normalcolor \intop_{-\infty}^{t}\left[e^{-\frac{\left(z-\beta c\left(t-T\right)\right)^{2}}{w^{2}\left(x\right)}}\cos\left(\omega T\right)\right]dT}}}}\\
+\text{Set}: & Z=\beta cT+z-\beta ct\iff T=\frac{Z-z}{\beta c}+t\Rightarrow\frac{1}{\beta c}dZ=dT,T=t\iff Z=z\\
+ & =A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\frac{1}{\omega}c\beta\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\cos\theta\cdot\intop_{-\infty}^{z}\left[e^{-\frac{Z^{2}}{w^{2}\left(x\right)}}\cos\left(\omega\left(\frac{Z-z}{\beta c}+t\right)\right)\right]\frac{1}{\beta c}dZ\\
+ & =A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\frac{1}{\omega}c\beta\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\cos\theta\cdot\intop_{-\infty}^{z}\left[e^{-\frac{Z^{2}}{w^{2}\left(x\right)}}\cos\left(\frac{\omega}{\beta c}Z+t-\frac{z}{\beta c}\right)\right]\frac{1}{\beta c}dZ\\
+ & =A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\frac{1}{\omega}c\beta\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Remark
+The term in the cosine has the spatial frequency of about 
+\begin_inset Formula $\approx\frac{1}{2}\lambda$
+\end_inset
+
+, while the width of the gaussian in 
+\begin_inset Formula $z$
+\end_inset
+
+ has the width of about 
+\begin_inset Formula $\left(2-4\right)\lambda$
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+\frac{\omega}{\beta c}=\frac{k}{\beta}\approx2k\approx\frac{4\pi}{\lambda}\Rightarrow
+\]
+
+\end_inset
+
+If we had one standing wave with frequency and amplitude 
+\begin_inset Formula $\omega,A$
+\end_inset
+
+ and to moving waves with frequencies 
+\begin_inset Formula $\omega_{\pm},\frac{\Gamma_{\pm}}{\Gamma_{\mp}}A_{\pm}$
+\end_inset
+
+, then we would have instead:
+\begin_inset Formula 
+\begin{align*}
+G & =c\beta\intop_{-\infty}^{t}A_{z}\left(\boldsymbol{x}-\beta c\left(t-T\right)\hat{z},T\right)dT\\
+ & =A\beta c\cos\theta\left[2\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\frac{1}{\omega}\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\intop_{-\infty}^{t}\left[e^{-\frac{\left(z-\beta c\left(t-T\right)\right)^{2}}{w^{2}\left(x\right)}}\cos\left(\omega T\right)\right]dT+\frac{\Gamma_{+}}{\Gamma_{-}}\frac{w_{0+}}{w_{+}\left(x\right)}e^{-\frac{y^{2}}{w_{+}^{2}\left(x\right)}}\frac{1}{\omega_{+}}e^{i\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)}\intop_{-\infty}^{t}\left[e^{-\frac{\left(z-\beta c\left(t-T\right)\right)^{2}}{\sigma_{+}^{2}\left(x\right)}}\cos\left(\omega_{+}T\right)\right]dT+\text{Same with }\omega_{-}\right]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Where we calculate the value of 
+\begin_inset Formula $I\left(x,y,z,t\right)$
+\end_inset
+
+ in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "subsec:Calculating-the-integral"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+.
+\end_layout
+
+\begin_layout Standard
+And the gradient (using 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_17"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+, we know the derivatives with respect to 
+\begin_inset Formula $\hat{y},\hat{z}$
+\end_inset
+
+ are negligible comparing to the derivative in 
+\begin_inset Formula $x$
+\end_inset
+
+) and also the derivative with respect to 
+\begin_inset Formula $\hat{x}$
+\end_inset
+
+ is mostly due to the 
+\begin_inset Formula $\cos$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\nabla G\approx\hat{x}\cdot A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\frac{1}{\omega}c\beta\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot\left(k_{l}+k_{l}\frac{y^{2}+z^{2}}{2}{\color{gray}\underset{\frac{d}{dx}\frac{1}{R\left(x\right)}=\frac{d}{dx}\left(\frac{x}{x^{2}+x_{R}^{2}}\right)}{\underbrace{{\normalcolor \frac{x_{R}^{2}-x^{2}}{\left(x^{2}+x_{R}^{2}\right)^{2}}}}}}+{\color{gray}\underset{\frac{d}{dx}\psi\left(x\right)}{\underbrace{{\normalcolor \frac{\frac{1}{x_{R}}}{1+\left(\frac{x}{x_{R}}\right)^{2}}}}}}\right)
+\]
+
+\end_inset
+
+(Also for a moving wave the result will be the same, as the 
+\begin_inset Formula $\cos$
+\end_inset
+
+ will be replaced with complex exponent)
+\begin_inset Formula 
+\[
+=\hat{x}\cdot A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\cancel{{\color{purple}\frac{1}{\omega}c}}\beta\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot{\color{gray}\underset{\text{Same but with }\lambda\text{ only and no }k_{l},x_{R}}{\underbrace{{\normalcolor \left(\cancel{{\color{purple}\frac{2\pi}{\lambda}}}+{\color{purple}\cancel{\frac{2\pi}{\lambda}}}\frac{y^{2}+z^{2}}{2}\cdot\frac{\left(\frac{\lambda}{\pi\cdot\left(NA\right)^{2}}\right)^{2}-x^{2}}{\left(x^{2}+\left(\frac{\lambda}{\pi\cdot\left(NA\right)^{2}}\right)^{2}\right)^{2}}+\frac{\frac{\cancel{{\color{purple}2\pi}}\cdot\left(NA\right)^{2}}{2\cancel{{\color{purple}\lambda}}}}{1+\left(\frac{\pi\cdot\left(NA\right)^{2}}{\lambda}\cdot x\right)^{2}}\right)}}}}
+\]
+
+\end_inset
+
+Recalling that 
+\begin_inset Formula $\frac{2\pi}{\lambda}=\frac{1}{\nicefrac{c}{\omega}}$
+\end_inset
+
+, we can write:
+\begin_inset Formula 
+\[
+=\hat{x}\cdot\beta A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot\left({\color{purple}1}+{\color{purple}1}\cdot{\color{gray}\underset{\text{small correction}}{\underbrace{{\normalcolor \frac{y^{2}+z^{2}}{2\lambda^{2}}}}}}\cdot\frac{\left(\frac{1}{\pi\cdot\left(NA\right)^{2}}\right)^{2}-\left(\frac{x}{\lambda}\right)^{2}}{\left(\frac{x^{2}}{\lambda^{2}}+\frac{1}{\left(\pi\cdot\left(NA\right)^{2}\right)^{2}}\right)^{2}}+{\color{gray}\underset{<6\%\text{ for NA}=0.3}{\underbrace{{\normalcolor \frac{2\left(NA\right)^{2}}{1+\left(\pi\cdot\left(NA\right)^{2}\cdot\frac{x}{\lambda}\right)^{2}}}}}}\right)\approx
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\approx\hat{x}\cdot\beta A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Substituting all in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_18"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we get:
+\begin_inset Formula 
+\begin{align*}
+\phi\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left({\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz
+\end{align*}
+
+\end_inset
+
+defining:
+\begin_inset Formula 
+\begin{equation}
+\varphi\left(x\right)=k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\label{eq:gaussian_beam_phase_def}
+\end{equation}
+
+\end_inset
+
+And with approximation:
+\begin_inset Formula 
+\begin{align*}
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}} & \left[{\color{gray}\overset{y}{\overbrace{{\normalcolor {\color{red}\left(A_{\text{envelope}}^{2}\left(y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}}}}}\right.\\
+ & +{\color{gray}\overset{z}{\overbrace{{\normalcolor {\color{blue}\left(1-\beta^{2}\right)\cdot A_{\text{envelope}}^{2}\left(y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\theta\cos^{2}\left(\omega t\left(z\right)\right)}}}}}\\
+ & +{\color{gray}\underset{x}{\underbrace{{\normalcolor \left.{\color{green}\beta^{2}A_{\text{envelope}}^{2}\left(y,z\right)\sin^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\left(\theta\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]}}}}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}} & A_{\text{envelope}}^{2}\left(y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}\right.\\
+ & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]\right]
+\end{align*}
+
+\end_inset
+
+The integragtion over 
+\begin_inset Formula $\cos^{2}\left(\omega t\left(z\right)\right),\sin^{2}\left(\omega t\left(z\right)\right),\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)$
+\end_inset
+
+ will just add a half factor and we get:
+\begin_inset Formula 
+\begin{align*}
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}} & \frac{1}{2}A_{\text{envelope}}^{2}\left(y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\right)}\right.\\
+ & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)}\right]\right]
+\end{align*}
+
+\end_inset
+
+The red and the first blue parts are simply 
+\begin_inset Formula $\cos^{2}\left(\varphi\left(x\right)\right)$
+\end_inset
+
+ (because it is 
+\begin_inset Formula $\sin^{2}\left(\theta\right)+\cos^{2}\left(\theta\right)$
+\end_inset
+
+, and the second blue part and the green part will be 
+\begin_inset Formula $-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)}=-\cos\left(2\varphi\left(x\right)\right)$
+\end_inset
+
+):
+\begin_inset Formula 
+\[
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}}\frac{1}{2}A_{\text{envelope}}^{2}\left(y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}}\frac{1}{2}A_{\text{envelope}}^{2}\left(y,z\right)\left[{\color{red}\frac{1}{2}+\frac{1}{2}\cos\left(2\varphi\left(x\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}}\frac{1}{2}A_{\text{envelope}}^{2}\left(y,z\right){\color{red}\frac{1}{2}}\left[{\color{red}1}+\left({\color{red}1}-2\cos^{2}\left(\theta\right)\beta^{2}\right)\cos\left(2\varphi\left(x\right)\right)\right]\label{eq:ponderomotive_integral_final_result_standing_wave}
+\end{equation}
+
+\end_inset
+
+And for a moving wave (that does not have the 
+\begin_inset Formula $\cos\left(\varphi\left(x\right)\right)$
+\end_inset
+
+ grating in it, but only the slowly varying envelope):
+\begin_inset Formula 
+\begin{align}
+\phi\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left({\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz\nonumber \\
+= & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}A_{\text{envelope}}^{2}\left(y,z\right)}{2m\gamma\beta c}\left({\color{red}\sin^{2}\theta\cancel{\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)}}+{\color{blue}\left(1-\beta^{2}\right)\cdot\left(\cdot\cos\theta\cancel{\cos\left(\omega t\left(z\right)\right)}\right)^{2}}+{\color{green}\left(\beta^{2}\cos^{2}\left(\theta\right)\cancel{\sin^{2}\left(\omega t\left(z\right)\right)}\right)}\right)dz\nonumber \\
+= & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}A_{\text{envelope}}^{2}\left(y,z\right)}{4m\gamma\beta c}\left({\color{gray}\underset{=1}{\underbrace{{\normalcolor {\color{red}\sin^{2}\left(\theta\right)}+{\color{blue}\cos^{2}\left(\theta\right)}}}}}-\cancel{{\color{blue}\beta^{2}\cos^{2}\left(\theta\right)}+{\color{green}\left(\beta^{2}\cdot\cos^{2}\left(\theta\right)\right)}}\right)dz\nonumber \\
+= & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}A_{\text{envelope}}^{2}\left(y,z\right)}{4m\gamma\beta c}dz\label{eq:ponderomotive_integral_final_result_moving_wave}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Calculate the envelope 
+\begin_inset Formula $A_{\text{envelope}}\left(x,y,z\right)$
+\end_inset
+
+ for two gaussian beams in the moving frame:
+\end_layout
+
+\begin_layout Standard
+Let's assume the laser propagates in the 
+\begin_inset Formula $\hat{x}$
+\end_inset
+
+ direction.
+\end_layout
+
+\begin_layout Standard
+The original electric and magnetic fields are:
+\begin_inset Formula 
+\[
+\boldsymbol{E}\left(\boldsymbol{x},t\right)=\left[E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]\begin{pmatrix}0\\
+\cos\left(\theta\right)\\
+\sin\left(\theta\right)
+\end{pmatrix}
+\]
+
+\end_inset
+
+The 
+\begin_inset Formula $\boldsymbol{B}$
+\end_inset
+
+ vector depends on the direction of propagation:
+\begin_inset Formula 
+\begin{align*}
+\boldsymbol{B}\left(\boldsymbol{x},t\right) & =\frac{1}{c}{\color{gray}\overset{=\hat{\pm x}}{\overbrace{{\normalcolor \hat{k}}}}}\times{\color{gray}\overset{\boldsymbol{E}}{\overbrace{{\normalcolor \left[E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]\begin{pmatrix}0\\
+\cos\left(\theta\right)\\
+\sin\left(\theta\right)
+\end{pmatrix}}}}}=\\
+ & =\pm\frac{1}{c}\left[E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]\begin{pmatrix}0\\
+-\sin\theta\\
+\cos\theta
+\end{pmatrix}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The field at point 
+\begin_inset Formula $\boldsymbol{E}^{\prime}\left(\boldsymbol{x}^{\prime},t^{\prime}\right)$
+\end_inset
+
+ will be:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\boldsymbol{E}^{\prime}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & =\begin{pmatrix}E_{x}^{\prime}\\
+E_{y}^{\prime}\\
+E_{z}^{\prime}
+\end{pmatrix}\left(\boldsymbol{x}^{\prime},ct^{\prime}\right)\\
+ & =\begin{pmatrix}\cancel{E_{x}}\\
+\gamma\left(E_{y}-vB_{z}\right)\\
+\gamma\left(E_{z}+vB_{y}\right)
+\end{pmatrix}\left(\Lambda^{-1}\left(\boldsymbol{x}^{\prime},ct^{\prime}\right)\right)
+\end{align*}
+
+\end_inset
+
+and for a general linear polarization orientation (in lab's frame) 
+\begin_inset Formula $\boldsymbol{E}\left(x,y\right)=E_{0}\left(x,y\right)\begin{pmatrix}0\\
+\cos\theta\\
+\sin\theta
+\end{pmatrix},\boldsymbol{B}\left(x,y\right)=\pm\frac{E_{0}\left(x,y\right)}{c}\begin{pmatrix}0\\
+-\sin\theta\\
+\cos\theta
+\end{pmatrix}$
+\end_inset
+
+ (the 
+\begin_inset Formula $+$
+\end_inset
+
+ sign is for a wave propagating in the 
+\begin_inset Formula $+\hat{x}$
+\end_inset
+
+ direction and the 
+\begin_inset Formula $-$
+\end_inset
+
+ sign is for a field propagating in the 
+\begin_inset Formula $-\hat{x}$
+\end_inset
+
+ direction) we get:
+\begin_inset Formula 
+\begin{align*}
+\boldsymbol{E}^{\prime}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & =\begin{pmatrix}0\\
+\gamma\left({\color{gray}\overset{E_{y}}{\overbrace{{\normalcolor E_{0}\left(\Lambda^{-1}\left(\boldsymbol{x}^{\prime},ct^{\prime}\right)\right)\cos\theta}}}}{\color{gray}\overset{-B_{z}}{\overbrace{{\normalcolor \mp v\frac{E_{0}\left(\Lambda^{-1}\left(\boldsymbol{x}^{\prime},ct^{\prime}\right)\right)\cos\left(\theta\right)}{c}}}}}\right)\\
+\gamma\left({\color{gray}\underset{E_{z}}{\underbrace{{\normalcolor E_{0}\left(\Lambda^{-1}\left(\boldsymbol{x}^{\prime},ct^{\prime}\right)\right)\sin\theta}}}}{\color{gray}\underset{+B_{y}}{\underbrace{{\normalcolor \mp v\frac{E_{0}\left(\Lambda^{-1}\left(\boldsymbol{x}^{\prime},ct^{\prime}\right)\right)\sin\left(\theta\right)}{c}}}}}\right)
+\end{pmatrix}\\
+ & =\begin{pmatrix}0\\
+\cos\theta\gamma\left(1\mp\frac{v}{c}\right)\\
+\sin\theta\gamma\left(1\mp\frac{v}{c}\right)
+\end{pmatrix}E_{0}\left(\Lambda^{-1}\left(\boldsymbol{x}^{\prime},ct^{\prime}\right)\right)\\
+ & =\begin{pmatrix}0\\
+\cos\theta\\
+\sin\theta
+\end{pmatrix}\gamma\left(1\mp\frac{v}{c}\right)E_{0}\left(\Lambda^{-1}\left(\boldsymbol{x}^{\prime},ct^{\prime}\right)\right)
+\end{align*}
+
+\end_inset
+
+Denote:
+\begin_inset Formula 
+\begin{equation}
+\gamma\left(1\mp\beta\right)=\frac{\left(1\mp\beta\right)}{\sqrt{1-\beta^{2}}}=\frac{\left(1\mp\beta\right)}{\sqrt{\left(1-\beta\right)\left(1+\beta\right)}}=\sqrt{\frac{1\mp\beta}{1\pm\beta}}\equiv\Gamma_{\mp}\label{eq:capital_gamma_def}
+\end{equation}
+
+\end_inset
+
+And get:
+\begin_inset Formula 
+\begin{align*}
+\boldsymbol{E}^{\prime}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & =\Gamma_{\mp}{\color{gray}\underset{\text{Scalar}}{\underbrace{{\normalcolor E_{0}\left(\Lambda^{-1}\left(\boldsymbol{x}^{\prime},ct^{\prime}\right)\right)}}}}\begin{pmatrix}0\\
+\cos\theta\\
+\sin\theta
+\end{pmatrix}
+\end{align*}
+
+\end_inset
+
+Looking at a coordinate 
+\begin_inset Formula $\left(\boldsymbol{x}^{\prime},t^{\prime}\right)$
+\end_inset
+
+, the corresponding space-time point will be:
+\begin_inset Formula 
+\[
+\begin{pmatrix}x\\
+y\\
+z\\
+t
+\end{pmatrix}=\Lambda^{-1}\begin{pmatrix}x^{\prime}\\
+y^{\prime}\\
+z^{\prime}\\
+t^{\prime}
+\end{pmatrix}=\begin{pmatrix}\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\\
+y\\
+z\\
+\gamma\left(t^{\prime}+\frac{\beta x^{\prime}}{c}\right)
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boldsymbol{E}^{\prime}\left(\boldsymbol{x}^{\prime},t^{\prime}\right)=\Gamma_{\mp}\boldsymbol{E}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right),0,0,\gamma\left(t+\frac{\beta x^{\prime}}{c}\right)\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And get, after substituting for the relevant waves (before substituting
+ 
+\begin_inset Formula $x\rightarrow\gamma\left(x^{\prime}+\beta ct^{\prime}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $t\rightarrow\gamma\left(t+\frac{\beta x^{\prime}}{c}\right)$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{equation}
+=\left[\Gamma_{-}E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+\Gamma_{+}E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+\Gamma_{-}E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+E_{2}\Gamma_{+}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]_{\left(x,t\right)=\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right),\gamma\left(t^{\prime}+\frac{\beta x^{\prime}}{c}\right)\right)}\label{eq:e_5}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Performing the coordinates substitution, the argument in the exponent changes
+ like
+\begin_inset Formula 
+\begin{align*}
+\omega_{i}t\mp\frac{\omega_{i}}{c}x & \rightarrow\omega_{i}\gamma\left(t^{\prime}+\frac{\beta x^{\prime}}{c}\right)\mp\frac{\omega_{i}}{c}\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\\
+ & =\omega_{i}\gamma t^{\prime}+\omega_{i}\gamma\frac{\beta x^{\prime}}{c}\mp\frac{\omega_{i}}{c}\gamma x^{\prime}\mp\frac{\omega_{i}}{\cancel{c}}\gamma\beta\cancel{c}t^{\prime}\\
+ & =\omega_{i}\left(1\mp\beta\right)\gamma t^{\prime}\mp\left(1\mp\beta\right)\gamma\frac{\omega_{i}}{c}x^{\prime}\\
+ & =\sqrt{\frac{1\mp\beta}{1\pm\beta}}\omega_{i}t^{\prime}\mp\sqrt{\frac{1\mp\beta}{1\pm\beta}}\frac{\omega_{i}}{c}x^{\prime}\\
+ & =\Gamma_{\mp}\omega_{i}t^{\prime}\mp\Gamma_{\mp}\frac{\omega_{i}}{c}x^{\prime}\\
+ & =\Gamma_{\mp}\left(\omega_{i}t^{\prime}\mp\frac{\omega_{i}}{c}x^{\prime}\right)
+\end{align*}
+
+\end_inset
+
+
+\color gray
+
+\begin_inset Formula 
+\begin{align}
+\omega_{i}t\mp\frac{\omega_{i}}{c}x\mp k_{i}\frac{y^{2}+z^{2}}{R\left(x\right)}\pm\psi_{i}\left(x\right) & \rightarrow\omega_{i}\gamma\left(t^{\prime}+\frac{\beta x^{\prime}}{c}\right)\mp\frac{\omega_{i}}{c}\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\mp k_{i}\frac{y^{\prime2}+z^{\prime2}}{R_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)}\pm\psi_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\nonumber \\
+ & =\omega_{i}\gamma t^{\prime}+\omega_{i}\gamma\frac{\beta x^{\prime}}{c}\mp\frac{\omega_{i}}{c}\gamma x^{\prime}\mp\frac{\omega_{i}}{\cancel{c}}\gamma\beta\cancel{c}t^{\prime}\mp k_{i}\frac{y^{\prime2}+z^{\prime2}}{R_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)}\pm\psi_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\nonumber \\
+ & =\omega_{i}\left(1\mp\beta\right)\gamma t^{\prime}\mp\left(1\mp\beta\right)\gamma\frac{\omega_{i}}{c}x^{\prime}\mp k_{i}\frac{y^{\prime2}+z^{\prime2}}{R_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)}\pm\psi_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\nonumber \\
+ & =\sqrt{\frac{1\mp\beta}{1\pm\beta}}\omega_{i}t^{\prime}\mp\sqrt{\frac{1\mp\beta}{1\pm\beta}}\frac{\omega_{i}}{c}x^{\prime}\mp k_{i}\frac{y^{\prime2}+z^{\prime2}}{R_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)}\pm\psi_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\nonumber \\
+ & =\Gamma_{\mp}\omega_{i}t^{\prime}\mp\Gamma_{\mp}\frac{\omega_{i}}{c}x^{\prime}\mp k_{i}\frac{y^{\prime2}+z^{\prime2}}{R_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)}\pm\psi_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\nonumber \\
+ & =\Gamma_{\mp}\left(\omega_{i}t^{\prime}\mp\frac{\omega_{i}}{c}x^{\prime}\right)\mp{\color{gray}\underset{\Psi_{i}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}{\underbrace{k_{i}\frac{y^{\prime2}+z^{\prime2}}{R_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)}\pm\psi_{i}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)}}}\label{eq:gouy_phase_lorentz_transform}
+\end{align}
+
+\end_inset
+
+
+\color inherit
+Plugging it into the wave 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_5"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+, we get:
+\begin_inset Formula 
+\[
+E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right)=\Gamma_{-}E_{1}e^{i\Gamma_{-}\left(\omega_{1}t^{\prime}-\frac{\omega_{1}}{c}x^{\prime}\right)}+\Gamma_{+}E_{1}e^{\Gamma_{+}i\left(\omega_{1}t^{\prime}+\frac{\omega_{1}}{c}x^{\prime}\right)}+\Gamma_{-}E_{2}e^{\Gamma_{-}i\left(\omega_{2}t^{\prime}-\frac{\omega_{2}}{c}x^{\prime}\right)}+\Gamma_{+}E_{2}e^{\Gamma_{+}i\left(\omega_{2}t^{\prime}+\frac{\omega_{2}}{c}x^{\prime}\right)}
+\]
+
+\end_inset
+
+
+\color gray
+
+\begin_inset Formula 
+\begin{align*}
+E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & =\Gamma_{-}E_{1}e^{i\Gamma_{-}\left(\omega_{1}t^{\prime}-\frac{\omega_{1}}{c}x^{\prime}\right)-\Psi_{1}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}+\Gamma_{+}E_{1}e^{\Gamma_{+}i\left(\omega_{1}t^{\prime}+\frac{\omega_{1}}{c}x^{\prime}\right)+\Psi_{1}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}\\
+ & +\Gamma_{-}E_{2}e^{\Gamma_{-}i\left(\omega_{2}t^{\prime}-\frac{\omega_{2}}{c}x^{\prime}\right)-\Psi_{2}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}+\Gamma_{+}E_{2}e^{\Gamma_{+}i\left(\omega_{2}t^{\prime}+\frac{\omega_{2}}{c}x^{\prime}\right)+\Psi_{2}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Find the 
+\begin_inset Formula $\beta_{\text{lattice}},E_{1},E_{2}$
+\end_inset
+
+ such that we have a standing wave 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:beta for standing wave"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+Choose 
+\begin_inset Formula $\beta$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\[
+\Gamma_{+}\omega_{1}=\Gamma_{-}\omega_{2}{\color{lightgray}\ \backslash:\Gamma_{+}\omega_{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\omega_{1}}{\omega_{2}}=\frac{\Gamma_{-}}{\Gamma_{+}}{\color{lightgray}\ \backslash\text{Substitute }\Gamma_{\pm}}\label{eq:e_6}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\omega_{1}}{\omega_{2}}=\frac{\sqrt{\frac{1-\beta}{1+\beta}}}{\sqrt{\frac{1+\beta}{1-\beta}}}=\frac{1-\beta}{1+\beta}{\color{lightgray}\ \backslash\left(1+\beta\right)}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\omega_{1}}{\omega_{2}}\left(1+\beta\right)=1-\beta{\color{lightgray}\ \backslash+\beta-\frac{\omega_{1}}{\omega_{2}}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\omega_{1}}{\omega_{2}}\beta+\beta=1-\frac{\omega_{1}}{\omega_{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(1+\frac{\omega_{1}}{\omega_{2}}\right)\beta=1-\frac{\omega_{1}}{\omega_{2}}{\color{lightgray}\ \backslash:\left(1+\frac{\omega_{1}}{\omega_{2}}\right)}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boxed{\beta_{0}=\frac{1-\frac{\omega_{1}}{\omega_{2}}}{1+\frac{\omega_{1}}{\omega_{2}}}=\frac{1-\frac{\lambda_{2}}{\lambda_{1}}}{1+\frac{\lambda_{2}}{\lambda_{1}}}}
+\]
+
+\end_inset
+
+Under 
+\begin_inset Formula $\beta_{0}$
+\end_inset
+
+, we can denote:
+\begin_inset Formula 
+\begin{align}
+\Gamma_{+}\omega_{1} & =\Gamma_{-}\omega_{2}\equiv\omega\nonumber \\
+\Gamma_{-}\omega_{1} & \equiv\omega_{-}\nonumber \\
+\Gamma_{+}\omega_{2} & \equiv\omega_{+}\label{eq:omega_def}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And get:
+\begin_inset Formula 
+\begin{equation}
+E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right)=\Gamma_{-}E_{1}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x\right)}+{\color{teal}\Gamma_{+}E_{1}}e^{i\left(\omega t^{\prime}+\frac{\omega}{c}x\right)}+{\color{teal}\Gamma_{-}E_{2}}e^{i\left(\omega t^{\prime}-\frac{\omega}{c}x\right)}+\Gamma_{+}E_{2}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x\right)}\label{eq:e_7}
+\end{equation}
+
+\end_inset
+
+Choosing equal amplitudes::
+\begin_inset Formula 
+\[
+{\color{teal}\Gamma_{+}E_{1}}={\color{teal}\Gamma_{-}E_{2}}{\color{lightgray}\ \backslash:\Gamma_{+}E_{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{E_{1}}{E_{2}}=\frac{\Gamma_{-}}{\Gamma_{+}}=\frac{1-\beta}{1+\beta}\stackrel{{\color{blue}\eqref{eq:e_6}}}{=}\frac{\omega_{1}}{\omega_{2}}=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{E_{1}}{E_{2}}=\frac{\omega_{1}}{\omega_{2}}=\frac{\lambda_{2}}{\lambda_{1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boxed{E_{2}=E_{1}\cdot\frac{\lambda_{1}}{\lambda_{2}}}
+\]
+
+\end_inset
+
+Denoting 
+\begin_inset Formula 
+\begin{equation}
+\Gamma_{+}E_{1}=\Gamma_{-}E_{2}={\color{teal}E_{0}}\label{eq:E_0_def}
+\end{equation}
+
+\end_inset
+
+, and substituting again in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_7"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+, we get:
+\begin_inset Formula 
+\begin{align}
+E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & =\frac{\Gamma_{-}}{\Gamma_{+}}{\color{teal}E_{0}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}+{\color{teal}E_{0}}e^{i\left(\omega t^{\prime}+\frac{\omega}{c}x^{\prime}\right)}+{\color{teal}E_{0}}e^{i\left(\omega t^{\prime}-\frac{\omega}{c}x^{\prime}\right)}+\frac{\Gamma_{+}}{\Gamma_{-}}{\color{teal}E_{0}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}\nonumber \\
+ & ={\color{teal}E_{0}}\left[\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}+e^{i\omega t^{\prime}}\left[e^{i\frac{\omega}{c}x^{\prime}}+e^{-i\frac{\omega}{c}x^{\prime}}\right]+\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}\right]\nonumber \\
+ & ={\color{teal}E_{0}}\left[\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}+2e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)+\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}\right]\label{eq:wave_in_moving_frame}
+\end{align}
+
+\end_inset
+
+And if instead of a plane wave we had also the other factors of a gaussian
+ beam 
+\begin_inset Formula $\varphi\left(x\right)=kx+k\frac{y^{2}+z^{2}}{R\left(x\right)}-\psi\left(x\right)$
+\end_inset
+
+ then according to 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:gouy_phase_lorentz_transform"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we would have here:
+\begin_inset Formula 
+\[
+E_{y,\text{gaussian beam}}={\color{teal}E_{0}}\left[\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}+\varphi_{-}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\right)}+2e^{i\omega t^{\prime}}\cos\left(\varphi\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\right)+\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\varphi_{+}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\right)}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the intensity:
+\begin_inset Formula 
+\begin{align*}
+E^{2}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & ={\color{teal}E_{0}^{2}}\left|{\color{red}\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}+{\color{green}2e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}\right|^{2}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+={\color{teal}E_{0}^{2}}\cdot & \left[{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{red}\cancel{\frac{\Gamma_{-}}{\Gamma_{+}}}e^{-i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{blue}\cancel{\frac{\Gamma_{+}}{\Gamma_{-}}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}+{\color{red}\cancel{\frac{\Gamma_{-}}{\Gamma_{+}}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{blue}\cancel{\frac{\Gamma_{+}}{\Gamma_{-}}}e^{-i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}+\right.\\
++ & {\color{red}\frac{\Gamma_{-}}{\Gamma_{+}}e^{-i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{green}2e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{red}\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{green}2e^{-i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}\\
++ & \left.{\color{blue}\frac{\Gamma_{+}}{\Gamma_{-}}e^{-i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}{\color{green}2e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}{\color{green}2e^{-i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}\right]
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+={\color{teal}E_{0}^{2}} & \left[{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+e^{i\left({\color{red}-\omega_{-}t^{\prime}+\frac{\omega_{-}}{c}x^{\prime}}+{\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}\right)}+e^{-i\left({\color{red}-\omega_{-}t^{\prime}+\frac{\omega_{-}}{c}x^{\prime}}+{\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}\right)}+\right.\\
++2 & \frac{\Gamma_{-}}{\Gamma_{+}}\left(e^{-i\left({\color{red}\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}+e^{i\left({\color{red}\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}\right)\cos\left(\frac{\omega}{c}x^{\prime}\right)\\
++ & \left.2\frac{\Gamma_{+}}{\Gamma_{-}}\left(e^{-i\left({\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}+e^{i\left({\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}\right)\cos\left(\frac{\omega}{c}x^{\prime}\right)\right]
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+={\color{teal}E_{0}^{2}} & \left[{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+2\cos\left(\left(\omega_{+}-\omega_{-}\right)t^{\prime}+\frac{\omega_{-}+\omega_{+}}{c}x^{\prime}\right)\right.\\
+ & \left.+4\cos\left(\frac{\omega}{c}x^{\prime}\right)\left(\frac{\Gamma_{-}}{\Gamma_{+}}\cos\left(\left(\omega_{-}-\omega\right)t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)+\frac{\Gamma_{+}}{\Gamma_{-}}\cos\left(\frac{\omega}{c}x^{\prime}\right)\cos\left(\left(\omega_{+}-\omega\right)t^{\prime}+\frac{\omega_{-}}{c}x^{\prime}\right)\right)\right]
+\end{align*}
+
+\end_inset
+
+And the ponderomotive potential over one period (by definition we have 
+\begin_inset Formula $\omega_{-}<\omega<\omega_{+}$
+\end_inset
+
+, so the frequency of the intensity oscillations will always be non 
+\begin_inset Formula $0$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{equation}
+\left\langle I\right\rangle ={\color{teal}E_{0}^{2}}\left({\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}\right)=\tag{e\_10}\label{eq:e_10}
+\end{equation}
+
+\end_inset
+
+Recalling the definition of 
+\begin_inset Formula $\Gamma_{\mp}$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\left\langle I\right\rangle ={\color{teal}E_{0}^{2}}\left({\color{red}\frac{\left(1-\beta\right)^{2}}{\left(1+\beta\right)^{2}}}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{\left(1-\beta\right)^{2}}}+{\color{green}2}+{\color{green}2\cos\left(2kx^{\prime}\right)}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And So we see that the intensity is a sum of constant terms (
+\begin_inset Formula ${\color{red}\frac{\left(1-\beta\right)^{2}}{\left(1+\beta\right)^{2}}}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{\left(1-\beta\right)^{2}}}+{\color{green}2}$
+\end_inset
+
+) and an oscillating term (
+\begin_inset Formula ${\color{green}2\cos\left(2kx^{\prime}\right)}$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+And for some gaussian envelope 
+\begin_inset Formula $E_{0}\left(x,y,z\right)$
+\end_inset
+
+ (neglecting the fact that near the reighley range different wavelengths
+ have different spot-size): 
+\series bold
+\color red
+Is it a reasonable assumption at all? I mean, in the waist where it is the
+ most interesting their spots sizes differ by 
+\begin_inset Formula $1:2$
+\end_inset
+
+!
+\series default
+\color inherit
+
+\begin_inset Formula 
+\begin{equation}
+\left\langle I\right\rangle \left(x^{\prime},y^{\prime},z^{\prime}\right)={\color{teal}E_{0}^{2}\left(\gamma x^{\prime}+\gamma\beta ct,y^{\prime},z^{\prime}\right)}\left({\color{red}\frac{\left(1-\beta\right)^{2}}{\left(1+\beta\right)^{2}}}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{\left(1-\beta\right)^{2}}}+{\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime},t^{\prime}\right)\right)}\right)\label{eq:moving_intensity}
+\end{equation}
+
+\end_inset
+
+for 
+\begin_inset Formula $\varphi\left(x^{\prime}\right)$
+\end_inset
+
+ defined in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:gaussian_beam_phase_def"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ as :
+\begin_inset Formula 
+\[
+\varphi\left(x^{\prime}\right)=k_{l}x^{\prime}+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\tag{{\color{blue}\ref{eq:gaussian_beam_phase_def}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Adding the gaussian envelope 
+\begin_inset Formula $A_{0}^{2}=E_{0}^{2}e^{-r^{2}}$
+\end_inset
+
+, and the other coefficients, we have (according to 
+\bar under
+\color blue
+
+\begin_inset CommandInset href
+LatexCommand href
+name "Osips paper"
+target "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7357394/"
+literal "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
+):
+\begin_inset Formula 
+\[
+V_{\text{ponderomotive}}=\left\langle I\right\rangle =\frac{e^{2}A_{0}^{2}}{4m\gamma}\frac{1}{2}\left({\color{red}\frac{\left(1-\beta\right)^{2}}{\left(1+\beta\right)^{2}}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{\left(1-\beta\right)^{2}}}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linear transformation of rotation and then lorentz transformation (required
+ for the next stage):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+\begin{pmatrix}\tilde{x}\\
+\tilde{y}\\
+\tilde{z}\\
+c\tilde{t}
+\end{pmatrix}={\color{gray}\underset{R}{\underbrace{{\normalcolor \begin{pmatrix}\cos\theta & 0 & -\sin\theta & 0\\
+0 & 1 & 0 & 0\\
+\sin\theta & 0 & \cos\theta & 0\\
+0 & 0 & 0 & 1
+\end{pmatrix}}}}}\begin{pmatrix}x\\
+y\\
+z\\
+ct
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{pmatrix}x^{\prime}\\
+y^{\prime}\\
+z^{\prime}\\
+ct^{\prime}
+\end{pmatrix}={\color{gray}\underset{L}{\underbrace{{\normalcolor \begin{pmatrix}\gamma & 0 & 0 & -\gamma\beta\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+-\gamma\beta & 0 & 0 & 1
+\end{pmatrix}}}}}\begin{pmatrix}\tilde{x}\\
+\tilde{y}\\
+\tilde{z}\\
+c\tilde{t}
+\end{pmatrix}
+\]
+
+\end_inset
+
+And in total:
+\begin_inset Formula 
+\[
+\begin{pmatrix}x^{\prime}\\
+y^{\prime}\\
+z^{\prime}\\
+ct^{\prime}
+\end{pmatrix}={\color{gray}\underset{R}{\underbrace{{\normalcolor \begin{pmatrix}\gamma & 0 & 0 & -\gamma\beta\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+-\gamma\beta & 0 & 0 & \gamma
+\end{pmatrix}}}}}{\color{gray}\underset{L}{\underbrace{{\normalcolor \begin{pmatrix}\cos\theta & 0 & -\sin\theta & 0\\
+0 & 1 & 0 & 0\\
+\sin\theta & 0 & \cos\theta & 0\\
+0 & 0 & 0 & 1
+\end{pmatrix}}}}}\begin{pmatrix}x\\
+y\\
+z\\
+ct
+\end{pmatrix}={\color{gray}\underset{T}{\underbrace{{\normalcolor \begin{pmatrix}\gamma\cos\theta & 0 & -\gamma\sin\theta & -\gamma\beta\\
+0 & 1 & 0 & 0\\
+\sin\theta & 0 & \cos\theta & 0\\
+-\gamma\beta\cos\theta & 0 & \gamma\beta\sin\theta & \gamma
+\end{pmatrix}}}}}\begin{pmatrix}x\\
+y\\
+z\\
+ct
+\end{pmatrix}=\begin{pmatrix}\gamma\left(x\cos\theta-z\sin\theta\right)-\gamma\beta ct\\
+y\\
+x\sin\theta+z\cos\theta\\
+\gamma\beta\left(-x\cos\theta+z\sin\theta\right)+\gamma ct
+\end{pmatrix}
+\]
+
+\end_inset
+
+And the inverse:
+\begin_inset Formula 
+\begin{align*}
+R^{-1} & =\begin{pmatrix}\cos\theta & 0 & \sin\theta & 0\\
+0 & 1 & 0 & 0\\
+-\sin\theta & 0 & \cos\theta & 0\\
+0 & 0 & 0 & 1
+\end{pmatrix}\\
+L^{-1} & =\begin{pmatrix}\gamma & 0 & 0 & \gamma\beta\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+\gamma\beta & 0 & 0 & 1
+\end{pmatrix}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+T^{-1}=\left(R^{-1}L^{-1}\right)=\begin{pmatrix}\cos\theta & 0 & \sin\theta & 0\\
+0 & 1 & 0 & 0\\
+-\sin\theta & 0 & \cos\theta & 0\\
+0 & 0 & 0 & 1
+\end{pmatrix}\begin{pmatrix}\gamma & 0 & 0 & \gamma\beta\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+\gamma\beta & 0 & 0 & 1
+\end{pmatrix}=\begin{pmatrix}\gamma\cos\theta & 0 & \sin\theta & \gamma\beta\cos\theta\\
+0 & 1 & 0 & 0\\
+-\gamma\sin\theta & 0 & \cos\theta & -\gamma\beta\sin\theta\\
+\gamma\beta & 0 & 0 & \gamma
+\end{pmatrix}
+\]
+
+\end_inset
+
+And so:
+\begin_inset Formula 
+\[
+\begin{pmatrix}y\\
+z\\
+x\\
+ct
+\end{pmatrix}=\begin{pmatrix}\gamma x^{\prime}\cos\theta+z^{\prime}\sin\theta+\gamma\beta ct^{\prime}\cos\theta\\
+y\\
+-\gamma x^{\prime}\sin\theta+z^{\prime}\cos\theta-\gamma\beta ct^{\prime}\sin\theta\\
+\gamma\beta x^{\prime}+\gamma ct^{\prime}
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+denote with 
+\begin_inset Formula $\tilde{r}$
+\end_inset
+
+ the coordinates in the rotated frame and with 
+\begin_inset Formula $r^{\prime}$
+\end_inset
+
+ the coordinates in the rotated and then moving frame:
+\end_layout
+
+\begin_layout Subsubsection
+The transformation:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\begin{pmatrix}\tilde{x}\\
+\tilde{y}\\
+\tilde{z}\\
+c\tilde{t}
+\end{pmatrix}={\color{gray}\underset{R}{\underbrace{{\normalcolor \begin{pmatrix}\cos\alpha & 0 & \sin\alpha & 0\\
+0 & 1 & 0 & 0\\
+-\sin\alpha & 0 & \cos\alpha & 0\\
+0 & 0 & 0 & 1
+\end{pmatrix}}}}}\begin{pmatrix}x\\
+y\\
+z\\
+ct
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{pmatrix}x^{\prime}\\
+y^{\prime}\\
+z^{\prime}\\
+ct^{\prime}
+\end{pmatrix}={\color{gray}\underset{L}{\underbrace{{\normalcolor \begin{pmatrix}\gamma & 0 & 0 & -\gamma\beta\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+-\gamma\beta & 0 & 0 & 1
+\end{pmatrix}}}}}\begin{pmatrix}\tilde{x}\\
+\tilde{y}\\
+\tilde{z}\\
+c\tilde{t}
+\end{pmatrix}
+\]
+
+\end_inset
+
+And in total:
+\begin_inset Formula 
+\[
+\begin{pmatrix}x^{\prime}\\
+y^{\prime}\\
+z^{\prime}\\
+ct^{\prime}
+\end{pmatrix}={\color{gray}\underset{R}{\underbrace{{\normalcolor \begin{pmatrix}\gamma & 0 & 0 & -\gamma\beta\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+-\gamma\beta & 0 & 0 & 1
+\end{pmatrix}}}}}{\color{gray}\underset{L}{\underbrace{{\normalcolor \begin{pmatrix}\cos\alpha & 0 & \sin\alpha & 0\\
+0 & 1 & 0 & 0\\
+-\sin\alpha & 0 & \cos\alpha & 0\\
+0 & 0 & 0 & 1
+\end{pmatrix}}}}}\begin{pmatrix}x\\
+y\\
+z\\
+ct
+\end{pmatrix}={\color{gray}\underset{T}{\underbrace{{\normalcolor \begin{pmatrix}\gamma\cos\alpha & 0 & \gamma\sin\alpha & -\gamma\beta\\
+0 & 1 & 0 & 0\\
+-\sin\alpha & 0 & \cos\alpha & 0\\
+-\gamma\beta\cos\alpha & 0 & -\gamma\beta\sin\alpha & \gamma
+\end{pmatrix}}}}}\begin{pmatrix}x\\
+y\\
+z\\
+ct
+\end{pmatrix}=\begin{pmatrix}\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\\
+y\\
+-\sin\alpha x+\cos\alpha z\\
+-\gamma\beta\left(x\cos\alpha+z\sin\alpha\right)+\gamma ct
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+The inverse transformation:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+R^{-1} & =\begin{pmatrix}\cos\alpha & 0 & -\sin\alpha & 0\\
+0 & 1 & 0 & 0\\
+\sin\alpha & 0 & \cos\alpha & 0\\
+0 & 0 & 0 & 1
+\end{pmatrix}\\
+L^{-1} & =\begin{pmatrix}\gamma & 0 & 0 & \gamma\beta\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+\gamma\beta & 0 & 0 & 1
+\end{pmatrix}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+T^{-1}=\left(R^{-1}L^{-1}\right)=\begin{pmatrix}\cos\alpha & 0 & -\sin\alpha & 0\\
+0 & 1 & 0 & 0\\
+\sin\alpha & 0 & \cos\alpha & 0\\
+0 & 0 & 0 & 1
+\end{pmatrix}\begin{pmatrix}\gamma & 0 & 0 & \gamma\beta\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+\gamma\beta & 0 & 0 & 1
+\end{pmatrix}=\begin{pmatrix}\gamma\cos\alpha & 0 & -\sin\alpha & \gamma\beta\cos\alpha\\
+0 & 1 & 0 & 0\\
+\gamma\sin\alpha & 0 & \cos\alpha & \gamma\beta\sin\alpha\\
+\gamma\beta & 0 & 0 & \gamma
+\end{pmatrix}
+\]
+
+\end_inset
+
+And so:
+\begin_inset Formula 
+\begin{equation}
+\begin{pmatrix}y\\
+z\\
+x\\
+ct
+\end{pmatrix}=\begin{pmatrix}\gamma x^{\prime}\cos\alpha-z^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\cos\alpha\\
+y\\
+\gamma x^{\prime}\sin\alpha+z^{\prime}\cos\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
+\gamma\beta x^{\prime}+\gamma ct^{\prime}
+\end{pmatrix}\label{eq:rotation+lorentz transformation}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+The cavity effect on one pencil beam centered at 
+\begin_inset Formula $\left(x_{0},y_{0}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\psi_{x_{0},y_{0}}\left(x,y,z,ct\right)$
+\end_inset
+
+ be the wave function of the electron in the lab's frame, for a pencil beam
+ centered around 
+\begin_inset Formula $x_{0},y_{0}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In the rotated and moving frame this wave function will become (Using 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rotation+lorentz transformation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+):
+\begin_inset Formula 
+\[
+\psi^{\prime}\left(x^{\prime},y^{\prime},z^{\prime},ct^{\prime}\right)\stackrel{{\color{blue}\eqref{eq:rotation+lorentz transformation}}}{=}\gamma\psi_{x_{0},y_{0}}\left(T^{-1}\left(x^{\prime},y^{\prime},z^{\prime},ct^{\prime}\right)\right)=\gamma\psi_{x_{0},y_{0}}\begin{pmatrix}\gamma x^{\prime}\cos\alpha-z^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\cos\alpha\\
+y^{\prime}\\
+\gamma x^{\prime}\sin\alpha+z^{\prime}\cos\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
+\gamma\beta x^{\prime}+\gamma ct^{\prime}
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $\psi_{x_{0},y_{0}}$
+\end_inset
+
+ had the form:
+\begin_inset Formula 
+\begin{align*}
+\psi_{x_{0},y_{0}}\left(x,y,z,t\right) & =e^{-\frac{\left(\left(x-x_{0}\right)^{2}+\left(y-y_{0}\right)^{2}\right)}{2\sigma^{2}}}e^{ikz}e^{i\omega t}\approx\\
+ & {\color{gray}\approx\delta\left(x-x_{0}\right)\delta\left(y-y_{0}\right)e^{ikz}e^{i\omega t}}
+\end{align*}
+
+\end_inset
+
+(Alternatively, we could also choose 
+\begin_inset Formula $\psi_{x_{0},y_{0}}\left(x,y,z,t\right)=\delta\left(x-x_{0},y-y_{0}\right)e^{ikz}e^{i\omega t}$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+Then 
+\begin_inset Formula $\psi^{\prime}$
+\end_inset
+
+ has the form:
+\begin_inset Formula 
+\begin{align*}
+\psi_{x_{0},y_{0}}^{\prime}\left(x^{\prime},y^{\prime},z^{\prime},ct^{\prime}\right) & =e^{-\frac{\left({\color{gray}\overset{x-x_{0}}{\overbrace{{\normalcolor \left(\gamma x^{\prime}\cos\alpha-z^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\cos\alpha-x_{0}\right)^{2}}}}}+\left(y^{\prime}-y_{0}\right)^{2}\right)}{2\sigma^{2}}}e^{ik{\color{gray}\overset{z}{\overbrace{{\normalcolor \left(\gamma x^{\prime}\sin\alpha+z^{\prime}\cos\alpha+\gamma\beta ct^{\prime}\sin\alpha\right)}}}}}e^{{\color{gray}\overset{t}{\overbrace{{\normalcolor i\omega t\left(\gamma\beta x^{\prime}+\gamma ct^{\prime}\right)}}}}}\approx\\
+ & {\color{gray}\approx\delta\left(\gamma x^{\prime}\cos\alpha-z^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\cos\alpha-x_{0}\right)\delta\left(y-y_{0}\right)e^{ik\left(\gamma x^{\prime}\sin\alpha+z^{\prime}\cos\alpha+\gamma\beta ct^{\prime}\sin\alpha\right)}e^{i\omega t\left(\gamma\beta x^{\prime}+\gamma ct^{\prime}\right)}}
+\end{align*}
+
+\end_inset
+
+And so we see that in the moving-rotated frame the wave function drifts
+ to the left over time, and has a different frequency.
+\end_layout
+
+\begin_layout Standard
+Let us choose the time 
+\begin_inset Formula $t=0$
+\end_inset
+
+ as the time the gaussian envelope 
+\color gray
+(The delta function)
+\color inherit
+ 
+\series bold
+of the wave function
+\series default
+ is centered around 
+\begin_inset Formula $x^{\prime}=y^{\prime}=z^{\prime}=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+At 
+\begin_inset Formula $z^{\prime}=0$
+\end_inset
+
+ the wave function will have the form:
+\begin_inset Formula 
+\begin{equation}
+\psi_{x_{0},y_{0}}^{\prime}\left(x^{\prime},y^{\prime},z^{\prime}=0,ct^{\prime}\right)=\gamma\psi_{x_{0},y_{0}}\begin{pmatrix}\gamma x^{\prime}\cos\alpha+\gamma\beta ct^{\prime}\cos\alpha\\
+y^{\prime}\\
+\gamma x^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
+\gamma\beta x^{\prime}+\gamma ct^{\prime}
+\end{pmatrix}=\gamma\psi_{x_{0},y_{0}}\begin{pmatrix}\gamma\cos\alpha\left(x^{\prime}+\beta ct^{\prime}\right)\\
+y^{\prime}\\
+\gamma x^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
+\gamma\beta x^{\prime}+\gamma ct^{\prime}
+\end{pmatrix}\tag{e\_32}\label{eq:e_32}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And so:
+\begin_inset Formula 
+\begin{align}
+\psi_{x_{0},y_{0}}\begin{pmatrix}\gamma\cos\alpha\left(x^{\prime}+\beta ct^{\prime}\right)\\
+y^{\prime}\\
+\gamma x^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
+\gamma\beta x^{\prime}+\gamma ct^{\prime}
+\end{pmatrix} & =e^{-\frac{\left(\left(\gamma\cos\alpha\left(x^{\prime}+\beta ct^{\prime}\right)-x_{0}\right)^{2}+\left(y^{\prime}-y_{0}\right)^{2}\right)}{2\sigma^{2}}}e^{ik\left(\gamma x^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\sin\alpha\right)}e^{i\omega\left(\gamma\beta x^{\prime}+\gamma ct^{\prime}\right)}\nonumber \\
+ & {\color{gray}\approx\delta\left(\gamma\cos\alpha\left(x^{\prime}+\beta ct^{\prime}\right)-x_{0}\right)\delta\left(y^{\prime}-y_{0}\right)e^{ik\left(\gamma x^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\sin\alpha\right)}e^{i\omega\left(\gamma\beta x^{\prime}+\gamma ct^{\prime}\right)}}\label{eq:e_29}
+\end{align}
+
+\end_inset
+
+For 
+\begin_inset Formula $t^{\prime}=0$
+\end_inset
+
+ we will have:
+\begin_inset Formula 
+\begin{align}
+\psi_{x_{0},y_{0}}\begin{pmatrix}\gamma x^{\prime}\cos\alpha\\
+y^{\prime}\\
+\gamma x^{\prime}\sin\alpha\\
+\gamma\beta x^{\prime}
+\end{pmatrix} & =e^{-\frac{\left(\left(\gamma x^{\prime}\cos\alpha-x_{0}\right)^{2}+\left(y^{\prime}-y_{0}\right)^{2}\right)}{2\sigma^{2}}}e^{ik\gamma x^{\prime}\sin\alpha}e^{i\omega\gamma\beta x^{\prime}}={\color{gray}\underset{\begin{array}{c}
+\text{Streched by a factor}\\
+\text{of }\gamma\cos\alpha\text{ in }x
+\end{array}}{\underbrace{{\normalcolor {\color{green}e^{-\frac{\left(x^{\prime}-\frac{x_{0}}{\gamma\cos\alpha}\right)^{2}}{2\left(\frac{\sigma}{\gamma\cos\alpha}\right)^{2}}}}}}}}{\color{green}e^{-\frac{\left(y^{\prime}-y_{0}\right)^{2}}{2\sigma^{2}}}}e^{ik\gamma x^{\prime}\sin\alpha}e^{i\omega\gamma\beta x^{\prime}}\nonumber \\
+ & {\color{gray}\approx{\color{gray}\underset{\text{Renormalization}}{\underbrace{\gamma\cos\alpha}}}\delta\left(\gamma\cos\alpha\left(x^{\prime}-\frac{x_{0}}{\gamma\cos\alpha}\right)\right)\delta\left(y^{\prime}-y_{0}\right)e^{ik\gamma x^{\prime}\sin\alpha}e^{i\omega\gamma\beta x^{\prime}}}\label{eq:e_30}
+\end{align}
+
+\end_inset
+
+And so we see the
+\color green
+ 
+\color inherit
+pencil beam is a Gaussian 
+\color gray
+delta function
+\color inherit
+ centered around 
+\begin_inset Formula $\left(\frac{x_{0}}{\gamma\cos\alpha},y_{0}\right)$
+\end_inset
+
+ (at 
+\begin_inset Formula $z^{\prime}=0$
+\end_inset
+
+ and 
+\begin_inset Formula $t^{\prime}=0$
+\end_inset
+
+).
+ Taking the width of the pencil to be very small with respect to the features
+ of the laser beam, we can approximate the electric field experienced by
+ the electron pencil beam to be the value at it's center (at 
+\begin_inset Formula $\left(x_{0},y_{0},z\right)$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Now we recall that in our 2 frequencies cavity there are 2 frequencies.
+ In particular, we saw that by choosing 
+\begin_inset Formula $\Gamma_{+}E_{1}=\Gamma_{-}E_{2}={\color{teal}E_{0}}$
+\end_inset
+
+, we get for a standing wave cavity a wave of the form:
+\begin_inset Formula 
+\[
+E_{\text{laser,lattic'es frame}}\left(x^{\prime},y^{\prime},z^{\prime},t^{\prime}\right)=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+={\color{teal}E_{0,\text{envelope}}\left(\gamma x^{\prime}+\gamma\beta ct^{\prime},y^{\prime},z^{\prime}\right)}\cdot\left[\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\varphi_{-}\left(x^{\prime}\right)\right)}+2e^{i\omega t}\cos\left(\varphi\left(x^{\prime}\right)\right)+\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\varphi_{+}\left(x^{\prime}\right)\right)}\right]\tag{{\color{blue}\ref{eq:wave_in_moving_frame}}}
+\]
+
+\end_inset
+
+For:
+\begin_inset Formula 
+\begin{align}
+{\color{teal}E_{0}} & \equiv\Gamma_{+}E_{1}=\Gamma_{-}E_{2}\tag{{\color{blue}\ref{eq:E_0_def}}}\nonumber \\
+{\color{gray}\underset{\text{function}}{\underbrace{{\normalcolor {\color{teal}E_{0}\left(x^{\prime},y^{\prime},z^{\prime},t^{\prime}\right)}}}}} & \equiv{\color{gray}\underset{\text{number}}{\underbrace{{\normalcolor {\color{teal}E_{0}}}}}}\cdot\frac{w_{0}}{w\left(\gamma x^{\prime}+\gamma\beta ct^{\prime}\right)}\cdot e^{-\frac{y^{2}+z^{2}}{w^{2}\left(\gamma x^{\prime}+\beta ct^{\prime}\right)}}\label{eq:e_31}\\
+\Gamma_{\pm} & \equiv\gamma\left(1\pm\beta\right)\tag{{\color{blue}\ref{eq:capital_gamma_def}}}\nonumber \\
+\omega & \equiv\Gamma_{+}\omega_{1}=\Gamma_{-}\omega_{2}\tag{{\color{blue}{\color{blue}\ref{eq:omega_def}}}}\nonumber \\
+\omega_{-} & \equiv\Gamma_{-}\omega_{1}\nonumber \\
+\omega_{+} & \equiv\Gamma_{+}\omega_{2}\nonumber \\
+\varphi_{\pm}\left(x\right) & =k_{\pm}x+k_{\pm}\frac{y^{2}+z^{2}}{2R_{\pm}\left(x\right)}-\psi_{\pm}\left(x\right)\nonumber 
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Remark
+And for a ring-cavity we will not have the two exponents and will remain
+ with just:
+\begin_inset Formula 
+\[
+E_{\text{laser, lattic'es frame, ring cavity}}{\color{teal}E_{0}\left(x^{\prime},y^{\prime},z^{\prime}\right)}\cdot2e^{i\omega t^{\prime}}\cos\left(\varphi\left(x^{\prime}\right)\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the intensity is given by equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:moving_intensity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+:
+\begin_inset Formula 
+\[
+\left\langle I_{\text{laser, lattic'es frame}}\right\rangle \left(x^{\prime},y^{\prime},z^{\prime}\right)={\color{teal}E_{0}^{2}\left(\gamma x^{\prime}+\gamma\beta ct,y^{\prime},z^{\prime}\right)}\left({\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)\tag{{\color{blue}\eqref{eq:moving_intensity}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And for a ring cavity:
+\begin_inset Formula 
+\[
+\left\langle I\right\rangle _{\text{laser, lattic'es frame, ring cavity}}={\color{teal}E_{0}^{2}\left(\gamma x^{\prime}+\gamma\beta ct,y^{\prime},z^{\prime}\right)}\cdot\left({\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now we are in a bit of a confusing situation - the envelope is running to
+ the left with velocity 
+\begin_inset Formula $\beta$
+\end_inset
+
+, so which value of the envelope will the electorn's pencil beam feel? we
+ have to remember that also the electron beam crosses the 
+\begin_inset Formula $z=0$
+\end_inset
+
+ plane at different 
+\begin_inset Formula $x$
+\end_inset
+
+'s for different times.
+ in particular - from the expression for the pencil beam in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_29"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we see that the pencil beam also drifts to the left with velocity 
+\begin_inset Formula $\beta c$
+\end_inset
+
+ and so 
+\series bold
+experiences a constant envelope value.
+\end_layout
+
+\begin_layout Standard
+Which value? Since it is constant in time, we can substitute the 
+\begin_inset Formula $x^{\prime}$
+\end_inset
+
+ value of 
+\begin_inset Formula $t=0$
+\end_inset
+
+, which would be 
+\begin_inset Formula $\frac{x_{0}}{\gamma\cos\alpha}$
+\end_inset
+
+ (according to equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_30"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+).
+\end_layout
+
+\begin_layout Standard
+Substituting it into the envelope expression in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_31"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ and the intensity from 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:moving_intensity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we get:
+\begin_inset Formula 
+\begin{align*}
+\left\langle I\right\rangle \left(x^{\prime}=\frac{x_{0}}{\gamma\cos\alpha},y^{\prime},z^{\prime},t^{\prime}=0\right) & ={\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\cancel{\gamma}\frac{x_{0}}{\cancel{\gamma}\cos\alpha}+\cancel{\gamma\beta c\cdot0}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\cancel{\gamma}\frac{x_{0}}{\cancel{\gamma}\cos\alpha}+\cancel{\gamma\beta c\cdot0}\right)}}}\left({\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)\\
+ & ={\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}}\left({\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the paper 
+\bar under
+\color blue
+
+\begin_inset CommandInset href
+LatexCommand href
+name "Osip's paper"
+target "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7357394/"
+literal "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
+, the total phase shift acquired is given by integrating the intensity envelope
+ of the electromagnetic wave over 
+\begin_inset Formula $z,t\left(z\right)$
+\end_inset
+
+, (equation 
+\begin_inset Formula $\left(9\right)$
+\end_inset
+
+ in the paper) and so we get:
+\begin_inset Formula 
+\begin{align*}
+\phi_{0}\left(x^{\prime}=\frac{x_{0}}{\cos\alpha},y^{\prime}=y_{0}\right) & =\frac{e^{2}}{4mc\beta\gamma\hbar}\cdot\intop A_{0}^{2}\left(y,z\right)dz\\
+ & =\intop{\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}}dz\\
+ & \stackrel{{\color{blue}\eqref{eq:gaussian_beam_potential_total_phase}}}{=}\frac{e^{2}}{\hbar4mc\beta_{e}\gamma_{e}\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{w_{0}^{2}E_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}e^{-\frac{2y_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And with the relativistic correction, from equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ponderomotive_integral_final_result_standing_wave"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we know that the 
+\begin_inset Formula ${\color{green}2+2\cos\left(2kx^{\prime}\right)}$
+\end_inset
+
+ term will end up as 
+\begin_inset Formula ${\color{green}2+2\rho\left(\theta,\beta\right)\cos\left(2kx^{\prime}\right)}$
+\end_inset
+
+ but from equation
+\color blue
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ponderomotive_integral_final_result_moving_wave"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+the two constant terms will just stay 
+\begin_inset Formula ${\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Adding it as a phase, we get:
+\begin_inset Formula 
+\[
+\psi^{\prime}\left(x^{\prime},y^{\prime},z^{\prime}=0,ct^{\prime}=0\right)\stackrel{{\color{blue}\eqref{eq:e_32}}}{=}\gamma\psi_{x_{0},y_{0}}\begin{pmatrix}\gamma\cos\alpha\left(x^{\prime}+\beta ct^{\prime}\right)\\
+y^{\prime}\\
+\gamma x^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
+\gamma\beta x^{\prime}+\gamma ct^{\prime}
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\theta},y_{0}\right)\left({\color{green}2+2\rho\left(\theta,\beta\right)\cos\left(2kx^{\prime}\right)}+{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}\right)}
+\]
+
+\end_inset
+
+Doing the Lorentz transform and rotation back, we get:
+\begin_inset Formula 
+\[
+x^{\prime}\rightarrow\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\Rightarrow
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\cos\left(2\varphi\left(x^{\prime}\right)\right)=\cos\left(2\varphi\left(\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\right)\right)
+\]
+
+\end_inset
+
+And so after transforming back to the lab's frame the phase will be:
+\begin_inset Formula 
+\[
+{\color{gray}\underset{\text{Lattice's frame}}{\underbrace{{\normalcolor \gamma\psi_{x_{0},y_{0}}\begin{pmatrix}\gamma x^{\prime}\cos\alpha-z^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\cos\alpha\\
+y^{\prime}\\
+\gamma x^{\prime}\sin\alpha+z^{\prime}\cos\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
+\gamma\beta x^{\prime}+\gamma ct^{\prime}
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+2\cos\left(2\varphi\left(x^{\prime}\right)\right)+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}}}}{\color{gray}\underset{T}{\underbrace{{\normalcolor \rightarrow}}}}{\color{gray}\underset{\text{Lab's frame}}{\underbrace{{\normalcolor \psi_{x_{0},y_{0}}\begin{pmatrix}x\\
+y\\
+z\\
+t
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+2\rho\left(\theta,\beta\right)\cos\left(2k\left(\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\right)\right)+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}}}}
+\]
+
+\end_inset
+
+Approximating again the wave function to be non-zero only at around 
+\begin_inset Formula $x=x_{0}$
+\end_inset
+
+, we can substitute 
+\begin_inset Formula $x=x_{0}$
+\end_inset
+
+ in the phase and get:
+\begin_inset Formula 
+\[
+\psi_{x_{0},y_{0}}\begin{pmatrix}x\\
+y\\
+z\\
+t
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+2\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+\text{Const}\right)}
+\]
+
+\end_inset
+
+And the middle band will be:
+\begin_inset Formula 
+\[
+e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+\text{Const}\right)}={\color{gray}\underset{\text{No t dependance}}{\underbrace{{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}}}}\cdot{\color{teal}e^{i\rho\left(\theta,\beta\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2\sin\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{2\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)\right)}}=
+\]
+
+\end_inset
+
+Using the identity:
+\begin_inset Formula 
+\[
+e^{i\left[{\color{brown}A_{0}}+{\color{teal}A\sin\left(\omega t\right)}\right]}={\color{brown}e^{iA_{0}}}\cdot{\color{teal}\sum_{q}J_{q}\left(A\right)e^{iq\omega t}}
+\]
+
+\end_inset
+
+We get:
+\begin_inset Formula 
+\[
+={\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}\cdot{\color{teal}\sum_{q=-\infty}^{\infty}J_{q}\left(\rho\left(\theta,\beta\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)e^{iq\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{4\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)}}\Rightarrow
+\]
+
+\end_inset
+
+And after the energy filter:
+\begin_inset Formula 
+\begin{equation}
+\Rightarrow{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}\cdot{\color{teal}J_{0}\left(\rho\left(\theta,\beta\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\label{eq:32}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\kaliHemiltonian\left|\psi\right\rangle =E\left|\psi\right\rangle \Rightarrow\left|\psi\right\rangle \approx e^{i\frac{E}{\hbar}t}\left|\psi\left(t=0\right)\right\rangle 
+\]
+
+\end_inset
+
+for 
+\begin_inset Formula 
+\begin{equation}
+\phi_{0}\left(x^{\prime}=\frac{x_{0}}{\cos\alpha},y^{\prime}=y_{0}\right)=\frac{e^{2}}{\hbar4mc\beta_{e}\gamma_{e}}\sqrt{\frac{\pi}{2}}\frac{E_{0}^{2}w_{0}^{2}}{w\left(\frac{x_{0}}{\cos\alpha}\right)}e^{-\frac{2y_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}\tag{e\_11}\label{eq:e_11}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And so the amplitude of the unmodulated wave will be 
+\begin_inset Formula 
+\[
+e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\cdot\text{Const}}J_{0}\left(\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)e^{i0\cdot\cancel{\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{4\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)}}=e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}J_{0}\left(2\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+The integral over the intensity envelope of the gaussian beam:
+\end_layout
+
+\begin_layout Standard
+The intensity envelope:
+\begin_inset Formula 
+\[
+I\left(x,y,z\right)=E_{0}^{2}\frac{w_{0}^{2}}{w^{2}\left(x\right)}e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(x\right)}}=\frac{\pi}{2}E_{0}^{2}w_{0}^{2}\cdot\frac{1}{\sqrt{2\pi}\cdot\frac{1}{2}w\left(x\right)}e^{-\frac{z^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}\cdot\frac{1}{\sqrt{2\pi}\cdot\frac{1}{2}w\left(x\right)}e^{-\frac{y^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}
+\]
+
+\end_inset
+
+The integral over the 
+\begin_inset Formula $z$
+\end_inset
+
+ axis will be:
+\begin_inset Formula 
+\[
+\intop_{-\infty}^{\infty}\frac{\pi}{2}E_{0}^{2}w_{0}^{2}\cdot\frac{1}{\sqrt{2\pi}\cdot\frac{1}{2}w\left(x\right)}e^{-\frac{{\color{green}y}^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}\cdot\frac{1}{\sqrt{2\pi}\cdot\frac{1}{2}w\left(x\right)}e^{-\frac{{\color{red}z}^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}dz=\frac{\pi}{2}E_{0}^{2}w_{0}^{2}\frac{1}{\sqrt{2\pi}\cdot\frac{1}{2}w\left(x\right)}e^{-\frac{{\color{green}y}^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}{\color{gray}\underset{1}{\underbrace{{\normalcolor \cancel{\intop_{-\infty}^{\infty}\cdot\frac{1}{\sqrt{2\pi}\cdot\frac{1}{2}w\left(x\right)}e^{-\frac{{\color{red}z}^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}\cdot dz}}}}}=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\intop_{z}I\left(y,z\right)dz & =\frac{\pi}{2}E_{0}^{2}w_{0}^{2}\frac{1}{\sqrt{2\pi}\cdot\frac{1}{2}w\left(x\right)}e^{-\frac{y^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}\\
+ & =\sqrt{\frac{\pi}{2}}\frac{E_{0}^{2}w_{0}^{2}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}
+\end{align*}
+
+\end_inset
+
+Adding the constants of the ponderomotive potential from 
+\bar under
+
+\begin_inset CommandInset href
+LatexCommand href
+name "ponderomotive potential article"
+target "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7357394/"
+literal "false"
+
+\end_inset
+
+
+\bar default
+ for the final phase (and also adding 
+\begin_inset Formula $\frac{1}{\omega^{2}}$
+\end_inset
+
+ factor because 
+\begin_inset Formula $\phi$
+\end_inset
+
+ is integration of 
+\begin_inset Formula $A^{2}$
+\end_inset
+
+ which is 
+\begin_inset Formula $\frac{E^{2}}{\omega^{2}}$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{equation}
+\boxed{\phi_{0}\left(x,y\right)=\frac{e^{2}}{\hbar4mc\beta\gamma\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{E_{0}^{2}w_{0}^{2}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}}\tag{e\_1}\label{eq:gaussian_beam_potential_total_phase}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using the relation 
+\begin_inset Formula $\boldsymbol{p}=\gamma mv=\gamma m\beta c=\hbar k$
+\end_inset
+
+ we can also write:
+\begin_inset Formula 
+\[
+\frac{e^{2}}{\hbar4mc\beta\gamma}=\frac{e^{2}}{4\hbar^{2}k_{\text{electron}}}
+\]
+
+\end_inset
+
+Which is more like Kirkland's notation.
+\end_layout
+
+\begin_layout Section
+Relation between wavelengths and numerical aperture in a fixed cavity
+\end_layout
+
+\begin_layout Standard
+Suppose we have two wavelengths, 
+\begin_inset Formula $\lambda_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda_{2}$
+\end_inset
+
+ in a symmetric cavity, with radius of curvature 
+\begin_inset Formula $R$
+\end_inset
+
+, length 
+\begin_inset Formula $L$
+\end_inset
+
+, and unconcentricity 
+\begin_inset Formula $u=R-\frac{L}{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We know that:
+\begin_inset Formula 
+\begin{equation}
+\begin{split}u & \equiv{\color{green}R}-\frac{L}{2}\\
+ & ={\color{green}\frac{L}{2}\left(\cancel{1}+\frac{4z^{2}}{L^{2}}\right)}-\cancel{\frac{L}{2}}\\
+ & =\frac{2z_{R}^{2}}{L}\\
+ & =\frac{2\pi^{2}\cdot w_{0}^{2}}{\lambda^{2}\cdot L}\\
+ & =\frac{2\pi^{2}\cdot w_{0}^{2}}{\lambda^{2}\cdot L}\cdot\frac{\pi^{2}}{\lambda^{2}}\cdot\frac{\lambda^{2}}{\pi^{2}}\\
+ & =\frac{2{\color{teal}\pi^{4}\cdot w_{0}^{4}}}{{\color{teal}\lambda^{2}}\cdot L}\cdot\frac{\lambda^{2}}{\pi^{2}}\\
+ & =\frac{2\lambda^{2}}{{\color{teal}NA^{4}}\cdot L\cdot\pi^{2}}{\color{lightgray}\ \backslash\cdot\frac{NA^{4}}{u}}
+\end{split}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+{\color{teal}NA^{4}}=\frac{2\lambda^{2}}{L\pi^{2}u}\Rightarrow
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+NA^{4}\propto\lambda^{2}{\color{lightgray}\ \backslash\sqrt[4]{}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+NA\propto\sqrt{\lambda}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+NA_{2}=NA_{1}\cdot\sqrt{\frac{\lambda_{2}}{\lambda_{1}}}
+\]
+
+\end_inset
+
+Thus if we have 
+\begin_inset Formula $\lambda_{1}=1064\unit{nm}$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda_{2}=532\unit{nm}$
+\end_inset
+
+, and 
+\begin_inset Formula $NA_{1}=0.1$
+\end_inset
+
+ then 
+\begin_inset Formula $NA_{2}=0.1\cdot\frac{1}{\sqrt{2}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Numerics
+\end_layout
+
+\begin_layout Subsection
+The code structure:
+\end_layout
+
+\begin_layout Standard
+The simulation is meant to take an electron wave function, and propagate
+ it through the different components of the microscope.
+\end_layout
+
+\begin_layout Standard
+The wave function is always represented with the 
+\family typewriter
+WaveFunction
+\family default
+ class, that contains the coordinates system on which it is evaluated, the
+ values of it over all of the coordinates system's points, and it's energy.
+\end_layout
+
+\begin_layout Standard
+The base unit of the simulation is the 
+\family typewriter
+Propagator
+\family default
+ class, which takes a 
+\family typewriter
+WaveFunction
+\family default
+ as an input and outputs a 
+\family typewriter
+WaveFunction
+\family default
+.
+ examples for such Propagators are the lens, the cavity, the sample, the
+ camera, etc...
+\end_layout
+
+\begin_layout Standard
+the main class is Microscope, which is defined by a list of propagators,
+ and know how to take a 
+\family typewriter
+WaveFunction
+\family default
+ as an input, pass it through all the 
+\family typewriter
+Propagator
+\family default
+s one by one, save the results on the way, and output the final 
+\family typewriter
+WaveFunction
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+This is an example of a code to run the simulation:
+\end_layout
+
+\begin_layout Subsection
+The integral to calculate 
+\begin_inset Formula $G$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+Assume a gaussian beam's electromagnetic potential that is aligned with
+ 
+\begin_inset Formula $\tilde{x}$
+\end_inset
+
+ axis is 
+\begin_inset Formula $\tilde{A}\left(x,y,z,t\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $\tilde{x}$
+\end_inset
+
+ is tilted by an angle 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ with the cavity (such that the positive 
+\begin_inset Formula $\tilde{x}$
+\end_inset
+
+ is tilted towards the positive 
+\begin_inset Formula $\tilde{z}$
+\end_inset
+
+ direction) then the potential in the lab's frame will be:
+\begin_inset Formula 
+\[
+\boldsymbol{A}\left(x,y,z,t\right)=\begin{pmatrix}\tilde{A}_{x}\cos\alpha+\tilde{A}_{z}\sin\alpha\\
+A_{y}\\
+-\tilde{A}_{x}\sin\alpha+\tilde{A}_{z}\cos\alpha
+\end{pmatrix}\left(x\cos\alpha-z\sin\alpha,y,x\sin\alpha+z\cos\alpha\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Therefore the integrand to calculate 
+\begin_inset Formula $G$
+\end_inset
+
+ will be:
+\begin_inset Formula 
+\[
+\text{Integrand}\left(x,y,z,t,T\right)=A_{z}\left(x,y,z-\beta c\left(t-T\right),T\right)=\left[-\tilde{A}_{x}\sin\alpha+A_{z}\cos\alpha\right]{\color{gray}\underset{\text{This is the argument of the function A, not a multiplication factor}}{\underbrace{{\normalcolor \left(x\cos\alpha-\left(z-\beta c\left(t-T\right)\right)\sin\alpha,y,x\sin\alpha+\left(z-\beta c\left(t-T\right)\right)\cos\alpha,T\right)}}}}
+\]
+
+\end_inset
+
+Since we choose a gauge where 
+\begin_inset Formula $\tilde{A_{x}}=0$
+\end_inset
+
+ then we are left with:
+\begin_inset Formula 
+\[
+\cos\alpha\cdot\tilde{A}_{z}\left(x\cos\alpha-\left(z-\beta c\left(t-T\right)\right)\sin\alpha,y,x\sin\alpha+\left(z-\beta c\left(t-T\right)\right)\cos\alpha,T\right)=
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+integral over 
+\begin_inset Formula $T$
+\end_inset
+
+ will be:
+\begin_inset Formula 
+\[
+G=\cos\alpha\beta c\intop_{-\infty}^{T}\tilde{A}_{z}\left(x\cos\alpha-\left(z-\beta c\left(t-T\right)\right)\sin\alpha,y,x\sin\alpha+\left(z-\beta c\left(t-T\right)\right)\cos\alpha,T\right)dT
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+Z & =z-\beta c\left(t-T\right) & \frac{1}{\beta c}dZ & =dT & T=t & \iff Z=z\\
+T & =\frac{Z-z}{\beta c}+t
+\end{align*}
+
+\end_inset
+
+And so the integral becomes:
+\begin_inset Formula 
+\begin{equation}
+G=\cos\alpha\intop_{-\infty}^{z}\tilde{A}_{z}\left(x\cos\alpha-Z\sin\alpha,y,x\sin\alpha+Z\cos\alpha,\frac{Z-z}{\beta c}+t\right)dZ\tag{e\_25}\label{eq:e_25}
+\end{equation}
+
+\end_inset
+
+Which is a bit more elegant.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\color teal
+If you search for the polarization term 
+\begin_inset Formula $\cos\theta$
+\end_inset
+
+ - it is inside 
+\begin_inset Formula $\tilde{A}_{z}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+The discrete interval 
+\begin_inset Formula $dz$
+\end_inset
+
+ required for an accurate integration of 
+\begin_inset Formula $A_{z}\left(z,t\left(z\right)\right)$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+Let us calculate the typical rate of change (as a function of 
+\begin_inset Formula $z$
+\end_inset
+
+) for a standing wave 
+\begin_inset Formula $A$
+\end_inset
+
+ of the form:
+\begin_inset Formula 
+\[
+A\left(z,t\right)=\cos\left(kx\right)\cos\left(\omega t\right)
+\]
+
+\end_inset
+
+And for and electron passing in it in a velocity 
+\begin_inset Formula $\beta c$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The time as a function of 
+\begin_inset Formula $z$
+\end_inset
+
+, 
+\begin_inset Formula $t\left(z\right)$
+\end_inset
+
+ is given by 
+\begin_inset Formula $t\left(z\right)=\frac{z}{\beta c}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+And so 
+\begin_inset Formula $A\left(z,t\left(z\right)\right)$
+\end_inset
+
+ is:
+\begin_inset Formula 
+\begin{align*}
+A\left(z,t\left(z\right)\right) & =\cos\left(kz\right)\cos\left(\omega t\left(z\right)\right)\\
+ & =\cos\left(kz\right)\cos\left({\color{green}\omega}\frac{z}{\beta{\color{green}c}}\right)\\
+ & =\cos\left(kz\right)\cos\left(\frac{{\color{green}k}}{\beta}z\right)\\
+ & =\frac{1}{2}\left[\cos\left(\left(1+\frac{1}{\beta}\right)kz\right)+\cos\left(\left(1-\frac{1}{\beta}\right)kz\right)\right]
+\end{align*}
+
+\end_inset
+
+And so we see that for a monochromatic light the greatest wavelength experienced
+ by the electron is 
+\begin_inset Formula $k_{\text{eff}}=\left(1+\frac{1}{\beta}\right)k\Rightarrow\lambda_{\text{eff}}=\frac{\lambda}{1+\frac{1}{\beta}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Given this, we know 
+\begin_inset Formula $dz$
+\end_inset
+
+ should be around:
+\begin_inset Formula 
+\[
+dz<\frac{\lambda}{1+\frac{1}{\beta}}
+\]
+
+\end_inset
+
+in practice, playing with it, I found that 
+\begin_inset Formula $dz=\frac{\lambda}{\left(1+\frac{1}{\beta}\right)}$
+\end_inset
+
+ is enough, and smaller 
+\begin_inset Formula $dz$
+\end_inset
+
+ does not produce much different results.
+\end_layout
+
+\begin_layout Subsubsection
+The derivative of 
+\begin_inset Formula $G$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $z$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+The definition of 
+\begin_inset Formula $G$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+G\left(z,t\right)=\intop_{-\infty}^{z}A_{z}\left(Z,t-\frac{z-Z}{\beta c}\right)dZ
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We have this 
+\color blue
+blue
+\color red
+ 
+\color inherit
+term in the integral of the phase:
+\begin_inset Formula 
+\[
+\intop_{-\infty}^{\infty}\left(A_{z}\left(z,t\left(z\right)\right)-{\color{blue}\nabla G\left(z,t\left(z\right)\right)}\right)^{2}\ldots dz
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Where 
+\begin_inset Formula $t\left(z\right)={\color{gray}\underset{t\text{ at }z=0}{\underbrace{{\normalcolor t_{0}}}}}+\frac{z}{\beta c}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+note how the 
+\begin_inset Formula $z$
+\end_inset
+
+'th component of the gradient is:
+\begin_inset Formula 
+\[
+\lim_{dz\rightarrow0}\frac{G\left(z+dz,t\left(z\right)\right)-G\left(z,t\left(z\right)\right)}{dz}
+\]
+
+\end_inset
+
+
+\series bold
+And not:
+\series default
+
+\begin_inset Formula 
+\[
+\lim_{dz\rightarrow0}\frac{G\left(z+dz,t\left(z{\color{red}+dz}\right)\right)-G\left(z,t\left(z\right)\right)}{dz}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Therefore:
+\begin_inset Formula 
+\begin{align}
+G\left(z+dz,t\left(z\right)\right) & =\intop_{-\infty}^{z+dz}A_{z}\left(Z,t\left(z\right)-\frac{z+dz-Z}{\beta c}\right)dZ\nonumber \\
+ & =\intop_{-\infty}^{z+dz}A_{z}\left(Z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)-\frac{z-Z}{\beta c}\right)\nonumber \\
+ & =\intop_{-\infty}^{{\color{red}z}}A_{z}\left(Z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)-\frac{z-Z}{\beta c}\right)dZ+{\color{gray}\underset{\xrightarrow[dz\rightarrow0]{}A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)-\cancel{\frac{z-z}{\beta c}}\right)\cdot dz}{\underbrace{{\normalcolor \intop_{{\color{red}z}}^{z+dz}A_{z}\left(Z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)-\frac{z-Z}{\beta c}\right)}}}}\nonumber \\
+ & =\intop_{-\infty}^{{\color{red}z}}A_{z}\left(Z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)-\frac{z-Z}{\beta c}\right)dZ+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\cdot dz\nonumber \\
+ & =G\left(z,t\left(z\right)-\frac{dz}{\beta c}\right)+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\cdot dz\tag{e\_26}\label{eq:e_26}
+\end{align}
+
+\end_inset
+
+And the derivative is:
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial G}{\partial z} & =\lim_{dz\rightarrow0}\left[\frac{G\left(z,t\left(z\right)-\frac{dz}{\beta c}\right)+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\cdot dz-G\left(z,t\left(z\right)\right)}{dz}\right]\\
+ & =\lim_{dz\rightarrow0}\left[\frac{G\left(z,t\left(z\right)-\frac{dz}{\beta c}\right)-G\left(z,t\left(z\right)\right)}{dz}\right]+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\\
+ & =-\frac{1}{\beta c}\frac{\partial G}{\partial t}+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\lim_{dz\rightarrow0}\left[\frac{G\left(z+dz,t\right)-G\left(z,t\right)}{dz}\right] & =\lim_{dz\rightarrow0}\frac{1}{dz}\left[\intop_{-\infty}^{t}A_{z}\left(z+dz-\beta c\left(t-T\right),T\right)dT-\intop_{-\infty}^{t}A_{z}\left(z-\beta c\left(t-T\right),T\right)dT\right]\\
+ & =\intop_{-\infty}^{t}\left[\lim_{dz\rightarrow0}\frac{A_{z}\left(z+dz-\beta c\left(t-T\right),T\right)-A_{z}\left(z+dz-\beta c\left(t-T\right),T\right)}{dz}\right]dT\\
+ & =\lim_{dz\rightarrow0}\intop_{-\infty}^{t}\frac{\partial A\left(z-\beta c\left(t-T\right),T\right)}{\partial z}dT
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Instead of Fourier transform:
+\end_layout
+
+\begin_layout Standard
+We have a phase of the form:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\phi\left(x,y,t\right)=\phi_{0}\left(x,y\right)+A\left(x,y\right)\cdot\sin\left(\Delta\omega+\varphi\left(x,y\right)\right)
+\]
+
+\end_inset
+
+Since 
+\begin_inset Formula $x,y$
+\end_inset
+
+ do not play a role in this equation, and we are going to do the calculation
+ to all pairs of 
+\begin_inset Formula $x,y$
+\end_inset
+
+ separately, then we can omit them for abbreviation: 
+\begin_inset Formula 
+\[
+\phi\left(t\right)=\phi_{0}+A\cdot\sin\left(\Delta\omega+\varphi\right)
+\]
+
+\end_inset
+
+We can evaluate the function in three different points in time:
+\begin_inset Formula 
+\begin{align*}
+t_{0} & =0\\
+t_{1} & =\frac{\pi}{2\Delta\omega}\\
+t_{2} & =\frac{\pi}{\Delta\omega}
+\end{align*}
+
+\end_inset
+
+So that:
+\begin_inset Formula 
+\begin{alignat*}{2}
+\phi\left(t_{0}\right) & =\phi_{0}+A\sin\left(0+\varphi\right) & =\phi_{0}+A\sin\left(\varphi\right)\\
+\phi\left(t_{1}\right) & =\phi_{0}+A\sin\left(\frac{\pi}{2\cancel{\Delta\omega}}\cancel{\Delta\omega}+\varphi\right) & =\phi_{0}+A\cos\left(\varphi\right)\\
+\phi\left(t_{2}\right) & =\phi_{0}+A\sin\left(\frac{\pi}{\cancel{\Delta\omega}}\cancel{\Delta\omega}+\varphi\right) & =\phi_{0}-A\sin\left(\varphi\right)
+\end{alignat*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\phi\left(t_{0}\right) & =\phi_{0}+\cancel{A\sin\left(\varphi\right)}\\
+\phi\left(t_{2}\right) & =\phi_{0}-\cancel{A\sin\left(\varphi\right)}{\color{gray}\ \backslash+}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boxed{\phi_{0}=\frac{\phi\left(t_{0}\right)+\phi\left(t_{2}\right)}{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\phi\left(t_{0}\right) & =\phi_{0}+A\sin\left(\varphi\right){\color{gray}\ \backslash-\phi_{0}}\\
+\phi\left(t_{1}\right) & =\phi_{0}+A\cos\left(\varphi\right){\color{gray}\ \backslash-\phi_{0}}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\phi\left(t_{0}\right)-\phi_{0} & =\cancel{A}\sin\left(\varphi\right)\\
+\phi\left(t_{1}\right)-\phi_{0} & =\cancel{A}\cos\left(\varphi\right){\color{gray}\ \backslash:}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\tan\left(\varphi\right)=\frac{\phi\left(t_{0}\right)-\phi_{0}}{\phi\left(t_{1}\right)-\phi_{0}}{\color{gray}\ \backslash\tan^{-1}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\boxed{\varphi=\tan^{-1}\left(\frac{\phi\left(t_{0}\right)-\phi_{0}}{\phi\left(t_{1}\right)-\phi_{0}}\right)}
+\]
+
+\end_inset
+
+And now if 
+\begin_inset Formula $\varphi$
+\end_inset
+
+ is very close to 
+\begin_inset Formula $0$
+\end_inset
+
+ or 
+\begin_inset Formula $\pi$
+\end_inset
+
+ we substitute it in the equation for 
+\begin_inset Formula $\phi\left(t_{1}\right)$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{equation}
+\boxed{A={\color{gray}\underset{\text{All are known by this point}}{\underbrace{{\normalcolor \frac{\phi\left(t_{1}\right)-\phi_{0}}{\cos\left(\varphi\right)}}}}}}\tag{e\_27}\label{eq:e_27}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And otherwise we can substitute it in the equation for
+\begin_inset Formula $\phi\left(t_{0}\right)$
+\end_inset
+
+ and get:
+\begin_inset Formula 
+\[
+\boxed{A={\color{gray}\underset{\text{All are known by this point}}{\underbrace{{\normalcolor \frac{\phi\left(t_{0}\right)-\phi_{0}}{\sin\left(\varphi\right)}}}}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Lens out of focus and with aberrations:
+\end_layout
+
+\begin_layout Standard
+Assume an object at position 
+\begin_inset Formula $z=-f+\Delta z_{1}$
+\end_inset
+
+, a lens at a position 
+\begin_inset Formula $z=0$
+\end_inset
+
+, and a sensor at 
+\begin_inset Formula $z=f$
+\end_inset
+
+.
+ At each position 
+\begin_inset Formula $z$
+\end_inset
+
+ the wave will be represented by:
+\begin_inset Formula 
+\begin{align*}
+U\left(x,y,z\right) & , & \tilde{U}\left(f_{x},f_{y},z\right) & =\kaliFourier\left[U\left(x,y,z\right)\right]\left(f_{x},f_{y}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+From the back of the lens to the camera:
+\end_layout
+
+\begin_layout Standard
+We start with the field just before the lens:
+\begin_inset Formula 
+\begin{align*}
+U\left(\xi,\eta,z=0^{-}\right) &  & \tilde{U}\left(f_{x},f_{y},z=0^{-}\right)
+\end{align*}
+
+\end_inset
+
+Passing it through the lens, we get:
+\begin_inset Formula 
+\[
+U\left(\xi,\eta,z=0^{+}\right)=U\left(\xi,\eta,z=0^{-}\right)\cdot e^{-\frac{ik}{2f}\left(\xi^{2}+\eta^{2}\right)+ia\left(\xi^{2}+\eta^{2}\right)^{2}}
+\]
+
+\end_inset
+
+Doing the Frensel integral do propagate it another 
+\begin_inset Formula $f$
+\end_inset
+
+ distance:
+\begin_inset Formula 
+\begin{align}
+U\left(x,y,z=f\right) & =\frac{e^{ikf}}{i\lambda f}\intop_{\xi}\intop_{\eta}{\color{brown}U\left(\xi,\eta,z=0^{+}\right)}{\color{teal}e^{\frac{ik}{2f}\left(\left(x-\xi\right)^{2}+\left(y-\eta\right)^{2}\right)}}d\xi d\eta\nonumber \\
+ & =\frac{e^{ikf}}{i\lambda f}\intop_{\xi}\intop_{\eta}{\color{brown}U\left(\xi,\eta,z=0^{+}\right)}{\color{teal}e^{\frac{ik}{2f}\left(x^{2}-2x\xi+\xi^{2}+y^{2}-2y\eta+\eta^{2}\right)}}d\xi d\eta\nonumber \\
+ & =\frac{e^{ikf}}{i\lambda f}e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}\intop_{\xi}\intop_{\eta}{\color{brown}U\left(\xi,\eta,z=0^{+}\right)}{\color{teal}e^{\frac{ik}{2f}\left(\xi^{2}+\eta^{2}\right)-\frac{ik}{f}\left(\xi x+\eta y\right)}}d\xi d\eta\nonumber \\
+ & =\frac{e^{ikf}}{i\lambda f}e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}\intop_{\xi}\intop_{\eta}{\color{brown}U\left(\xi,\eta,z=0^{-}\right)\cdot e^{-\cancel{\frac{ik}{2f}\left(\xi^{2}+\eta^{2}\right)}+ia\left(\xi^{2}+\eta^{2}\right)^{2}}}{\color{teal}e^{\cancel{\frac{ik}{2f}\left(\xi^{2}+\eta^{2}\right)}-\frac{ik}{f}\left(\xi x+\eta y\right)}}d\xi d\eta\nonumber \\
+ & =\frac{e^{ikf}}{i\lambda f}e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}\intop_{\xi}\intop_{\eta}{\color{brown}U\left(\xi,\eta,z=0^{-}\right)\cdot e^{ia\left(\xi^{2}+\eta^{2}\right)^{2}}}{\color{teal}e^{-2\pi i\xi\cdot\frac{x}{\lambda f}-2\pi i\eta\cdot\frac{y}{\lambda f}}}d\xi d\eta\nonumber \\
+ & =\frac{e^{ikf}}{i\lambda f}e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}\kaliFourier\left[{\color{brown}U\left(\xi,\eta,z=0^{-}\right)\cdot e^{ia\left(\xi^{2}+\eta^{2}\right)^{2}}}\right]\left(\frac{x}{\lambda f},\frac{y}{\lambda f}\right)\label{eq:e_33}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+From the object to the back of the lens:
+\end_layout
+
+\begin_layout Standard
+Let the object be represented by the complex function 
+\begin_inset Formula $U\left(x,y,z=-f+\Delta z_{1}\right)$
+\end_inset
+
+, and it's Fourier transform 
+\begin_inset Formula $\tilde{U}\left(f_{x},f_{y},z=-f+\Delta z_{1}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Propagating it to the lens, we get:
+\begin_inset Formula 
+\begin{align}
+\tilde{U}\left(f_{x},f_{y},z=0^{-}\right) & =\tilde{U}\left(f_{x},f_{y},z=-f+\Delta z_{1}\right)e^{-i\pi\lambda\left(f-\Delta z\right)\left(f_{x}^{2}+f_{y}^{2}\right)}\nonumber \\
+ & =\tilde{U}_{\text{object}}\left(f_{x},f_{y}\right)\cdot e^{-i\pi\lambda\left(f-\Delta z\right)\left(f_{x}^{2}+f_{y}^{2}\right)}\label{eq:e_34}
+\end{align}
+
+\end_inset
+
+Plugging it into 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_33"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we get:
+\begin_inset Formula 
+\begin{align*}
+U\left(x,y,z=f\right) & \stackrel{{\color{blue}\eqref{eq:e_33}}}{=}\frac{e^{ikf}}{i\lambda f}e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}\kaliFourier\left[{\color{brown}U\left(\xi,\eta,z=0^{-}\right)\cdot e^{ia\left(\xi^{2}+\eta^{2}\right)^{2}}}\right]\left(\frac{x}{\lambda f},\frac{y}{\lambda f}\right)\\
+ & \stackrel{{\color{blue}\eqref{eq:e_34}}}{=}\frac{e^{ikf}}{i\lambda f}e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}\kaliFourier\left[{\color{brown}\kaliFourier^{-1}\left[\tilde{U}_{\text{object}}\left(f_{x},f_{y}\right)\cdot e^{-i\pi\lambda\left(f-\Delta z\right)\left(f_{x}^{2}+f_{y}^{2}\right)}\right]\left(\xi,\eta\right)\cdot e^{ia\left(\xi^{2}+\eta^{2}\right)^{2}}}\right]\left(\frac{x}{\lambda f},\frac{y}{\lambda f}\right)
+\end{align*}
+
+\end_inset
+
+If we had 
+\begin_inset Formula $,a=0$
+\end_inset
+
+ (no aberrations) then:
+\begin_inset Formula 
+\begin{align*}
+= & \frac{e^{ikf}}{i\lambda f}e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}\cancel{\kaliFourier}\left[{\color{brown}\cancel{\kaliFourier^{-1}}\left[\tilde{U}_{\text{object}}\left(f_{x},f_{y}\right)\cdot e^{-i\pi\lambda\left(f-\Delta z\right)\left(f_{x}^{2}+f_{y}^{2}\right)}\right]\left(\xi,\eta\right)}\right]\left(\frac{x}{\lambda f},\frac{y}{\lambda f}\right)\\
+= & \frac{e^{ikf}}{i\lambda f}e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}\tilde{U}_{\text{object}}\left(\frac{x}{\lambda f},\frac{x}{\lambda f}\right)\cdot e^{-i\pi\lambda\left(\cancel{f}-\Delta z\right)\left(\frac{x^{2}}{\left(\lambda f\right)^{\cancel{2}}}+\frac{y^{2}}{\left(\lambda f\right)^{\cancel{2}}}\right)}\\
+= & \frac{e^{ikf}}{i\lambda f}e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}\tilde{U}_{\text{object}}\left(\frac{x}{\lambda f},\frac{x}{\lambda f}\right)\cdot e^{-i\frac{\pi}{\lambda f}\left(x^{2}+y^{2}\right)+\frac{i\pi}{\lambda f}\cdot\frac{\Delta z}{f}\left(x^{2}+y^{2}\right)}\\
+= & \frac{e^{ikf}}{i\lambda f}\cancel{e^{\frac{ik}{2f}\left(x^{2}+y^{2}\right)}}\tilde{U}_{\text{object}}\left(\frac{x}{\lambda f},\frac{x}{\lambda f}\right)\cdot e^{-\cancel{i\frac{k}{2f}\left(x^{2}+y^{2}\right)}+\frac{i\pi}{\lambda f}\cdot\frac{\Delta z}{f}\left(x^{2}+y^{2}\right)}\\
+ & \frac{e^{ikf}}{i\lambda f}\tilde{U}_{\text{object}}\left(\frac{x}{\lambda f},\frac{x}{\lambda f}\right)\cdot e^{-\frac{i\pi}{\lambda f}\cdot\frac{\Delta z}{f}\left(x^{2}+y^{2}\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Complexity:
+\end_layout
+
+\begin_layout Standard
+We note that in the total phase acquired term 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_18"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we have 
+\begin_inset Formula $\intop_{z}\ldots\partial_{x}G\left(x,y,z,t\right)$
+\end_inset
+
+ where 
+\begin_inset Formula $G$
+\end_inset
+
+ itself is an integral over 
+\begin_inset Formula $\intop_{Z}A_{z}\left(x,y,Z,\frac{Z-z}{\beta c}+t\right)dZ$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+it means that we have an integral inside a derivative inside an integral
+ - which we need to calculate to a grid of 
+\begin_inset Formula $n_{x}\times n_{y}$
+\end_inset
+
+ for many 
+\begin_inset Formula $t$
+\end_inset
+
+'s.
+ since every integral calls it's integrand many times - it means that the
+ inner most function 
+\begin_inset Formula $A_{z}\left(x,y,z,t\right)$
+\end_inset
+
+ might be called (say, 
+\begin_inset Formula $1000$
+\end_inset
+
+ times per integral and 
+\begin_inset Formula $\left(1+3\right)$
+\end_inset
+
+ times for gradient): 
+\begin_inset Formula $1000\cdot1000\cdot n_{x}\cdot n_{y}\cdot n_{t}\cdot4$
+\end_inset
+
+ which is a lot (for 
+\begin_inset Formula $n_{x}\times n_{y}=1000\times1000$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+However, we notice that when calculating 
+\begin_inset Formula $G$
+\end_inset
+
+, the term 
+\begin_inset Formula ${\color{teal}A_{z}\left(x,y,z_{1},t_{1}\right)}$
+\end_inset
+
+ is calculated many times: once in 
+\begin_inset Formula $G\left(x,y,z_{2},t_{1}-\frac{z_{1}-z_{2}}{\beta c}\right)$
+\end_inset
+
+ (because when we run the integral over 
+\begin_inset Formula $Z$
+\end_inset
+
+ and we get to 
+\begin_inset Formula $Z=z_{1}$
+\end_inset
+
+ then the integrand is 
+\begin_inset Formula 
+\[
+A_{z}\left(x,y,Z,t-\frac{z-Z}{\beta c}\right)=A_{z}\left(x,y,z_{1},t_{1}-\cancel{\frac{z_{1}-z_{2}}{\beta c}}-\cancel{\frac{z_{2}-z_{1}}{\beta c}}\right)={\color{teal}A_{z}\left(x,y,z_{1},t_{1}\right)}
+\]
+
+\end_inset
+
+) and once again in 
+\begin_inset Formula $G\left(x,y,z_{3},t_{1}-\frac{z_{1}-z_{3}}{\beta c}\right)$
+\end_inset
+
+, because also then for 
+\begin_inset Formula $Z=z_{1}$
+\end_inset
+
+ we get::
+\begin_inset Formula 
+\[
+A_{z}\left(x,y,Z,t-\frac{z-Z}{\beta c}\right)=A_{z}\left(x,y,z_{1},t_{1}-\cancel{\frac{z_{1}-z_{3}}{\beta c}}-\cancel{\frac{z_{3}-z_{1}}{\beta c}}\right)={\color{teal}A_{z}\left(x,y,z_{1},t_{1}\right)}
+\]
+
+\end_inset
+
+So, in principle, we can calculate it once, and then use the same value
+ repetitively for all integrals of the form 
+\begin_inset Formula $G\left(x,y,z,t-\frac{z_{1}-z}{\beta c}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We can initiate a large array of 
+\begin_inset Formula $A_{z}\left(x,y,z_{j},t_{k}\right)$
+\end_inset
+
+, and estimate the value of 
+\begin_inset Formula $G$
+\end_inset
+
+ at:
+\begin_inset Formula 
+\[
+G\left(x,y,z_{j},t_{k}\right)=\sum_{i=0}^{j}A_{z}\left(x,y,z_{i},t_{k}-\frac{z_{j}-{\color{gray}\overset{\equiv"Z"}{\overbrace{{\normalcolor z_{i}}}}}}{\beta c}\right)
+\]
+
+\end_inset
+
+Defining a time-dimensional position 
+\begin_inset Formula $\tilde{z}=\frac{z}{\beta c}$
+\end_inset
+
+, we can rewrite it as:
+\begin_inset Formula 
+\[
+G\left(x,y,z_{j},t_{k}\right)=\sum_{i=0}^{j}A_{z}\left(x,y,z_{i},t_{k}-\left(\tilde{z}_{j}-\tilde{z}_{i}\right)\right)=\sum_{i=0}^{j}A_{z}\left(x,y,z_{i},\tilde{z}_{i}+t_{k}-\tilde{z}_{j}\right)
+\]
+
+\end_inset
+
+If we choose the spacing in 
+\begin_inset Formula $z$
+\end_inset
+
+ of the grid to be 
+\begin_inset Formula $dz$
+\end_inset
+
+ and the spacing in 
+\begin_inset Formula $t$
+\end_inset
+
+ of 
+\begin_inset Formula $t$
+\end_inset
+
+ to be 
+\begin_inset Formula $\beta c\cdot dz$
+\end_inset
+
+ then this translates to:
+\begin_inset Formula 
+\[
+G\left(x,y,z_{j},t_{k}\right)=\sum_{i=0}^{j}A_{z}\left(x,y,z_{i},t_{i+\left(k-j\right)}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In matrix form, this equals summing the 
+\begin_inset Formula $\left(k-j\right)$
+\end_inset
+
+-offset diagonal from the first row and until the 
+\begin_inset Formula $j$
+\end_inset
+
+'th row:
+\end_layout
+
+\begin_layout Standard
+For example, in 
+\begin_inset Formula ${\color{red}j}={\color{red}4}$
+\end_inset
+
+ and 
+\begin_inset Formula $k=6$
+\end_inset
+
+ (and in particular 
+\begin_inset Formula $\left({\color{brown}k-j}={\color{brown}2}\right)$
+\end_inset
+
+) this is equal to summing all the blue elements:
+\begin_inset Formula 
+\[
+{\color{green}G\left(z_{{\color{brown}3}},t_{{\color{brown}4}}\right)},{\color{blue}G\left(z_{{\color{red}4}}t_{{\color{red}6}}\right)}\Rightarrow
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{array}{c|cccccccc}
+ & t_{0} & t_{{\color{brown}1}} & t_{{\color{brown}{\color{red}2}}} & t_{3} & t_{4} & t_{5} & t_{6} & t_{7}\\
+\hline z_{0} & A_{00} & {\color{green}A_{0{\color{brown}1}}} & {\color{blue}A_{0{\color{red}2}}} & A_{03}\\
+z_{1} & A_{10} & A_{11} & {\color{green}A_{12}} & {\color{blue}A_{13}} & A_{14}\\
+z_{2} &  &  &  & {\color{green}A_{23}} & {\color{blue}A_{24}} & A_{25}\\
+z_{{\color{brown}3}} &  &  &  &  & {\color{green}A_{3{\color{brown}4}}} & {\color{blue}A_{35}} & A_{36}\\
+z_{{\color{red}4}} &  &  &  &  &  & A_{45} & {\color{blue}A_{{\color{red}46}}} & A_{47}\\
+z_{5} &  &  &  &  &  &  & A_{56} & A_{57}\\
+z_{6}\\
+z_{7}
+\end{array}
+\]
+
+\end_inset
+
+If the last array is achieved by evaluation 
+\begin_inset Formula $A$
+\end_inset
+
+ on the arrays:
+\begin_inset Formula 
+\begin{align*}
+A\left(Z,T\right) & \text{for:} & Z= & \begin{array}{cccc}
+z_{0} & z_{0} & z_{0} & z_{0}\\
+z_{1} & z_{1} & z_{1} & z_{1}\\
+z_{2} & z_{2} & z_{2} & z_{2}\\
+z_{3} & z_{3} & z_{3} & z_{3}
+\end{array} & T= & \begin{array}{cccc}
+t_{0} & t_{1} & t_{2} & t_{3}\\
+t_{0} & t_{1} & t_{2} & t_{3}\\
+t_{0} & t_{1} & t_{2} & t_{3}\\
+t_{0} & t_{1} & t_{2} & t_{3}
+\end{array}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Therefore, we can 
+\begin_inset Quotes eld
+\end_inset
+
+skew
+\begin_inset Quotes erd
+\end_inset
+
+ this 
+\begin_inset Formula $A$
+\end_inset
+
+ array by replacing the 
+\begin_inset Formula $T$
+\end_inset
+
+ matrix like so:
+\begin_inset Formula 
+\[
+T\rightarrow T^{\prime}=T+\frac{Z}{\beta c}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{array}{cccc}
+t_{0} & t_{1} & t_{2} & t_{3}\\
+t_{0} & t_{1} & t_{2} & t_{3}\\
+t_{0} & t_{1} & t_{2} & t_{3}\\
+t_{0} & t_{1} & t_{2} & t_{3}
+\end{array}\rightarrow\begin{array}{cccc}
+t_{0}+\frac{z_{0}}{\beta c} & t_{1}+\frac{z_{0}}{\beta c} & t_{2}+\frac{z_{0}}{\beta c} & t_{3}+\frac{z_{0}}{\beta c}\\
+t_{0}+\frac{z_{1}}{\beta c} & t_{1}+\frac{z_{1}}{\beta c} & t_{2}+\frac{z_{1}}{\beta c} & t_{3}+\frac{z_{1}}{\beta c}\\
+t_{0}+\frac{z_{2}}{\beta c} & t_{1}+\frac{z_{2}}{\beta c} & t_{2}+\frac{z_{2}}{\beta c} & t_{3}+\frac{z_{2}}{\beta c}\\
+t_{0}+\frac{z_{3}}{\beta c} & t_{1}+\frac{z_{3}}{\beta c} & t_{2}+\frac{z_{3}}{\beta c} & t_{3}+\frac{z_{3}}{\beta c}
+\end{array}=\begin{array}{cccc}
+t_{0} & t_{1} & t_{2} & t_{3}\\
+t_{0} & t_{2} & t_{3} & t_{4}\\
+t_{0} & t_{3} & t_{4} & t_{5}\\
+t_{0} & t_{4} & t_{5} & t_{6}
+\end{array}
+\]
+
+\end_inset
+
+While keeping the 
+\begin_inset Formula $z$
+\end_inset
+
+ matrix as:
+\begin_inset Formula 
+\[
+Z\rightarrow Z
+\]
+
+\end_inset
+
+Then evaluating 
+\begin_inset Formula $A$
+\end_inset
+
+ on the new array 
+\begin_inset Formula $T$
+\end_inset
+
+ like so:
+\begin_inset Formula 
+\[
+A\left(Z,T^{\prime}\right)
+\]
+
+\end_inset
+
+will result in a skewed 
+\begin_inset Formula $A$
+\end_inset
+
+ like so:
+\begin_inset Formula 
+\[
+\begin{array}{c|ccccc}
+ & t_{0}+\frac{Z}{\beta c} & t_{{\color{brown}1}}+\frac{Z}{\beta c} & t_{{\color{red}2}}+\frac{Z}{\beta c} & t_{3}+\frac{Z}{\beta c} & t_{4}+\frac{Z}{\beta c}\\
+\hline z_{0} & A_{00} & {\color{green}A_{0{\color{brown}1}}} & {\color{blue}A_{0{\color{red}2}}} & A_{03}\\
+z_{1} & A_{11} & {\color{green}A_{12}} & {\color{blue}A_{13}} & A_{14}\\
+z_{2} & A_{22} & {\color{green}A_{23}} & {\color{blue}A_{24}} & A_{25}\\
+z_{{\color{brown}3}} & A_{33} & {\color{green}A_{{\color{brown}34}}} & {\color{blue}A_{35}} & A_{36}\\
+z_{{\color{red}4}} & A_{44} & A_{45} & {\color{blue}A_{{\color{red}46}}} & A_{47}\\
+z_{5}\\
+z_{6}\\
+z_{7}
+\end{array}
+\]
+
+\end_inset
+
+And now the value of 
+\begin_inset Formula $G$
+\end_inset
+
+ can be achieved by simply taking the cumulative integral:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+G=\texttt{np.cumsum(A(Z,T'),axis=0)}\begin{array}{c|ccccc}
+ & t_{0}+\frac{Z}{\beta c} & t_{1}+\frac{Z}{\beta c} & t_{2}+\frac{Z}{\beta c} & t_{3}+\frac{Z}{\beta c} & t_{4}+\frac{Z}{\beta c}\\
+\hline z_{0} & G_{00} & G_{01} & G_{02} & G_{03}\\
+z_{1} & G_{11} & G_{12} & G_{13} & G_{14}\\
+z_{2} & G_{22} & G_{23} & G_{24} & G_{25}\\
+z_{3} & G_{33} & {\color{green}G_{{\color{brown}34}}} & G_{35} & G_{36}\\
+z_{4} & G_{44} & G_{45} & {\color{blue}G_{{\color{red}46}}} & G_{47}\\
+z_{5}\\
+z_{6}\\
+z_{7}
+\end{array}
+\]
+
+\end_inset
+
+In particular the 
+\family typewriter
+np.cumsum
+\family default
+ command will give us in each column the values of 
+\begin_inset Formula $G\left(z,t\left(z\right)\right)$
+\end_inset
+
+ as required for the final integral of 
+\begin_inset Formula $\phi$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset listings
+lstparams "language=Python"
+inline false
+status open
+
+\begin_layout Plain Layout
+\align center
+
+np.diagonal(G, offset=k) = np.cumsum(np.diagonal(A, offset=k))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+And if we wish to have 
+\begin_inset Formula $G\left(\boldsymbol{z},t_{k}\right),\boldsymbol{z}=\left(z_{0},z_{1},z_{2},\ldots,n_{z}\right)$
+\end_inset
+
+ (
+\begin_inset Formula $G$
+\end_inset
+
+ for a constant 
+\begin_inset Formula $t_{k}$
+\end_inset
+
+ and for all values of 
+\begin_inset Formula $z$
+\end_inset
+
+) , each of those values 
+\begin_inset Formula $G\left(z_{j},t_{k}\right)$
+\end_inset
+
+ will be achieved from the 
+\begin_inset Formula $\left(k-j\right)$
+\end_inset
+
+-offset diagonal of 
+\begin_inset Formula $A$
+\end_inset
+
+, and so the first term (for 
+\begin_inset Formula $z_{0}$
+\end_inset
+
+) will be achieved from the 
+\begin_inset Formula $k$
+\end_inset
+
+-diagonal of 
+\begin_inset Formula $A$
+\end_inset
+
+, and the last one will be achieved from the 
+\begin_inset Formula $k+n_{z}$
+\end_inset
+
+ diagonal of 
+\begin_inset Formula $A$
+\end_inset
+
+.
+ The 
+\begin_inset Formula $k+n_{z}$
+\end_inset
+
+ diagonal of 
+\begin_inset Formula $n_{z}$
+\end_inset
+
+, with length 
+\begin_inset Formula $n_{z}$
+\end_inset
+
+, extends all the way to the 
+\begin_inset Formula $A_{n_{z},k+2n_{z}}$
+\end_inset
+
+ element of 
+\begin_inset Formula $A$
+\end_inset
+
+, thus for one column in 
+\begin_inset Formula $G\left(\boldsymbol{z},t_{k}\right)$
+\end_inset
+
+ we need to initialize a matrix that extends from 
+\begin_inset Formula $A_{0,k}$
+\end_inset
+
+ all the way to 
+\begin_inset Formula $A_{n_{z},k+2n_{z}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+But - it is 
+\series bold
+not
+\series default
+ 
+\begin_inset Formula $n_{z}\cdot k+2n_{z}$
+\end_inset
+
+ elements 
+\series bold
+per
+\series default
+ vector 
+\begin_inset Formula $G\left(\boldsymbol{z},t_{k}\right)$
+\end_inset
+
+.
+ if we are interested in the two vectors 
+\begin_inset Formula $G\left(\boldsymbol{z},t_{k}\right),G\left(\boldsymbol{z},t_{k+1}\right)$
+\end_inset
+
+, then we need only one more column - we need 
+\begin_inset Formula $A$
+\end_inset
+
+ to range between 
+\begin_inset Formula $A_{0,k}$
+\end_inset
+
+ downwards and rightwards to 
+\begin_inset Formula $A_{n_{z},k+2n_{z}+1}$
+\end_inset
+
+, and in general for 
+\begin_inset Formula $G$
+\end_inset
+
+ that has 
+\begin_inset Formula $n_{z}\times k_{f}$
+\end_inset
+
+ terms we need to have a total of 
+\begin_inset Formula $\left(n_{z}\times\left(2n_{z}+n_{t}\right)\right)$
+\end_inset
+
+ terms.
+\end_layout
+
+\begin_layout Plain Layout
+For example, if we want 
+\begin_inset Formula $\left(\boldsymbol{z},t_{k}\right),\boldsymbol{z}=\begin{pmatrix}z_{0}\\
+\vdots\\
+z_{n_{z}}
+\end{pmatrix},\boldsymbol{t}=\begin{pmatrix}t_{0}\\
+\vdots\\
+t_{n_{t}}
+\end{pmatrix}$
+\end_inset
+
+ then we need to initiate 
+\begin_inset Formula $A_{00}\ldots A_{n_{z},\left(2n_{z}+n_{t}\right)}$
+\end_inset
+
+ matrix.
+\end_layout
+
+\begin_layout Plain Layout
+Recalling that we do everything per coordinate 
+\begin_inset Formula $x,y$
+\end_inset
+
+ then we need to generate 
+\begin_inset Formula $A$
+\end_inset
+
+ in the range: 
+\begin_inset Formula $A_{0000}\ldots A_{n_{x},n_{y},n_{z},\left(2n_{z}+n_{t}\right)}$
+\end_inset
+
+ which
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

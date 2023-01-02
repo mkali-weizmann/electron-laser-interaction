@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5ff89dad-03cf-48ce-92cf-53adee473ef3" name="Changes" comment="move files">
+      <change beforePath="$PROJECT_DIR$/.idea/Simulation.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Simulation.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace-DESKTOP-G4KVDKK.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/microscope.py" beforeDir="false" afterPath="$PROJECT_DIR$/microscope.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/microscope_data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/microscope_data_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/one_point_simple_working_example_arrays.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/playground.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/playground.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/playground.py" beforeDir="false" afterPath="$PROJECT_DIR$/playground.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2GZcNpdsdHyH6wal1bbrdoxb7Q0" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/michaeka/OneDrive - weizmann.ac.il/Current Semester/Research/Simulation",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "settings.editor.selected.configurable": "preferences.keymap"
+  }
+}]]></component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="Simulation" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="Simulation" />
+      </console-settings>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\michaeka\OneDrive - weizmann.ac.il\Current Semester\Research\Simulation" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.microscope">
+    <configuration name="Playground" type="PythonConfigurationType" factoryName="Python">
+      <module name="Simulation" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\michaeka\AppData\Local\Programs\Python\Python310\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/playground.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="Simulation" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="integral_methods_validation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Simulation" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/integral_methods_validation.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="integral_methods_validation_whole_proccess" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Simulation" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/integral_methods_validation_whole_proccess.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="microscope" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="Simulation" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\michaeka\AppData\Local\Programs\Python\Python310\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/microscope.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="microscope_data_analysis" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="Simulation" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\michaeka\AppData\Local\Programs\Python\Python310\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/microscope_data_analysis.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.microscope_data_analysis" />
+      <item itemvalue="Python.Playground" />
+      <item itemvalue="Python.microscope" />
+      <item itemvalue="Python.integral_methods_validation_whole_proccess" />
+      <item itemvalue="Python.integral_methods_validation" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.integral_methods_validation_whole_proccess" />
+        <item itemvalue="Python.integral_methods_validation" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5ff89dad-03cf-48ce-92cf-53adee473ef3" name="Changes" comment="" />
+      <created>1666599512040</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1666599512040</updated>
+      <workItem from="1666599514733" duration="30201000" />
+      <workItem from="1667124485130" duration="1826000" />
+      <workItem from="1667977658050" duration="18497000" />
+      <workItem from="1668063421922" duration="6413000" />
+      <workItem from="1668451820090" duration="86000" />
+      <workItem from="1668451915449" duration="3605000" />
+      <workItem from="1668456431431" duration="3000" />
+      <workItem from="1668508299600" duration="3839000" />
+      <workItem from="1668612582832" duration="16000" />
+      <workItem from="1668674678121" duration="2181000" />
+      <workItem from="1668938479183" duration="888000" />
+      <workItem from="1669644926268" duration="46000" />
+      <workItem from="1669881190454" duration="1287000" />
+      <workItem from="1670164560169" duration="5004000" />
+      <workItem from="1670233661021" duration="13492000" />
+      <workItem from="1670522531631" duration="15979000" />
+      <workItem from="1670768937200" duration="817000" />
+      <workItem from="1670772965207" duration="66551000" />
+      <workItem from="1671441457554" duration="12321000" />
+      <workItem from="1671526270545" duration="21196000" />
+      <workItem from="1671699242939" duration="26438000" />
+      <workItem from="1672573879098" duration="650000" />
+      <workItem from="1672665235735" duration="693000" />
+    </task>
+    <task id="LOCAL-00001" summary="main change of double laser cavity">
+      <created>1666635280033</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1666635280033</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Add square to the Bessel function">
+      <created>1666724979146</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1666724979146</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add integral_methods_validation.py and convert playground to microscope_data_analysis.py">
+      <created>1668090804699</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1668090804699</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Add relativistic correction to the Bessel function and mathematica notebook">
+      <created>1668106160688</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1668106160688</updated>
+    </task>
+    <task id="LOCAL-00005" summary="finishing integral_methods_validation.py and starting numeric integration for the G function in microscope.py">
+      <created>1670172524751</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1670172524751</updated>
+    </task>
+    <task id="LOCAL-00006" summary="this version is not complete and have the integrand after change of variables, when we integrate over Z instead of over T, And I am about to invert it back to integral over T.&#10;&#10;The reason is that we are going to need to calculate it for many z's but not for many t's, and the integrand can not appear as an array in the upper bound of the integral, therefore can not be vectorized">
+      <created>1670338261043</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1670338261043</updated>
+    </task>
+    <task id="LOCAL-00007" summary="initiating G with all elements - even the partial diagonals that miss the beginning(and therefore can not be used)">
+      <created>1670532019025</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1670532019025</updated>
+    </task>
+    <task id="LOCAL-00008" summary="initiating G with all elements - even the partial diagonals that miss the beginning(and therefore can not be used)">
+      <created>1670532221445</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1670532221445</updated>
+    </task>
+    <task id="LOCAL-00009" summary="commit before changing the integration back to the rolled A and then cumsum on the columns">
+      <created>1670534022273</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1670534022273</updated>
+    </task>
+    <task id="LOCAL-00010" summary="commit after changing the integration back to the rolled A and then cumsum on the columns">
+      <created>1670535005830</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1670535005830</updated>
+    </task>
+    <task id="LOCAL-00011" summary="change the integral on z to be on shifted ranges for different X's">
+      <created>1670946568963</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1670946568963</updated>
+    </task>
+    <task id="LOCAL-00012" summary="commit before changing the t axis to only t=0 and t=pi/omega">
+      <created>1671033321400</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1671033321400</updated>
+    </task>
+    <task id="LOCAL-00013" summary="First working numerical simulation (but with attenuation of 0.91 instead of 0.78 I think)">
+      <created>1671052373773</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1671052373773</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Commit before changing the integrand of the numeric phi to the general integrand, that does not assume wave propagation in X.">
+      <created>1671526391971</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1671526391971</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Working numeric simulation on x=0, y=0, redy for comparing with the arrays calculation">
+      <created>1671560653022</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1671560653022</updated>
+    </task>
+    <task id="LOCAL-00016" summary="setting dynamical value for the n_z according to the length of the integral range and the wavelength">
+      <created>1671719647377</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1671719647377</updated>
+    </task>
+    <task id="LOCAL-00017" summary="change the order of functions in the numeric phase plate">
+      <created>1671720814432</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1671720814432</updated>
+    </task>
+    <task id="LOCAL-00018" summary="move files">
+      <created>1672147364784</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1672147364784</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="main change of double laser cavity" />
+    <MESSAGE value="Add square to the Bessel function" />
+    <MESSAGE value="Add integral_methods_validation.py and convert playground to microscope_data_analysis.py" />
+    <MESSAGE value="Add relativistic correction to the Bessel function and mathematica notebook" />
+    <MESSAGE value="finishing integral_methods_validation.py and starting numeric integration for the G function in microscope.py" />
+    <MESSAGE value="this version is not complete and have the integrand after change of variables, when we integrate over Z instead of over T, And I am about to invert it back to integral over T.&#10;&#10;The reason is that we are going to need to calculate it for many z's but not for many t's, and the integrand can not appear as an array in the upper bound of the integral, therefore can not be vectorized" />
+    <MESSAGE value="initiating G with all elements - even the partial diagonals that miss the beginning(and therefore can not be used)" />
+    <MESSAGE value="commit before changing the integration back to the rolled A and then cumsum on the columns" />
+    <MESSAGE value="commit after changing the integration back to the rolled A and then cumsum on the columns" />
+    <MESSAGE value="change the integral on z to be on shifted ranges for different X's" />
+    <MESSAGE value="commit before changing the t axis to only t=0 and t=pi/omega" />
+    <MESSAGE value="First working numerical simulation (but with attenuation of 0.91 instead of 0.78 I think)" />
+    <MESSAGE value="Commit before changing the integrand of the numeric phi to the general integrand, that does not assume wave propagation in X." />
+    <MESSAGE value="Working numeric simulation on x=0, y=0, redy for comparing with the arrays calculation" />
+    <MESSAGE value="setting dynamical value for the n_z according to the length of the integral range and the wavelength" />
+    <MESSAGE value="change the order of functions in the numeric phase plate" />
+    <MESSAGE value="move files" />
+    <option name="LAST_COMMIT_MESSAGE" value="move files" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Simulation$playground.coverage" NAME="playground Coverage Results" MODIFIED="1667981155247" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Simulation$integral_methods_validation_whole_proccess.coverage" NAME="integral_methods_validation_whole_proccess Coverage Results" MODIFIED="1671700243669" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Simulation$microscope.coverage" NAME="microscope Coverage Results" MODIFIED="1672331706307" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Simulation$integral_methods_validation.coverage" NAME="integral_methods_validation Coverage Results" MODIFIED="1670934717546" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Simulation$Playground.coverage" NAME="Playground Coverage Results" MODIFIED="1671018875509" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>

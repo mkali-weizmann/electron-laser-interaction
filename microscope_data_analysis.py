@@ -20,11 +20,11 @@ cavity_2f = Cavity2FrequenciesAnalyticalPropagator(l_1=1064e-9, l_2=532e-9, E_1=
 cavity_1f = Cavity2FrequenciesAnalyticalPropagator(l_1=1064e-9, l_2=None, E_1=5.06e-7, E_2=None, NA=0.05)
 
 M_2f = Microscope([dummy_sample, first_lens, cavity_2f, second_lens])
-M_2f.take_a_picture(first_wave)
+M_2f.propagate(first_wave)
 M_1f = Microscope([dummy_sample, first_lens, cavity_1f, second_lens])
-M_1f.take_a_picture(first_wave)
+M_1f.propagate(first_wave)
 M_no_f = Microscope([dummy_sample, first_lens, second_lens])
-M_no_f.take_a_picture(first_wave)
+M_no_f.propagate(first_wave)
 
 sub_box_size = 250
 X, Y = M_2f.propagation_steps[2].input_wave.coordinates.X_grid, M_2f.propagation_steps[2].input_wave.coordinates.Y_grid
@@ -65,7 +65,8 @@ plt.show()
 
 phi_0 = cavity_2f.phi_0(X, Y, beta_electron=E2beta(M_2f.propagation_steps[2].input_wave.E0))
 constant_phase_shift = cavity_2f.phase_shift(phi_0=phi_0, X_grid=X, Y_grid=Y)
-attenuation_factor = cavity_2f.attenuation_factor(phi_0=phi_0, X_grid=X, Y_grid=Y)
+attenuation_factor = cavity_2f.attenuation_factor(beta_electron=E2beta(M_2f.propagation_steps[2].input_wave.E0),
+                                                  phi_0=phi_0, X_grid=X, Y_grid=Y)
 
 plt.imshow(constant_phase_shift, extent=limits)
 plt.title(r'phase shift - 2f')
