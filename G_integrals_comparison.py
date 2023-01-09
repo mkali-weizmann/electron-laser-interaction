@@ -19,10 +19,10 @@ def plot_3d_complex(x_real, y_complex):
 
 
 l = 532e-9
-k_l = l2k(l)
+k_l = k_of_l(l)
 omega_l = k_l * C_LIGHT
 beta = 0.5
-gamma = beta2gamma(beta)
+gamma = gamma_of_beta(beta)
 Na = 0.2
 w_0 = l / (pi * Na)
 x_R = x_R_gaussian(w_0, l)

@@ -1,34 +1,73 @@
-import matplotlib.pyplot as plt
-
 from microscope import *
 
+# %% global parameters
+l_1 = 1064e-9
+l_2 = 532e-9
+NA_1 = 0.05
+N_POINTS = 128  # Resolution of image
+pixel_size = 1e-10
+
+
 # %%
-N_POINTS = 1024
-input_coordinate_system = CoordinateSystem(lengths=(52.4e-9, 52.4e-9), n_points=(N_POINTS, N_POINTS))
+input_coordinate_system = CoordinateSystem(dxdydz=(pixel_size, pixel_size), n_points=(N_POINTS, N_POINTS))
 first_wave = WaveFunction(psi=np.ones((N_POINTS, N_POINTS)),
                           coordinates=input_coordinate_system,
-                          E0=KeV2Joules(300))
+                          E0=Joules_of_keV(300))
 
-dummy_sample = SamplePropagator(dummy_potential='letters',
+dummy_sample = SamplePropagator(dummy_potential='letters small',
                                 axes=tuple([first_wave.coordinates.axes[0],
                                             first_wave.coordinates.axes[1],
                                             np.linspace(-5e-10, 5e-10, 2)]))
+
 first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
-
 second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
-cavity_2f = Cavity2FrequenciesAnalyticalPropagator(l_1=1064e-9, l_2=532e-9, E_1=3.42e-7, E_2=-1, NA=0.05)
-cavity_1f = Cavity2FrequenciesAnalyticalPropagator(l_1=1064e-9, l_2=None, E_1=5.06e-7, E_2=None, NA=0.05)
 
-M_2f = Microscope([dummy_sample, first_lens, cavity_2f, second_lens])
-M_2f.propagate(first_wave)
-M_1f = Microscope([dummy_sample, first_lens, cavity_1f, second_lens])
-M_1f.propagate(first_wave)
-M_no_f = Microscope([dummy_sample, first_lens, second_lens])
-M_no_f.propagate(first_wave)
+cavity_2f_analytical = Cavity2FrequenciesAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1)
+cavity_2f_analytical_NA_8 = Cavity2FrequenciesAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=0.08)
+cavity_2f_analytical_NA_10 = Cavity2FrequenciesAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=0.1)
+cavity_2f_analytical_NA_12 = Cavity2FrequenciesAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=0.12)
+cavity_2f_analytical_NA_20 = Cavity2FrequenciesAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=0.2)
+cavity_2f_numerical = Cavity2FrequenciesNumericalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1,
+                                                            print_progress=True, ignore_past_files=True)
+cavity_2f_numerical_a = Cavity2FrequenciesNumericalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1,
+                                                            print_progress=True, ignore_past_files=True)
+cavity_1f = Cavity2FrequenciesAnalyticalPropagator(l_1=l_1, l_2=None, E_1=-1, E_2=None, NA_1=NA_1)
+cavity_2f_analytical_ring = Cavity2FrequenciesAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, ring_cavity=True)
+cavity_2f_numerical_ring = Cavity2FrequenciesNumericalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1,
+                                                                 ring_cavity=True, print_progress=True)
 
-sub_box_size = 250
-X, Y = M_2f.propagation_steps[2].input_wave.coordinates.X_grid, M_2f.propagation_steps[2].input_wave.coordinates.Y_grid
-limits = [x * sub_box_size / N_POINTS for x in M_2f.propagation_steps[2].input_wave.coordinates.limits]
+aberration_propagator = AberrationsPropagator(Cs=0e-7, defocus=0e-21, atigmatism_parameter=0, astigmatism_orientation=0)
+
+M_2f_a = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens, aberration_propagator])
+pic_2f_a = M_2f_a.take_a_picture(first_wave)
+
+# M_2f_a_NA_8 = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens, aberration_propagator])
+# pic_2f_a_NA_8 = M_2f_a_NA_8.take_a_picture(first_wave)
+#
+# M_2f_a_NA_10 = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens, aberration_propagator])
+# pic_2f_a_NA_10 = M_2f_a_NA_10.take_a_picture(first_wave)
+#
+# M_2f_a = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens, aberration_propagator])
+# pic_2f_a = M_2f_a.take_a_picture(first_wave)
+#
+# M_2f_a = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens, aberration_propagator])
+# pic_2f_a = M_2f_a.take_a_picture(first_wave)
+
+# M_2f_a_ring = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens, aberration_propagator])
+# pic_2f_a_ring = M_2f_a_ring.take_a_picture(first_wave)
+#
+# M_1f = Microscope([dummy_sample, first_lens, cavity_1f, second_lens, aberration_propagator])
+# pic_1f_a = M_1f.take_a_picture(first_wave)
+#
+M_2f_n = Microscope([dummy_sample, first_lens, cavity_2f_numerical, second_lens, aberration_propagator])
+# pic_2f_n = M_2f_n.take_a_picture(first_wave)
+#
+# M_2f_n_ring = Microscope([dummy_sample, first_lens, cavity_2f_numerical, second_lens, aberration_propagator])
+# # pic_2f_n_ring = M_2f_n_ring.take_a_picture(first_wave)
+#
+# M_no_cavity = Microscope([dummy_sample, first_lens, second_lens, aberration_propagator])
+# no_f_pic = M_no_cavity.take_a_picture(first_wave)
+
 
 # %%
 # M.plot_step(0, title="specimen - input wave (upper) and output (lower) wave", file_name="specimen.png")
@@ -36,88 +75,47 @@ limits = [x * sub_box_size / N_POINTS for x in M_2f.propagation_steps[2].input_w
 # M.plot_step(2, title="cavity_2f - input wave (upper) and output (lower) wave", file_name="cavity_2f.png")
 # M.plot_step(3, title="second lens wave - input (upper) and output (lower) wave", file_name="second_lens.png")
 
-
-phase_map = np.angle(M_2f.propagation_steps[0].output_wave.psi[0:sub_box_size, 0:sub_box_size])
-plt.title('total phase delay given by the sample')
-plt.imshow(phase_map - np.max(phase_map), extent=M_2f.propagation_steps[0].output_wave.coordinates.limits)
-plt.savefig('Figures\phase_map_2f.png')
-plt.colorbar()
-plt.show()
-
-plt.imshow(np.abs(np.flip(M_2f.propagation_steps[3].output_wave.psi[-sub_box_size:, -sub_box_size:], axis=(0, 1))) ** 2, extent=M_2f.propagation_steps[3].output_wave.coordinates.limits)
-plt.colorbar()
-plt.title('double laser cavity')
-plt.savefig('Figures\zoomed_final_image_2f.png')
-plt.show()
-
-plt.imshow(np.abs(np.flip(M_1f.propagation_steps[3].output_wave.psi[-sub_box_size:, -sub_box_size:], axis=(0, 1))) ** 2, extent=M_1f.propagation_steps[3].output_wave.coordinates.limits)
-plt.colorbar()
-plt.title('single laser cavity')
-plt.savefig('Figures\zoomed_final_image_1f.png')
-plt.show()
-
-plt.imshow(np.abs(np.flip(M_no_f.propagation_steps[2].output_wave.psi[-sub_box_size:, -sub_box_size:], axis=(0, 1))) ** 2, extent=M_1f.propagation_steps[2].output_wave.coordinates.limits)
-plt.colorbar()
-plt.title('no cavity')
-plt.savefig('Figures\zoomed_final_image_no_f.png')
-plt.show()
-
-
-phi_0 = cavity_2f.phi_0(X, Y, beta_electron=E2beta(M_2f.propagation_steps[2].input_wave.E0))
-constant_phase_shift = cavity_2f.phase_shift(phi_0=phi_0, X_grid=X, Y_grid=Y)
-attenuation_factor = cavity_2f.attenuation_factor(beta_electron=E2beta(M_2f.propagation_steps[2].input_wave.E0),
-                                                  phi_0=phi_0, X_grid=X, Y_grid=Y)
-
-plt.imshow(constant_phase_shift, extent=limits)
-plt.title(r'phase shift - 2f')
-plt.colorbar()
-plt.savefig(r'Figures\phase_shift_2f.png')
-plt.show()
-
-plt.imshow(attenuation_factor, extent=limits)
-plt.title(r'attenuation factor')
-plt.colorbar()
-plt.savefig(r'Figures\attenuation_factor.png')
-plt.show()
-
-phi_0_1f = cavity_1f.phi_0(X, Y, beta_electron=E2beta(M_1f.propagation_steps[2].input_wave.E0))
-constant_phase_shift_1f = cavity_1f.phase_shift(phi_0=phi_0_1f, X_grid=X, Y_grid=Y)
-plt.imshow(constant_phase_shift_1f, extent=limits)
-plt.title(r'phase shift - 1f')
-plt.colorbar()
-plt.savefig(r'Figures\phase_shift_2f.png')
-plt.show()
-
-
-fig = plt.figure(figsize=(15, 15))
-plt.imshow(np.abs(np.flip(M_1f.propagation_steps[3].output_wave.psi, axis=(0, 1))) ** 2, extent=M_1f.propagation_steps[3].output_wave.coordinates.limits)
-plt.colorbar()
-plt.title('single laser cavity')
-plt.savefig(r'Figures\final_image_1f.png')
-plt.show()
-
-fig = plt.figure(figsize=(15, 15))
-plt.imshow(np.abs(np.flip(M_2f.propagation_steps[3].output_wave.psi, axis=(0, 1))) ** 2, extent=M_2f.propagation_steps[3].output_wave.coordinates.limits)
-plt.colorbar()
-plt.title('double laser cavity')
-plt.savefig(r'Figures\final_image_2f.png')
-plt.show()
-
-# %% Find optimal A for pi/2 phase shift - double frequency cavity_2f
-# X, Y = M_1f.propagation_steps[2].input_wave.coordinates.grids
-# N = 3
-# As = np.linspace(5e-7, 5.1e-7, N)
-# phases = np.zeros(N)
-#
-# for i, A in enumerate(As):
-#     print(i)
-#     cavity = CavityDoubleFrequencyPropagator(l_1=1064e-9, l_2=532e-9, E_1=A, NA=0.05, E_2=None)
-#     M = Microscope([dummy_sample, first_lens, cavity], print_progress=True)
-#     last_wave = M.take_a_picture(input_wave=first_wave)
-#     phi_0 = cavity.phi_0(X, Y, beta_electron=E2beta(M.propagation_steps[2].input_wave.E0))
-#     constant_phase_shift = cavity.phase_shift(phi_0=phi_0, X_grid=X, Y_grid=Y)
-#     phases[i] = constant_phase_shift[512, 512]
-#
-# plt.plot(As, phases)
-# plt.axhline(np.pi/2, color='r')
+# %% sample phase shift
+# phase_map = np.angle(M_2f_a.step_of_propagator(dummy_sample).output_wave.psi)
+# plt.title('total phase delay given by the sample')
+# plt.imshow(phase_map - np.max(phase_map), extent=M_2f_a.propagation_steps[0].output_wave.coordinates.limits)
 # plt.show()
+# plt.savefig('Figures\phase_map_2f.png')
+# %% analytical 2f cavity - final image
+# plt.title('2f, standing, analytical')
+# plt.imshow(pic_2f_a[0], extent=input_coordinate_system.limits)
+# # plt.savefig('Figures\phase_map_2f.png')
+# plt.show()
+
+# %% numerical 2f cavity - final image
+# plt.title('2f, standing, numerical')
+# plt.imshow(pic_2f_n[0], extent=input_coordinate_system.limits)
+# # plt.savefig('Figures\phase_map_2f.png')
+# plt.show()
+
+# %% analytical 1f cavity - final image
+# plt.title('1f, standing, analytical')
+# plt.imshow(pic_1f_a[0], extent=input_coordinate_system.limits)
+# # plt.savefig('Figures\phase_map_2f.png')
+# plt.show()
+
+# %% analytical 2f cavity, ring cavity - final image
+# plt.title('2f, ring, analytical')
+# plt.imshow(pic_2f_a_ring[0], extent=input_coordinate_system.limits)
+# # plt.savefig('Figures\phase_map_2f.png')
+# plt.show()
+# %%
+fourier_plane_wave = first_lens.propagate(first_wave)
+phase_and_amplitude_mask_n = cavity_2f_numerical.phase_and_amplitude_mask(fourier_plane_wave)
+phase_and_amplitude_mask_a = cavity_2f_analytical.phase_and_amplitude_mask(fourier_plane_wave)
+fig, ax = plt.subplots(2, 2)
+ax[0, 0].imshow(np.real(np.angle(phase_and_amplitude_mask_a)))
+ax[0, 0].set_title('analytical - phase')
+ax[0, 1].imshow(np.abs(phase_and_amplitude_mask_a)**2)
+ax[0, 1].set_title('analytical - intensity')
+ax[1, 0].imshow(np.real(np.angle(phase_and_amplitude_mask_n)))
+ax[1, 0].set_title('numerical - phase')
+ax[1, 1].imshow(np.abs(phase_and_amplitude_mask_n)**2)
+ax[1, 1].set_title('numerical - intensity')
+plt.show()
+
