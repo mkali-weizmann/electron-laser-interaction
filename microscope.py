@@ -495,12 +495,13 @@ class Microscope:
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         self.propagation_steps = []
+        normalized_input_wave = WaveFunction(input_wave.psi / np.sqrt(np.sum(np.abs(input_wave.psi) ** 2)), input_wave.coordinates, input_wave.E0)
         for propagator in self.propagators:
             if self.print_progress:
                 print(f"Propagating with {propagator}")
-            output_wave = propagator.propagate(input_wave)
-            self.propagation_steps.append(PropagationStep(input_wave, output_wave, propagator))
-            input_wave = output_wave
+            output_wave = propagator.propagate(normalized_input_wave)
+            self.propagation_steps.append(PropagationStep(normalized_input_wave, output_wave, propagator))
+            normalized_input_wave = output_wave
         return input_wave
 
     def expose_camera(self, output_wave: Optional[WaveFunction] = None) -> Tuple[np.ndarray, CoordinateSystem]:
@@ -511,7 +512,7 @@ class Microscope:
             output_wave = self.propagation_steps[-1].output_wave
 
         output_wave_intensity = np.abs(output_wave.psi) ** 2
-        expected_electrons_per_pixel = output_wave_intensity * self.n_electrons / np.sum(output_wave_intensity)
+        expected_electrons_per_pixel = output_wave_intensity * self.n_electrons
         output_wave_intensity_shot_noise = np.random.poisson(expected_electrons_per_pixel)  # This actually assumes an
         # independent shot noise for each pixel, which is not true, but it's a good approximation for many pixels.
         return output_wave_intensity_shot_noise, self.propagation_steps[-1].output_wave.coordinates
@@ -756,6 +757,11 @@ class CavityPropagator(Propagator):
         self.ring_cavity: bool = ring_cavity
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
+        phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave)
+        output_wave = input_wave.psi * phase_and_amplitude_mask
+        return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
+
+    def phase_and_amplitude_mask(self, input_wave: WaveFunction) -> np.array:
         raise NotImplementedError
 
     def NA_lorentz_transform(self, NA):
@@ -876,11 +882,6 @@ class CavityAnalyticalPropagator(CavityPropagator):
 
         self.debug_mode = debug_mode
 
-    def propagate(self, input_wave: WaveFunction) -> WaveFunction:
-        phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave)
-        output_wave = input_wave.psi * phase_and_amplitude_mask
-        return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
-
     def phase_and_amplitude_mask(self, input_wave: WaveFunction):
         X, Y = input_wave.coordinates.X_grid, input_wave.coordinates.Y_grid
         beta = input_wave.beta
@@ -974,13 +975,6 @@ class CavityNumericalPropagator(CavityPropagator):
         self.n_t = n_t
         self.print_progress = print_progress
 
-    def propagate(self, input_wave: WaveFunction) -> WaveFunction:
-        phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
-        output_wave_psi = input_wave.psi * phase_and_amplitude_mask
-        if self.print_progress:
-            print('finished propagating')
-        return WaveFunction(output_wave_psi, input_wave.coordinates, input_wave.E0)
-
     def phase_and_amplitude_mask(self, input_wave: WaveFunction):
         setup_file_path = self.setup_to_path(input_wave=input_wave)
         # if this setup was calculated once in the past and the user did not ask to ignore past files, load the file
@@ -1008,15 +1002,15 @@ class CavityNumericalPropagator(CavityPropagator):
                 problematic_elements = np.abs(sin_varphi) < 1e-3  # This e-3 clipping value will not affect the result.
                 sin_varphi_no_small_values = np.where(problematic_elements, 1, sin_varphi)
                 cos_varphi_no_small_values = np.where(problematic_elements, np.cos(varphi), 1)
-                A_computed_with_sin = np.where(problematic_elements,
+                C_computed_with_sin = np.where(problematic_elements,
                                                0,
                                                (phi_values[:, :, 0] - phi_0) / sin_varphi_no_small_values
                                                )
-                A_computed_with_cos = np.where(problematic_elements,
+                C_computed_with_cos = np.where(problematic_elements,
                                                (phi_values[:, :, 1] - phi_0) / cos_varphi_no_small_values,
                                                0)
-                A = A_computed_with_sin + A_computed_with_cos
-                phase_and_amplitude_mask = jv(0, A) * np.exp(1j * phi_0)
+                C = C_computed_with_sin + C_computed_with_cos
+                phase_and_amplitude_mask = jv(0, C) * np.exp(1j * phi_0)
             else:
                 # NOT ACCURATE UNLESS N_T IS BIG!
                 energy_bands = np.fft.fft(phase_factor, axis=-1, norm='forward')
@@ -1203,23 +1197,25 @@ class CavityNumericalPropagator(CavityPropagator):
     def generate_z_vector(self, x, beta_electron):
         # This function generates a linearly spaced z values in units of the spot size with a number of points that
         # is required for accurate integration of A in the widest integration range (between -5 and 5 w(x) for the
-        # maximal w(x))
+        # maximal w(x)). based on equation e_40 in the simulation notes.
         alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
-        integral_limit_in_spot_size_units = 5  # ARBITRARY - should be enough
+        integral_limit_in_spot_size_units = 5  # ARBITRARY - but should be enough
         max_z_integration_interval = w_x_gaussian(w_0=w0_of_NA(self.NA_max, self.max_l),
                                                   x=np.max(np.abs(x)) / np.cos(alpha_cavity),
                                                   l_laser=self.max_l) / np.cos(alpha_cavity) * \
                                      (2 * integral_limit_in_spot_size_units)
-        required_n_z_for_integration_over_maximal_interval = int(
-            max_z_integration_interval / (1 / (1 + 1 / beta_electron) * self.min_l))
+        dz = self.min_l / (1 + 1 / beta_electron) / 3  # ARBITRARY - the terms before the 3 factor is the effective
+        # wavelength seen by the electron, and we divide it by 3 to sample the wave in a higher frequency.
+        required_n_z_for_integration_over_maximal_interval = int(max_z_integration_interval / dz)
         # The denominator is chosen such that the G_gauge function is accurate. In general the spacing dz should be
         # around the effective wavelength that is seen by the passing electron. The effective wavelength is (
         # 1+1/beta) * l. This is because: cos(kx) * cos(wt) -> cos(kx) * cos(w * (x/(beta*c))) = cos(kx) * cos(
-        # k/beta * x) = 1/2 * ( cos((1+1/beta)kx) + cos((1-1/beta)kx)
+        # k/beta * x) = 1/2 * ( cos((1+1/beta)kx) + cos((1-1/beta)kx).
+        # The full derivation is in equation e_40 in the simulation notes.
 
         z = np.linspace(-integral_limit_in_spot_size_units,
                         integral_limit_in_spot_size_units,
-                        1000)  # ARVITRARY SHOULD BE required_n_z_for_integration_over_maximal_interval
+                        required_n_z_for_integration_over_maximal_interval)
         return z
 
     def potential_envelope2vector_components(self, A: np.ndarray, component_index: Union[str, int], beta_electron):
@@ -1238,3 +1234,22 @@ class CavityNumericalPropagator(CavityPropagator):
             return A * np.cos(self.theta_polarization) * np.cos(alpha_cavity)
         else:
             raise ValueError("component_index must be in [1, 2, 3, 'x', 'y', 'z']")
+
+
+# N_POINTS = 1024
+# input_coordinate_system = CoordinateSystem(lengths=(52.4e-9, 52.4e-9), n_points=(N_POINTS, N_POINTS))
+# first_wave = WaveFunction(psi=np.ones((N_POINTS, N_POINTS)),
+#                           coordinates=input_coordinate_system,
+#                           E0=Joules_of_keV(300))
+#
+# dummy_sample = SamplePropagator(dummy_potential='letters',
+#                                 axes=tuple([first_wave.coordinates.axes[0],
+#                                             first_wave.coordinates.axes[1],
+#                                             np.linspace(-5e-10, 5e-10, 2)]))
+# first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
+#
+# second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
+# cavity_2f = CavityAnalyticalPropagator(E_1=-1, NA_1=0.05, theta_polarization=np.pi / 2, ring_cavity=False)
+#
+# M_2f = Microscope([dummy_sample, first_lens, cavity_2f, second_lens])
+# M_2f.take_a_picture(first_wave)

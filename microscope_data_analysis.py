@@ -5,7 +5,7 @@ l_1 = 1064e-9
 l_2 = 532e-9
 NA_1 = 0.05
 N_POINTS = 128  # Resolution of image
-pixel_size = 1e-11
+pixel_size = 1e-10
 
 
 # %%
@@ -23,7 +23,7 @@ first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
 second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
 
 cavity_2f_analytical = CavityAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, ring_cavity=False)
-cavity_2f_numerical = CavityNumericalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, print_progress=True, ring_cavity=False, ignore_past_files=True)
+cavity_2f_numerical = CavityNumericalPropagator(l_1=l_1, l_2=l_2, E_1=1310609022.7794511, NA_1=NA_1, print_progress=True, ring_cavity=False, ignore_past_files=True)
 
 cavity_1f = CavityAnalyticalPropagator(l_1=l_1, l_2=None, E_1=-1, E_2=None, NA_1=NA_1)
 cavity_2f_analytical_ring = CavityAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, ring_cavity=True)
@@ -52,8 +52,8 @@ aberration_propagator = AberrationsPropagator(Cs=0e-7, defocus=0e-21, atigmatism
 # M_1f = Microscope([dummy_sample, first_lens, cavity_1f, second_lens, aberration_propagator])
 # pic_1f_a = M_1f.take_a_picture(first_wave)
 #
-# M_2f_n = Microscope([dummy_sample, first_lens, cavity_2f_numerical, second_lens, aberration_propagator])
-# pic_2f_n = M_2f_n.take_a_picture(first_wave)
+M_2f_n = Microscope([dummy_sample, first_lens, cavity_2f_numerical, second_lens, aberration_propagator])
+pic_2f_n = M_2f_n.take_a_picture(first_wave)
 
 # M_2f_n_ring = Microscope([dummy_sample, first_lens, cavity_2f_numerical_ring, second_lens, aberration_propagator])
 # pic_2f_n_ring = M_2f_n_ring.take_a_picture(first_wave)
@@ -131,3 +131,6 @@ ax4.set_title('numerical - intensity')
 cax = divider.append_axes('right', size='5%', pad=0.05)
 fig.colorbar(im4, cax=cax, orientation='vertical')
 plt.show()
+# %%
+
+
