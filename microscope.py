@@ -987,7 +987,7 @@ class CavityNumericalPropagator(CavityPropagator):
                  alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
                  ring_cavity: bool = True,
                  ignore_past_files: bool = False,
-                 print_progress: bool = False,
+                 print_progress: bool = True,
                  n_t: int = 3):
 
         if E_1 == -1:
@@ -1017,7 +1017,7 @@ class CavityNumericalPropagator(CavityPropagator):
         phase_factor = np.exp(1j * phi_values)
         if self.E_2 is None:  # If there is only one mode, then the phase is constant in time and there is no amplitude
             # modulation.
-            return phase_factor
+            return phase_factor[:, :, 0]  # Assumes the phase is constant in time
         else:
             if self.n_t == 3:
                 # This assumes that if there are exactly 3 time steps, then they are [0, pi/(2delta_w), pi/delta_w]:
@@ -1053,7 +1053,7 @@ class CavityNumericalPropagator(CavityPropagator):
             else:
                 t = np.linspace(0, 20 * pi / delta_w, self.n_t)  # ARBITRARY total_t_needed
         else:
-            t = np.array([0])
+            t = np.array([0], dtype=np.float64)
         phi_values = divide_calculation_to_batches(self.phi_single_batch, list_of_axes=[x, y, t],
                                                    numel_maximal=int(1e4),  # ARBITRARY - reflects the memeory size
                                                    # limit of the computer
