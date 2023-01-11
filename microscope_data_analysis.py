@@ -15,21 +15,24 @@ first_wave = WaveFunction(psi=np.ones((N_POINTS, N_POINTS)),
                           E0=Joules_of_keV(300))
 
 dummy_sample = SamplePropagator(dummy_potential='letters small',
-                                axes=tuple([first_wave.coordinates.axes[0],
-                                            first_wave.coordinates.axes[1],
-                                            np.linspace(-5e-10, 5e-10, 2)]))
+                                coordinates_for_dummy_potential=CoordinateSystem(axes=(input_coordinate_system.x_axis,
+                                                                                       input_coordinate_system.y_axis,
+                                                                                       np.linspace(-5e-10, 5e-10, 2)
+                                                                                       )))
+
 
 first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
 second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
 
 cavity_2f_analytical = CavityAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, ring_cavity=False)
-cavity_2f_numerical = CavityNumericalPropagator(l_1=l_1, l_2=l_2, E_1=1310609022.7794511, NA_1=NA_1, print_progress=True, ring_cavity=False, ignore_past_files=True)
+cavity_2f_numerical = CavityNumericalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, print_progress=True, ring_cavity=False)
 
-cavity_1f = CavityAnalyticalPropagator(l_1=l_1, l_2=None, E_1=-1, E_2=None, NA_1=NA_1)
-cavity_2f_analytical_ring = CavityAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, ring_cavity=True)
-cavity_2f_numerical_ring = CavityNumericalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, ring_cavity=True, print_progress=True)
+# cavity_1f = CavityAnalyticalPropagator(l_1=l_1, l_2=None, E_1=-1, E_2=None, NA_1=NA_1)
+# cavity_2f_analytical_ring = CavityAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, ring_cavity=True)
+# cavity_2f_numerical_ring = CavityNumericalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, ring_cavity=True, print_progress=True)
 
-aberration_propagator = AberrationsPropagator(Cs=0e-7, defocus=0e-21, atigmatism_parameter=0, astigmatism_orientation=0)
+aberration_propagator = AberrationsPropagator(Cs=0e-7, defocus=0e-21, astigmatism_parameter=0,
+                                              astigmatism_orientation=0)
 
 # M_2f_a = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens, aberration_propagator])
 # pic_2f_a = M_2f_a.take_a_picture(first_wave)
@@ -132,5 +135,9 @@ cax = divider.append_axes('right', size='5%', pad=0.05)
 fig.colorbar(im4, cax=cax, orientation='vertical')
 plt.show()
 # %%
+plt.plot(np.real(np.angle(phase_and_amplitude_mask_n[:, phase_and_amplitude_mask_n.shape[1]//2])), label='numerical')
+plt.plot(np.real(np.angle(phase_and_amplitude_mask_a[:, phase_and_amplitude_mask_a.shape[1]//2])), label='analytical')
+plt.legend()
+plt.show()
 
 
