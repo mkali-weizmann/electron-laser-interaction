@@ -479,15 +479,28 @@ class CoordinateSystem:
 
 
 @dataclass()
-class WaveFunction:
+class SpatialFunction:
+    def __init__(self,
+                 function_values: np.ndarray,  # The values of the function
+                 coordinates: CoordinateSystem,  # The coordinate system on which it is evaluated
+                 ):
+        self.values: np.ndarray = function_values
+        self.coordinates = coordinates
+
+
+@dataclass()
+class WaveFunction(SpatialFunction):
     def __init__(self,
                  psi: np.ndarray,  # The input wave function in one z=const plane
                  coordinates: CoordinateSystem,  # The coordinate system of the input wave
                  E0: float,  # Energy of the particle
                  ):
-        self.psi: np.ndarray = psi
-        self.coordinates = coordinates
+        super().__init__(psi, coordinates)
         self.E0: float = E0
+
+    @property
+    def psi(self) -> np.ndarray:
+        return self.values
 
     @property
     def beta(self):
@@ -513,7 +526,7 @@ class Microscope:
         self.print_progress = print_progress
         self.n_electrons = n_electrons
 
-    def take_a_picture(self, input_wave: WaveFunction) -> Tuple[np.ndarray, CoordinateSystem]:
+    def take_a_picture(self, input_wave: WaveFunction) -> SpatialFunction:
         output_wave = self.propagate(input_wave)
         image = self.expose_camera(output_wave)
         return image
@@ -527,9 +540,9 @@ class Microscope:
             output_wave = propagator.propagate(normalized_input_wave)
             self.propagation_steps.append(PropagationStep(normalized_input_wave, output_wave, propagator))
             normalized_input_wave = output_wave
-        return input_wave
+        return normalized_input_wave
 
-    def expose_camera(self, output_wave: Optional[WaveFunction] = None) -> Tuple[np.ndarray, CoordinateSystem]:
+    def expose_camera(self, output_wave: Optional[WaveFunction] = None) -> SpatialFunction:
         if len(self.propagation_steps) == 0:
             raise ValueError("You must propagate the wave first")
 
@@ -540,7 +553,7 @@ class Microscope:
         expected_electrons_per_pixel = output_wave_intensity * self.n_electrons
         output_wave_intensity_shot_noise = np.random.poisson(expected_electrons_per_pixel)  # This actually assumes an
         # independent shot noise for each pixel, which is not true, but it's a good approximation for many pixels.
-        return output_wave_intensity_shot_noise, self.propagation_steps[-1].output_wave.coordinates
+        return SpatialFunction(output_wave_intensity_shot_noise, self.propagation_steps[-1].output_wave.coordinates)
 
     def plot_step(self, propagator: Propagator, clip=True, title=None, file_name=None):
         step_idx = self.propagators.index(propagator)
@@ -598,29 +611,24 @@ class Microscope:
 
 class SamplePropagator(Propagator):
     def __init__(self,
-                 coordinates: Optional[CoordinateSystem] = None,
-                 axes: Optional[Tuple[np.ndarray, ...]] = None,
-                 potential: Optional[np.ndarray] = None,
-                 path_to_potential_file: Optional[str] = None,
+                 sample: Optional[SpatialFunction] = None,
+                 path_to_sample_file: Optional[str] = None,
                  dummy_potential: Optional[str] = None,
+                 coordinates_for_dummy_potential: Optional[CoordinateSystem] = None,
                  ):
-
-        if coordinates is not None:
-            self.coordinates = coordinates
-        elif axes is not None:
-            self.coordinates = CoordinateSystem(axes=axes)
-        if potential is not None:
-            self.potential = potential
-        elif path_to_potential_file is not None:
-            self.potential = np.load(path_to_potential_file)
+        if sample is not None:
+            self.sample: SpatialFunction = sample
+        # elif path_to_sample_file is not None:
+        #     self.sample: SpatialFunction = np.load(path_to_sample_file)
         elif dummy_potential is not None:
-            self.generate_dummy_potential(dummy_potential)
+            self.generate_dummy_potential(dummy_potential, coordinates_for_dummy_potential)
         else:
-            raise ValueError("You must specify either a potential or a path to a potential file or a dummy potential")
+            raise ValueError("You must specify either a sample or a path to a potential file or a dummy potential")
 
-    def generate_dummy_potential(self, potential_type: str = 'one gaussian'):
-        X, Y, Z = self.coordinates.grids
-        lengths = self.coordinates.lengths
+    def generate_dummy_potential(self, potential_type: str, coordinates_for_dummy_potential: CoordinateSystem):
+        c = coordinates_for_dummy_potential  # just abbreviation for the name
+        X, Y, Z = c.grids
+        lengths = c.lengths
         if potential_type == 'one gaussian':
             potential = 100 * np.exp(-(
                     X ** 2 / (2 * (lengths[0] / 3) ** 2) + Y ** 2 / (2 * (lengths[1] / 3) ** 2) + Z ** 2 / (
@@ -633,41 +641,37 @@ class SamplePropagator(Propagator):
                     2 * (lengths[1] / 4) ** 2) + Z ** 2 / (2 * (lengths[0] / 8) ** 2)))
         elif potential_type == 'a letter':
             potential_2d = np.load("example_letter.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, self.coordinates.grids[0].shape[2]))
+            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2]))
         elif potential_type == 'letters':
             potential_2d = np.load("Data Arrays\\Static Data\\letters_1024.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, self.coordinates.grids[0].shape[2]))
+            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.grids[0].shape[2]))
         elif potential_type == 'letters medium':
             potential_2d = np.load("Data Arrays\\Static Data\\letters_256.npy") * 10  # ARBITRARY
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, self.coordinates.grids[0].shape[2]))
+            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2]))
         elif potential_type == 'letters small':
             potential_2d = np.load("Data Arrays\\Static Data\\letters_128.npy") * 10  # ARBITRARY
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, self.coordinates.grids[0].shape[2]))
+            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2]))
         else:
             raise NotImplementedError("This potential type is not implemented, enter 'one gaussian' or "
                                       "'two gaussians' or 'a letter'")
-        self.potential = potential
+        self.sample: SpatialFunction = SpatialFunction(potential, c)
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
-        if self.potential is None:
-            warn("No potential is defined, generating a dummy potential of two gaussians")
-            self.generate_dummy_potential('two gaussians')
-
         output_wave = input_wave.psi.copy()
-        for i in range(self.potential.shape[2]):
-            output_wave = ASPW_propagation(output_wave, self.coordinates.dxdydz, k_of_E(input_wave.E0))
+        for i in range(self.sample.coordinates.n_points[2]):
+            output_wave = ASPW_propagation(output_wave, self.sample.coordinates.dxdydz, k_of_E(input_wave.E0))
             output_wave = propagate_through_potential_slice(output_wave,
-                                                            self.potential[:, :, i],
-                                                            self.coordinates.dz, input_wave.E0)
+                                                            self.sample.values[:, :, i],
+                                                            self.sample.coordinates.dz, input_wave.E0)
         return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
 
     def plot_potential(self, layer=None):
         if layer is None:
-            plt.imshow(np.sum(self.potential))
+            plt.imshow(np.sum(self.sample.values, axis=2))
         elif isinstance(layer, float):
-            plt.imshow(self.potential[:, :, int(np.round(self.potential.shape[2] * layer))])
+            plt.imshow(self.sample.values[:, :, int(np.round(self.sample.values.shape[2] * layer))])
         elif isinstance(layer, int):
-            plt.imshow(self.potential[:, :, layer])
+            plt.imshow(self.sample.values[:, :, layer])
         plt.show()
 
 
@@ -710,11 +714,11 @@ class LensPropagator(Propagator):
 
 class AberrationsPropagator(Propagator):
     def __init__(self, Cs, defocus,
-                 atigmatism_parameter: float = 0,
+                 astigmatism_parameter: float = 0,
                  astigmatism_orientation: float = 0):
         self.Cs = Cs
         self.defocus = defocus
-        self.astigmatism_parameter = atigmatism_parameter
+        self.astigmatism_parameter = astigmatism_parameter
         self.astigmatism_orientation = astigmatism_orientation
 
     # This is somewhat inefficient, because we could add all the aberrations in the fourier plane, but I want to
