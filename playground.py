@@ -13,7 +13,7 @@ from microscope import *
 # first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
 #
 #
-# C = Cavity2FrequenciesNumericalPropagator(E_1=925177518, NA_1=0.05,
+# C = CavityNumericalPropagator(E_1=925177518, NA_1=0.05,
 #                                                             print_progress=True, ignore_past_files=True)
 #
 # fourier_plane_wave = first_lens.propagate(first_wave)
@@ -35,7 +35,7 @@ dummy_sample = SamplePropagator(dummy_potential='letters small',
 
 first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
 
-C = Cavity2FrequenciesNumericalPropagator(E_1=925177518.67943, NA_1=0.05, print_progress=True, ignore_past_files=True, ring_cavity=True)
+C = CavityNumericalPropagator(E_1=925177518.67943, NA_1=0.05, print_progress=True, ignore_past_files=True, ring_cavity=True)
 fourier_plane_wave = first_lens.propagate(first_wave)
 mask = C.phase_and_amplitude_mask(fourier_plane_wave)
 plt.imshow(np.abs(mask)**2)
