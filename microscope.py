@@ -308,42 +308,67 @@ def divide_calculation_to_batches(f_s: Callable, list_of_axes: List[np.ndarray],
     return output
 
 
-def find_amplitude_for_phase(starting_E: float, desired_phase: float = pi / 2, cavity_type: str = 'numerical',
-                             plot=False, print_progress=True, **kwargs):
-    phases = []
+def find_amplitude_for_phase(starting_E: float=1e7, desired_phase: float = pi / 2, cavity_type: str = 'numerical',
+                             print_progress=True, **kwargs):
+
     input_coordinate_system = CoordinateSystem(lengths=(0, 0),
                                                n_points=(1, 1))
     input_wave = WaveFunction(psi=np.ones((1, 1)),
                               coordinates=input_coordinate_system,
                               E0=Joules_of_keV(300))
-    resulted_phase = 0
-    E = starting_E
-    Es = []
-    while resulted_phase + desired_phase > 0:
-        if cavity_type == 'numerical':
-            C = CavityNumericalPropagator(E_1=E, **kwargs)
-        elif cavity_type == 'analytical':
-            C = CavityAnalyticalPropagator(E_1=E, **kwargs)
-        else:
-            raise ValueError("cavity_type must be either 'numerical' or 'analytical'")
-        phase_and_amplitude_mask = C.phase_and_amplitude_mask(input_wave=input_wave)
-        resulted_phase = np.real(np.angle(phase_and_amplitude_mask[0, 0]))
-        phases.append(resulted_phase)
-        if print_progress:
-            print(f"For E={E:.2e} the phase is phi={resulted_phase:.2e}", end='\r')
-        Es.append(E)
-        E *= 1.01
 
-    if plot:
-        plt.plot(Es, np.real(phases))
-        plt.axhline(-desired_phase, color='r')
-        plt.ylabel('Phase [rad]')
-        plt.xlabel('E_{1} [J]')
-        plt.title("phase of x=y=0 as a function of E_1 amplitude")
-        plt.show()
+    x_1 = starting_E
+    if cavity_type == 'numerical':
+        C_1 = CavityNumericalPropagator(E_1=x_1, **kwargs)
+    elif cavity_type == 'analytical':
+        C_1 = CavityAnalyticalPropagator(E_1=x_1, **kwargs)
+    else:
+        raise ValueError(f"Unknown cavity type {cavity_type}")
+    mask_1 = C_1.phase_and_amplitude_mask(input_wave=input_wave)
+    y_1 = np.real(np.angle(mask_1[0, 0]))
+    y_2_supposed = -desired_phase
+    x_2 = np.sqrt(y_2_supposed * x_1 ** 2 / y_1)
+
+    if cavity_type == 'numerical':
+        C_2 = CavityNumericalPropagator(E_1=x_2, **kwargs)
+    else:
+        C_2 = CavityAnalyticalPropagator(E_1=x_2, **kwargs)
+
+    mask_2 = C_2.phase_and_amplitude_mask(input_wave=input_wave)
+    y_2_resulted = np.real(np.angle(mask_2[0, 0]))
     if print_progress:
-        print(f"{Es[-1]:.2e}")
-    return Es[-1]
+        print(f"for E_1 = {x_2:.1e} the resulted phase is {y_2_resulted / np.pi:.2f} pi")
+    return x_2
+    # Brute force search:
+    # phases = []
+    # resulted_phase = 0
+    # E = starting_E
+    # Es = []
+    # while resulted_phase + desired_phase > 0:
+    #     if cavity_type == 'numerical':
+    #         C = CavityNumericalPropagator(E_1=E, **kwargs)
+    #     elif cavity_type == 'analytical':
+    #         C = CavityAnalyticalPropagator(E_1=E, **kwargs)
+    #     else:
+    #         raise ValueError("cavity_type must be either 'numerical' or 'analytical'")
+    #     phase_and_amplitude_mask = C.phase_and_amplitude_mask(input_wave=input_wave)
+    #     resulted_phase = np.real(np.angle(phase_and_amplitude_mask[0, 0]))
+    #     phases.append(resulted_phase)
+    #     if print_progress:
+    #         print(f"For E={E:.2e} the phase is phi={resulted_phase:.2e}", end='\r')
+    #     Es.append(E)
+    #     E *= 1.01
+    #
+    # if plot:
+    #     plt.plot(Es, np.real(phases))
+    #     plt.axhline(-desired_phase, color='r')
+    #     plt.ylabel('Phase [rad]')
+    #     plt.xlabel('E_{1} [J]')
+    #     plt.title("phase of x=y=0 as a function of E_1 amplitude")
+    #     plt.show()
+    # if print_progress:
+    #     print(f"{Es[-1]:.2e}")
+    # return Es[-1]
 
 
 ############################################################################################################
@@ -872,9 +897,8 @@ class CavityAnalyticalPropagator(CavityPropagator):
                  ring_cavity: bool = True):
 
         if E_1 == -1:
-            E_1 = find_amplitude_for_phase(starting_E=1e7, cavity_type='analytical',
-                                           plot=False, print_progress=False, l_1=l_1, l_2=l_2, E_2=E_2, NA_1=NA_1,
-                                           NA_2=NA_2,
+            E_1 = find_amplitude_for_phase(starting_E=1e7, cavity_type='analytical', print_progress=False,
+                                           l_1=l_1, l_2=l_2, E_2=E_2, NA_1=NA_1, NA_2=NA_2,
                                            theta_polarization=theta_polarization, alpha_cavity=alpha_cavity,
                                            ring_cavity=ring_cavity)
 
@@ -963,12 +987,10 @@ class CavityNumericalPropagator(CavityPropagator):
                  n_t: int = 3):
 
         if E_1 == -1:
-            E_1 = find_amplitude_for_phase(starting_E=1e7, cavity_type='numerical',
-                                           plot=False, print_progress=False, l_1=l_1, l_2=l_2, E_2=E_2, NA_1=NA_1,
-                                           NA_2=NA_2,
+            E_1 = find_amplitude_for_phase(starting_E=1e7, cavity_type='numerical', print_progress=False,
+                                           l_1=l_1, l_2=l_2, E_2=E_2, NA_1=NA_1, NA_2=NA_2,
                                            theta_polarization=theta_polarization, alpha_cavity=alpha_cavity,
-                                           ring_cavity=ring_cavity, n_t=n_t,
-                                           ignore_past_files=ignore_past_files)
+                                           ring_cavity=ring_cavity, n_t=n_t, ignore_past_files=ignore_past_files)
         super().__init__(l_1, l_2, E_1, E_2, NA_1, NA_2, theta_polarization, alpha_cavity, ring_cavity)
 
         self.ignore_past_files = ignore_past_files
@@ -996,21 +1018,21 @@ class CavityNumericalPropagator(CavityPropagator):
             if self.n_t == 3:
                 # This assumes that if there are exactly 3 time steps, then they are [0, pi/(2delta_w), pi/delta_w]:
                 # The derivation is in equation eq:27 in my readme file.
-                phi_0 = 1 / 2 * (phi_values[:, :, 0] + phi_values[:, :, 2])
-                varphi = np.arctan2(phi_values[:, :, 0] - phi_0, phi_values[:, :, 1] - phi_0)
+                phi_const = 1 / 2 * (phi_values[:, :, 0] + phi_values[:, :, 2])
+                varphi = np.arctan2(phi_values[:, :, 0] - phi_const, phi_values[:, :, 1] - phi_const)
                 sin_varphi = np.sin(varphi)
                 problematic_elements = np.abs(sin_varphi) < 1e-3  # This e-3 clipping value will not affect the result.
                 sin_varphi_no_small_values = np.where(problematic_elements, 1, sin_varphi)
                 cos_varphi_no_small_values = np.where(problematic_elements, np.cos(varphi), 1)
                 C_computed_with_sin = np.where(problematic_elements,
                                                0,
-                                               (phi_values[:, :, 0] - phi_0) / sin_varphi_no_small_values
+                                               (phi_values[:, :, 0] - phi_const) / sin_varphi_no_small_values
                                                )
                 C_computed_with_cos = np.where(problematic_elements,
-                                               (phi_values[:, :, 1] - phi_0) / cos_varphi_no_small_values,
+                                               (phi_values[:, :, 1] - phi_const) / cos_varphi_no_small_values,
                                                0)
                 C = C_computed_with_sin + C_computed_with_cos
-                phase_and_amplitude_mask = jv(0, C) * np.exp(1j * phi_0)
+                phase_and_amplitude_mask = jv(0, C) * np.exp(1j * phi_const)
             else:
                 # NOT ACCURATE UNLESS N_T IS BIG!
                 energy_bands = np.fft.fft(phase_factor, axis=-1, norm='forward')
@@ -1204,7 +1226,7 @@ class CavityNumericalPropagator(CavityPropagator):
                                                   x=np.max(np.abs(x)) / np.cos(alpha_cavity),
                                                   l_laser=self.max_l) / np.cos(alpha_cavity) * \
                                      (2 * integral_limit_in_spot_size_units)
-        dz = self.min_l / (1 + 1 / beta_electron) / 3  # ARBITRARY - the terms before the 3 factor is the effective
+        dz = self.min_l / (1 + 1 / beta_electron) / 3  # ARBITRARY - the term before the 3 factor is the effective
         # wavelength seen by the electron, and we divide it by 3 to sample the wave in a higher frequency.
         required_n_z_for_integration_over_maximal_interval = int(max_z_integration_interval / dz)
         # The denominator is chosen such that the G_gauge function is accurate. In general the spacing dz should be
