@@ -10,6 +10,9 @@
 \usepackage{autobreak}
 \usepackage{relsize}
 \usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usepackage{listings}
 
 % Set vertical space before and after dislpay equations to be longer for better redability:
 \AtBeginDocument{\setlength\abovedisplayskip{12pt}}
@@ -20,12 +23,12 @@
 % Set space between words to be wider:
 \spaceskip=1.3\fontdimen2\font plus 1\fontdimen3\font minus 1.5\fontdimen4\font
 
-% Convert the Lyx colors into more pleasent colors:
+% Convert the Lyx colors into more pleasant colors:
 \usepackage{xcolor}
-\definecolor{blue}{RGB}{14,107,217}
-\definecolor{green}{RGB}{0,158,40}
+\definecolor{blue}{RGB}{12,97,197}
+\definecolor{green}{RGB}{0,128,40}
 \definecolor{red}{RGB}{235,16,16}
-\definecolor{brown}{RGB}{164,66,0}
+\definecolor{brown}{RGB}{154,58,0}
 \definecolor{orange}{RGB}{231,135,26}
 \definecolor{purple}{RGB}{94,53,177}
 
@@ -58,26 +61,19 @@
 \newcommand{\kaliLargeLand}{\mathop{\mathlarger{\mathlarger{\mathlarger{\land}}}}}
 
 
-\usepackage{listings}
+
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{RGB}{148,85,141}
-\definecolor{codekeyword}{RGB}{204,120,50}
-\definecolor{codelightpurple}{RGB}{135,134,159}
-\definecolor{codedark}{RGB}{43,43,43}
-\definecolor{codefunctions}{RGB}{255,198,109}
-\definecolor{codenumbers}{RGB}{104,151,187}
-\definecolor{codestr}{RGB}{106,135,89}
-\definecolor{codecomment}{RGB}{128,128,128}
-\definecolor{codebasic}{RGB}{169,183,198}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
 \lstdefinestyle{mystyle}{
-    backgroundcolor=\color{codedark},   
-    commentstyle=\color{codecomment},
-    keywordstyle=\color{codekeyword},
-    numberstyle=\color{codenumbers},
-    stringstyle=\color{codestr},
-    basicstyle=\ttfamily\color{codebasic},
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
     breakatwhitespace=false,         
     breaklines=true,                 
     captionpos=b,                    
@@ -304,6 +300,13 @@ today
 \end_layout
 
 \begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 This file contains the derivations used in the 
 \family typewriter
 microscope.py
@@ -472,7 +475,7 @@ WaveFunction
 \family typewriter
 WaveFunction
 \family default
- as an output), followed by :
+ as an output) followed by a detailed explanation of each one of them :
 \end_layout
 
 \begin_layout Standard
@@ -488,7 +491,7 @@ class LensPropagator(Propagator):
 
 \begin_layout Plain Layout
 
-    ...
+	...
 \end_layout
 
 \begin_layout Plain Layout
@@ -513,7 +516,7 @@ class AberrationsPropagator(Propagator):
 
 \begin_layout Plain Layout
 
-class Cavity2FrequenciesPropagator(Propagator):
+class CavityPropagator(Propagator):
 \end_layout
 
 \begin_layout Plain Layout
@@ -523,7 +526,7 @@ class Cavity2FrequenciesPropagator(Propagator):
 
 \begin_layout Plain Layout
 
-class Cavity2FrequenciesAnalyticalPropagator(Cavity2FrequenciesPropagator):
+class CavityAnalyticalPropagator(CavityPropagator):
 \end_layout
 
 \begin_layout Plain Layout
@@ -533,7 +536,7 @@ class Cavity2FrequenciesAnalyticalPropagator(Cavity2FrequenciesPropagator):
 
 \begin_layout Plain Layout
 
-class Cavity2FrequenciesNumericalPropagator(Cavity2FrequenciesPropagator):
+class CavityNumericalPropagator(CavityPropagator):
 \end_layout
 
 \end_inset
@@ -552,7 +555,7 @@ This class propagates a
 \family typewriter
 WaveFunction 
 \family default
-through a sample with known potential 
+through a sample with a known potential 
 \begin_inset Formula $V\left(x,y,z\right)$
 \end_inset
 
@@ -560,7 +563,21 @@ through a sample with known potential
 \end_layout
 
 \begin_layout Standard
-It does it using the slice-by-slice method, as described in Kirland's book
+It does so using the slice-by-slice method, as described in 
+\bar under
+\color blue
+
+\begin_inset CommandInset href
+LatexCommand href
+name "Kirland's book"
+target "https://link.springer.com/book/10.1007/978-1-4419-6533-2"
+literal "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
  in section 
 \begin_inset Formula $6.4$
 \end_inset
@@ -659,11 +676,20 @@ generate_dummy_potential
 \begin_layout Subsection
 
 \family typewriter
-Cavity2FrequenciesAnalyticalPropagator
+CavityPropagator
 \end_layout
 
 \begin_layout Standard
-This class propagates a 
+Cavity propagators are propagators that take the 
+\family typewriter
+WaveFunction
+\family default
+ in the focal plane, and change it according to the electron-laser interaction
+ with the laser in the cavity.
+\end_layout
+
+\begin_layout Standard
+More formally, the cavity propagators propagate a 
 \family typewriter
 WaveFunction
 \family default
@@ -717,7 +743,9 @@ E_1, E_2
 \family default
  
 \family typewriter
-(alpha_cavity):
+(alpha_cavity)
+\family default
+.
 \end_layout
 
 \begin_layout Standard
@@ -1097,30 +1125,223 @@ end{tikzpicture}
 \end_layout
 
 \begin_layout Standard
-The class (as well as 
-\family typewriter
-Cavity2FrequenciesNumericalPropagator
-\family default
-) acts on a wave function by multiplying every pixel (that represent a different
- 
-\begin_inset Quotes eld
+The electron-laser interaction is derived in section 
+\bar under
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sec:Review-of-Osip's"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
-pencil beams
-\begin_inset Quotes erd
+
+\bar default
+\color inherit
+ and for the case of a general electromagnetic field ends with equation
+  
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_3"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
- of the electron in the focal plane) by a complex number.
+
+\color inherit
+ which expresses the total phase given to the electron:
+\begin_inset Formula 
+\[
+\phi\left(x,y,t\right)=-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\left(\boldsymbol{A}\left(\boldsymbol{x},T\left(z,t\right)\right)-\nabla G\left(\boldsymbol{x},T\left(z,t\right)\right)\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(\boldsymbol{x},T\left(z,t\right)\right)-\partial_{z}G\left(\boldsymbol{x},T\left(z,t\right)\right)\right)^{2}}\right)dz\tag{{\color{blue}\ref{eq:e_3}}}
+\]
+
+\end_inset
+
+Where 
+\begin_inset Formula $x,y$
+\end_inset
+
+ are the center of the thin electron beam in the focal plane, 
+\begin_inset Formula $t$
+\end_inset
+
+ is the time at which it crosses the focal plane, and the function 
+\begin_inset Formula $G$
+\end_inset
+
+ is defined also in the same section in equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:G_def"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+:
+\begin_inset Formula 
+\[
+G\left(\boldsymbol{x},t\right)=c\beta\intop_{-\infty}^{t}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}\tag{{\color{blue}\ref{eq:G_def}}}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-A few notes:
+When there are two frequencies in the cavity, the intensity 
+\begin_inset Formula $A^{2}$
+\end_inset
+
+ will oscillate, which will result in an oscillating phase shift (oscillating
+ in time 
+\begin_inset Formula $t$
+\end_inset
+
+) of the form:
+\begin_inset Formula 
+\[
+\phi\left(x,y,t\right)=\phi_{\text{const}}\left(x,y\right)+C\cos\left(\Delta\omega t\right)\tag{{\color{blue}\ref{eq:oscillating_phase_shift}}}
+\]
+
+\end_inset
+
+With some 
+\begin_inset Formula $\phi_{\text{const}}$
+\end_inset
+
+ and oscillation frequency 
+\begin_inset Formula $C$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The effect of the oscillating phase shift is described in section 
+\bar under
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sec:Interaction with an oscillating laser"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
+ and ends with the expression:
+\begin_inset Formula 
+\[
+\boxed{\psi_{\text{output}}\left(x,y\right)=\psi_{\text{input}}\left(x,y\right)\cdot{\color{brown}e^{i\phi_{\text{const}}\left(x,y\right)}}\cdot{\color{teal}J_{0}\left(C\right)}}\tag{{\color{blue}\ref{eq:after_energy_filter_general}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There are two versions of this cavity propagator, and both inherit 
+\family typewriter
+CavityPropagator
+\family default
+: The first is 
+\family typewriter
+CavityAnalyticalPropagator 
+\family default
+which calculates the mask 
+\begin_inset Formula $e^{i\phi_{\text{const}}\left(x,y\right)}\cdot J_{0}\left(C\right)$
+\end_inset
+
+ of the last equation using a closed formula (with no integrals), and uses
+ some simplifying approximations which will be described in the next subsection.
+ The second is 
+\family typewriter
+CavityNumericalPropagator
+\family default
+ that calculates the mask 
+\begin_inset Formula $e^{i\phi_{\text{const}}\left(x,y\right)}\cdot J_{0}\left(C\right)$
+\end_inset
+
+ of the last equation directly with no simplifying assumptions (by doing
+ a numeric integration of equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_3"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ that was quoted a few paragraphs before).
+\end_layout
+
+\begin_layout Standard
+Both classes have the same propagate function: first calculate they the
+ mask 
+\begin_inset Formula ${\color{brown}e^{i\phi_{\text{const}}\left(x,y\right)}}\cdot{\color{teal}J_{0}\left(C\right)}$
+\end_inset
+
+ and then multiply the input 
+\family typewriter
+WaveFunction
+\family default
+ by the mask to get the output 
+\family typewriter
+WaveFunction
+\end_layout
+
+\begin_layout Standard
+A few notes that are relevant for both cavity propagators (more elaborated
+ explanation on each cavity class comes right afterwards):
 \end_layout
 
 \begin_layout Enumerate
-The phase of the complex number is the phase the electron acquired by passing
- through the ponderomotive potential.
+The phase of the mask 
+\begin_inset Formula ${\color{brown}e^{i\phi_{\text{const}}\left(x,y\right)}}$
+\end_inset
+
+ from the last equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:after_energy_filter_general"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+, is the phase the electron acquires by passing through the ponderomotive
+ potential.
  The derivation for this phase is given in section 
+\bar under
 \color blue
 
 \begin_inset CommandInset ref
@@ -1133,13 +1354,14 @@ noprefix "false"
 \end_inset
 
 
+\bar default
 \color inherit
 , and in particular is given by equation 
 \color blue
 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:e_35"
+reference "eq:e_3"
 plural "false"
 caps "false"
 noprefix "false"
@@ -1148,46 +1370,33 @@ noprefix "false"
 
 
 \color inherit
-.
- The absolute value of this complex number is the attenuation factor that
- is given to this beam by being modulated in frequency by the cavity, and
- later passing through an energy filter that will keep only the zero'th
- energy.
- It is derived in the same section and appears also in equation 
-\color blue
-
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:e_35"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-
-\color inherit
-.
+ that was quoted a few paragraphs ago.
 \end_layout
 
-\begin_deeper
 \begin_layout Enumerate
-the attenuation factor is calculated in method 
+The absolute value of this complex number is the attenuation factor 
+\begin_inset Formula ${\color{teal}J_{0}\left(C\right)}$
+\end_inset
+
+ that is given to this beam by being modulated in frequency by the cavity,
+ and later passing through an energy filter that will keep only the zero'th
+ energy.
+ 
+\end_layout
+
+\begin_layout Enumerate
+When initializing the object with 
 \family typewriter
-attenuation_factor
+E_1=-1
 \family default
-, the total phase shift in method 
-\family typewriter
-phase_shift
-\family default
-, and the total phase mask (phase + attenuation) is in method 
-\family typewriter
-phase_and_amplitude_mask
-\family default
+ the object searches itself for the amplitude that will result in phase
+ shift of 
+\begin_inset Formula $\frac{\pi}{2}$
+\end_inset
+
 .
 \end_layout
 
-\end_deeper
 \begin_layout Enumerate
 The ratio used in the simulation between 
 \begin_inset Formula $E_{1}$
@@ -1198,6 +1407,7 @@ The ratio used in the simulation between
 \end_inset
 
  is derived in section 
+\bar under
 \color blue
 
 \begin_inset CommandInset ref
@@ -1210,6 +1420,7 @@ noprefix "false"
 \end_inset
 
 
+\bar default
 \color inherit
  and in equation 
 \color blue
@@ -1256,7 +1467,15 @@ noprefix "false"
 
 
 \color inherit
-.
+:
+\begin_inset Formula 
+\[
+E_{2}=E_{1}\cdot\frac{\lambda_{1}}{\lambda_{2}}\tag{{\color{blue}\ref{eq:E_ratio}}}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Enumerate
@@ -1290,6 +1509,7 @@ The ratio used in the simulation between
 \end_inset
 
  is derived in section 
+\bar under
 \color blue
 
 \begin_inset CommandInset ref
@@ -1302,6 +1522,7 @@ noprefix "false"
 \end_inset
 
 
+\bar default
 \color inherit
  and in equation 
 \color blue
@@ -1352,6 +1573,7 @@ The tilt of the cavity
 \end_inset
 
  used in the simulation is derived in section 
+\bar under
 \color blue
 
 \begin_inset CommandInset ref
@@ -1364,6 +1586,7 @@ noprefix "false"
 \end_inset
 
 
+\bar default
 \color inherit
  and appear in equation 
 \color blue
@@ -1413,7 +1636,379 @@ E_2=None
 \begin_layout Subsection
 
 \family typewriter
-Cavity2FrequenciesNumericalPropagator
+CavityAnalyticalPropagator
+\end_layout
+
+\begin_layout Standard
+As said before, this 
+\family typewriter
+Propagator
+\family default
+ calculates the total phase and attenuation given to each pixel using simplifyin
+g approximations.
+ all approximations are done in section 
+\bar under
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "subsec:The cavity effect on a pencil beam"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
+ and end in the final equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_35"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+:
+\begin_inset Formula 
+\begin{align*}
+\psi_{x_{0},y_{0}}\begin{pmatrix}x\\
+y\\
+z\\
+t
+\end{pmatrix} & \xrightarrow{\text{Passing through the cavity}}\psi_{x_{0},y_{0}}\begin{pmatrix}x\\
+y\\
+z\\
+t
+\end{pmatrix}\cdot{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}J_{0}\left(\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{{\color{blue}\ref{eq:e_35}}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For:
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $J_{0}$
+\end_inset
+
+ is the Bessel function of first kind, 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the polarization of light, 
+\begin_inset Formula $x_{0},y_{0}$
+\end_inset
+
+ is the location of the pixel in the focal plane (corresponding to the original
+ transverse frequency), 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is the tilt angle of the cavity
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\beta_{e}^{\prime}$
+\end_inset
+
+ is defined to be
+\begin_inset Formula 
+\[
+\beta_{e}^{\prime}=\frac{\frac{1}{\gamma_{c}}\beta_{e}\cos\alpha}{1-\beta_{e}\sin\alpha\cdot\beta_{c}}\tag{{\color{blue}\ref{eq:beta_e_moving_frame}}}
+\]
+
+\end_inset
+
+Where 
+\begin_inset Formula $\beta_{e}$
+\end_inset
+
+ is the velocity of the electron in the lab's frame and 
+\begin_inset Formula $\beta_{c}$
+\end_inset
+
+ is the velocity of the standing wave created by the two laser frequency,
+ which is given by:
+\begin_inset Formula 
+\[
+\beta_{\text{c}}=\frac{\lambda_{1}-\lambda_{2}}{\lambda_{1}+\lambda_{2}}\tag{{\color{blue}\ref{eq:beta_lattice}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\phi_{0}$
+\end_inset
+
+ defined in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:phi_0_first_time"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+:
+\begin_inset Formula 
+\[
+\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)=\frac{e^{2}}{4\hbar mc\beta_{e}^{\prime}\gamma_{e}^{\prime}\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{w_{0}^{2}E_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}e^{-\frac{2y_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}\tag{{\color{blue}\ref{eq:phi_0_first_time}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Note that two running waves in opposite directions 
+\begin_inset Formula $E_{0}e^{-i\omega t+kx},E_{0}e^{-i\omega t-kx}$
+\end_inset
+
+ will sum to a standing wave with a 
+\begin_inset Formula ${\color{green}2}$
+\end_inset
+
+ factor before it, and a factor of 
+\begin_inset Formula ${\color{green}4}$
+\end_inset
+
+ for the intensity:
+\begin_inset Formula 
+\begin{align*}
+E & =E_{0}e^{-i\omega t+kx}+E_{0}e^{-i\omega t-kx}={\color{green}2}\cos\left(kx\right)e^{-i\omega t}\\
+I & ={\color{green}4}\cos^{2}\left(kx\right)
+\end{align*}
+
+\end_inset
+
+In the original paper This 
+\begin_inset Formula ${\color{green}4}$
+\end_inset
+
+ factor appears as part of 
+\begin_inset Formula $\phi_{0}$
+\end_inset
+
+ in the original paper 
+\bar under
+\color blue
+
+\begin_inset CommandInset href
+LatexCommand href
+name "relativistic ponderomotive potential paper"
+target "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7357394/"
+literal "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
+ but here because there are multiple waves that are not all standing, I
+ took this 
+\begin_inset Formula ${\color{green}4}$
+\end_inset
+
+ factor out of the definition of 
+\begin_inset Formula $\phi_{0}$
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+\begin_inset Formula $\Gamma_{\pm}$
+\end_inset
+
+ is defined in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:capital_gamma_def"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+:
+\begin_inset Formula 
+\[
+\gamma\left(1\mp\beta_{c}\right)=\frac{\left(1\mp\beta_{c}\right)}{\sqrt{1-\beta_{c}^{2}}}=\frac{\left(1\mp\beta_{c}\right)}{\sqrt{\left(1-\beta_{c}\right)\left(1+\beta_{c}\right)}}=\sqrt{\frac{1\mp\beta_{c}}{1\pm\beta_{c}}}\equiv\Gamma_{\mp}\tag{{\color{blue}\ref{eq:capital_gamma_def}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\rho\left(\theta,\beta\right)$
+\end_inset
+
+ is defined in equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rho_def"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+:
+\begin_inset Formula 
+\[
+\rho\left(\theta,\beta\right)=1-2\beta^{2}\cos^{2}\left(\theta\right)\tag{{\color{blue}\ref{eq:rho_def}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here is a pseudo code of the propagation process, done in the method 
+\family typewriter
+propagate
+\family default
+:
+\end_layout
+
+\begin_layout Itemize
+Create the total phase and amplitude mask which is the right hand side in
+ 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_35"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ in method 
+\family typewriter
+phase_and_amplitude_mask
+\family default
+:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+First, 
+\begin_inset Formula $\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)$
+\end_inset
+
+ is calculated in the method 
+\family typewriter
+phi_0
+\family default
+.
+\end_layout
+
+\begin_layout Itemize
+Then, the total 
+\color brown
+brown
+\color inherit
+ term in the exponent 
+\begin_inset Formula ${\color{brown}\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}$
+\end_inset
+
+ is calculated in the method 
+\family typewriter
+phase_shift
+\family default
+.
+\end_layout
+
+\begin_layout Itemize
+Then, the teal attenuation factor 
+\begin_inset Formula ${\color{teal}J_{0}\left(\rho\left(\theta,\beta_{e}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}$
+\end_inset
+
+ is calculated in 
+\family typewriter
+attenuation_factor
+\family default
+.
+\end_layout
+
+\begin_layout Itemize
+multiply the terms from 
+\begin_inset Formula $\left(b\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\left(c\right)$
+\end_inset
+
+ to get the total phase masks.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Multiply the input 
+\family typewriter
+WaveFunction 
+\family default
+and the 
+\family typewriter
+phase_and_amplitude_mask
+\family default
+ to get the output 
+\family typewriter
+WaveFunction
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+CavityNumericalPropagator
 \end_layout
 
 \begin_layout Standard
@@ -1423,7 +2018,7 @@ WaveFunction
 \family default
  as 
 \family typewriter
-Cavity2FrequenciesAnalyticalPropagator
+CavityAnalyticalPropagator
 \family default
  but instead of using the final expression for the phase shift in 
 \color blue
@@ -1473,17 +2068,35 @@ noprefix "false"
 \end_layout
 
 \begin_layout Standard
-The two 
-\family typewriter
-Propagators
-\family default
- produce very similar results - up to a few percents difference.
- All the notes about the analytical one apply to this one two.
+Here is the original equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_3"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ for your comfort:
+\begin_inset Formula 
+\[
+\phi\left(x,y,t\right)=-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\left(\boldsymbol{A}\left(\boldsymbol{x},T\left(z,t\right)\right)-\nabla G\left(\boldsymbol{x},T\left(z,t\right)\right)\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(\boldsymbol{x},T\left(z,t\right)\right)-\partial_{z}G\left(\boldsymbol{x},T\left(z,t\right)\right)\right)^{2}}\right)dz\tag{{\color{blue}\ref{eq:e_3}}}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 Note that this integral is very heavy computationally, and this problem
  is addressed in 
+\bar under
 \color blue
 
 \begin_inset CommandInset ref
@@ -1496,6 +2109,7 @@ noprefix "false"
 \end_inset
 
 
+\bar default
 \color inherit
 .
  besides the numerical optimizations, the class knows to take the integral
@@ -1518,7 +2132,7 @@ noprefix "false"
 \end_inset
 
  triplets, and to divide it into segments such that no segments exceeds
- the memory limit.
+ some arbitrary memory limit.
 \end_layout
 
 \begin_layout Standard
@@ -1532,181 +2146,71 @@ Also, once it computed the phase shift and amplitude attenuation for every
 A few notes:
 \end_layout
 
-\begin_layout Enumerate
-The evaluation of potential 
-\begin_inset Formula $A_{0}\left(x,y,z,t\left(z\right)\right)$
-\end_inset
-
- that is the integrand in equation 
-\color blue
-
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:A_for_G"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-
-\color inherit
- and equation 
-\color blue
-
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:e_3"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-
-\color inherit
- happens in method 
+\begin_layout Standard
+Here is a pseudo code of the way the 
 \family typewriter
-rotated_gaussian_beam_A
+propagate
 \family default
-.
+ method of this class calculates the 
+\family typewriter
+phase_and_amplitude_mask
+\family default
+ (which later multiplies each pixel):
 \end_layout
 
-\begin_layout Enumerate
-The integration of 
-\begin_inset Formula $A_{z}$
-\end_inset
-
- to generate 
-\begin_inset Formula $G$
-\end_inset
-
- as in 
-\color blue
-
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:A_for_G"
-plural "false"
-caps "false"
-noprefix "false"
-
+\begin_layout Standard
+\begin_inset space \space{}
 \end_inset
 
 
-\color inherit
- happens in method 
-\family typewriter
-G_gauge
-\family default
-.
 \end_layout
 
-\begin_layout Enumerate
-The gradient 
-\begin_inset Formula $\nabla G$
-\end_inset
-
- from the integrand of equation 
-\color blue
-
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:e_3"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-
-\color inherit
- is calculated in method 
-\family typewriter
-grad_G
-\family default
-.
+\begin_layout Standard
+First check if the phase and amplitude mask was calculated for this set
+ up in the past.
+ if yes, load the results.
+ if not - calculate proceed to calculate it for the first time
 \end_layout
 
-\begin_layout Enumerate
-The summation of all elements in the integrand of 
-\color blue
-
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:e_3"
-plural "false"
-caps "false"
-noprefix "false"
-
+\begin_layout Standard
+Suppose not - calculate 
+\begin_inset Formula $\phi\left(x,y,t\right)$
 \end_inset
 
-
-\color inherit
- is calculated in method 
-\family typewriter
-phi_integrand
-\family default
-.
-\end_layout
-
-\begin_layout Enumerate
-The integral itself of equation 
-\color blue
-
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:e_3"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-
-\color inherit
- is calculated in method 
+ with the method 
 \family typewriter
 phi
 \family default
-.
- this method divides the calculation to batches that can fit in the memory,
- and each one of them is called with function 
-\family typewriter
-phi_single_batch
-\family default
-.
- (the integral itself is in 
-\family typewriter
-phi_single_batch
-\family default
-).
+:
 \end_layout
 
-\begin_layout Enumerate
-To extract the zero'th energy's amplitude from the value of 
+\begin_layout Itemize
+if the number of points in time for evaluation of 
 \begin_inset Formula $\phi$
 \end_inset
 
- in different times, the method 
-\family typewriter
-extract_0th_energy_level_amplitude
-\family default
- takes values of 
-\family typewriter
-phi
-\family default
- and:
-\end_layout
+ is 
+\begin_inset Formula $3$
+\end_inset
 
-\begin_deeper
-\begin_layout Enumerate
-If the 
+ (which is the default, and is stored as 
+\family typewriter
+self.n_t
+\family default
+), then set the 
 \family typewriter
 t
 \family default
- vector (the values in time) has 3 elements in it (which is the default),
- it uses the derivations in 
+ values on which 
+\begin_inset Formula $\phi$
+\end_inset
+
+ will be evaluated to be 
+\begin_inset Formula $t_{0},t_{1},t_{2}=0,\frac{\pi}{2\Delta\omega},\frac{\pi}{\Delta\omega}$
+\end_inset
+
+, from section 
+\bar under
 \color blue
 
 \begin_inset CommandInset ref
@@ -1719,21 +2223,509 @@ noprefix "false"
 \end_inset
 
 
+\bar default
 \color inherit
- to extract the amplitude.
+.
 \end_layout
 
-\begin_layout Enumerate
-Otherwise, it does the Fourier transform to extract the amplitude of the
- zeroth energy.
+\begin_layout Itemize
+else, initiate a vector of evenly space 
+\begin_inset Formula $t$
+\end_inset
+
+'s with the number specified in 
+\family typewriter
+self.n_t
+\family default
+.
 \end_layout
 
-\begin_layout Enumerate
-Note that the precision of the Fourier transform requires relatively large
- number of evaluations.
+\begin_layout Itemize
+evaluate 
+\begin_inset Formula $\phi$
+\end_inset
+
+ on the 
+\begin_inset Formula $x,y,t$
+\end_inset
+
+ grids in batches using the method 
+\family typewriter
+phi_single_batch
+\family default
+ (division to batches is done so that memory limit is not being exceeded)
+\end_layout
+
+\begin_layout Itemize
+for every batch evaluated in 
+\family typewriter
+phi_single_batch:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+evaluate the integrand 
+\begin_inset Formula ${\color{green}\left(\boldsymbol{A}\left(\boldsymbol{x},T\left(z,t\right)\right)-\nabla G\left(\boldsymbol{x},T\left(z,t\right)\right)\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(\boldsymbol{x},T\left(z,t\right)\right)-\partial_{z}G\left(\boldsymbol{x},T\left(z,t\right)\right)\right)^{2}}$
+\end_inset
+
+ using the function 
+\family typewriter
+phi_integrand
+\family default
+:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+initiate lattices 
+\family typewriter
+X, Y, Z, T
+\family default
+ of size 
+\begin_inset Formula $n_{x}\times n_{y}\times n_{z}\times n_{t}$
+\end_inset
+
+ using the 
+\family typewriter
+generate_coordinates_lattice 
+\family default
+method.
+ (
+\color red
+Here you can see it take a lot of memory - for an integration of 
+\begin_inset Formula $800$
+\end_inset
+
+ 
+\begin_inset Formula $z$
+\end_inset
+
+ points, for 
+\begin_inset Formula $3$
+\end_inset
+
+ points in time and for an image of 128X128 pixels
+\color inherit
+, each of those lattices and 
+\begin_inset Formula $A$
+\end_inset
+
+ itself will have 
+\begin_inset Formula $4\cdot10^{7}$
+\end_inset
+
+ elements)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset space \space{}
+\end_inset
+
+explanation on the way they are initiated is in section 
+\bar under
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "subsec:Addressing the complexity problem"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
+ but in a nutshell:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset space \qquad{}
+\end_inset
+
+the 
+\family typewriter
+Z 
+\family default
+array is shifted such that for every 
+\begin_inset Formula $x$
+\end_inset
+
+, the values of 
+\begin_inset Formula $z$
+\end_inset
+
+ in that 
+\begin_inset Formula $x$
+\end_inset
+
+ are centered around the optical axis of the cavity.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset space \qquad{}
+\end_inset
+
+the 
+\family typewriter
+Z
+\family default
+ axis is scaled so that for every 
+\begin_inset Formula $x$
+\end_inset
+
+, the values of 
+\begin_inset Formula $z$
+\end_inset
+
+ range between 
+\begin_inset Formula $-5w\left(x\right)$
+\end_inset
+
+ to 
+\begin_inset Formula $5w\left(x\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset space \qquad{}
+\end_inset
+
+The 
+\family typewriter
+T
+\family default
+ array is shifted according to 
+\begin_inset Formula $z$
+\end_inset
+
+ to make it 
+\begin_inset Formula $T\left(z,t\right)=t+\frac{z}{\beta c}$
+\end_inset
+
+.
 \end_layout
 
 \end_deeper
+\begin_layout Itemize
+Calculate 
+\begin_inset Formula $A\left(x,y,z,t\left(z\right)\right)$
+\end_inset
+
+ on the lattices using the method 
+\family typewriter
+rotated_gaussian_beam_A
+\family default
+.
+ this method uses equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_37"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ for the evaluation of 
+\begin_inset Formula $A$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+Using the values calculated for 
+\begin_inset Formula $A$
+\end_inset
+
+, calculate 
+\begin_inset Formula $\nabla G$
+\end_inset
+
+ in the method 
+\family typewriter
+grad_G:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Recall that 
+\begin_inset Formula $G$
+\end_inset
+
+ is defined to be:
+\begin_inset Formula 
+\[
+G\left(x,y,z,t\right)=\intop_{Z}A_{z}\left(x,y,Z,t-\frac{z-Z}{\beta c}\right)dZ
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+The 
+\begin_inset Formula $x$
+\end_inset
+
+ component of 
+\begin_inset Formula $\nabla G$
+\end_inset
+
+ is given (by just substituting into the definition) by:
+\begin_inset Formula 
+\[
+\frac{G\left(x+dx,y,z,t\right)-G\left(x,y,z,t\right)}{dx}=\frac{1}{dx}\cdot\left[\intop_{Z}A_{z}\left(x+dx,y,Z,t-\frac{z-Z}{\beta c}\right)dZ-\intop_{Z}A_{z}\left(x,y,Z,t-\frac{z-Z}{\beta c}\right)dZ\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Same goes for the 
+\begin_inset Formula $y$
+\end_inset
+
+ component of 
+\begin_inset Formula $\nabla G$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+But the 
+\begin_inset Formula $z$
+\end_inset
+
+ component of 
+\begin_inset Formula $G$
+\end_inset
+
+ has this form, that is derived in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_39"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+:
+\begin_inset Formula 
+\[
+\frac{\partial G}{\partial z}=-\frac{1}{\beta c}\frac{\partial G}{\partial t}+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\tag{{\color{blue}\ref{eq:e_39}}}
+\]
+
+\end_inset
+
+Because of those we calculate 
+\begin_inset Formula $A$
+\end_inset
+
+ again (
+\series bold
+\color red
+Here is the heavy calculation!
+\series default
+\color inherit
+) in small shifts in 
+\begin_inset Formula $dx$
+\end_inset
+
+, 
+\begin_inset Formula $dy$
+\end_inset
+
+, 
+\begin_inset Formula $dt$
+\end_inset
+
+ (
+\color red
+and not 
+\begin_inset Formula $dz!$
+\end_inset
+
+
+\color inherit
+).
+\end_layout
+
+\begin_layout Itemize
+Calculate 
+\begin_inset Formula $G$
+\end_inset
+
+ again on those shifted 
+\begin_inset Formula $A$
+\end_inset
+
+'s
+\end_layout
+
+\begin_layout Itemize
+Numerically evaluate 
+\begin_inset Formula $\nabla G$
+\end_inset
+
+ using the values of the shifted 
+\begin_inset Formula $G$
+\end_inset
+
+'s.
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+sum the values of 
+\begin_inset Formula $\boldsymbol{A}\left(\boldsymbol{x},T\left(z,t\right)\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\nabla G$
+\end_inset
+
+ according to how they appear in the integrand above.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+integrate the values of 
+\family typewriter
+phi_integrand
+\family default
+ to get 
+\begin_inset Formula $\phi$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+using the resulted values of 
+\begin_inset Formula $\phi$
+\end_inset
+
+, calculate the amplitude attenuation factor using the method 
+\family typewriter
+extract_0th_energy_level_amplitude
+\family default
+:
+\end_layout
+
+\begin_layout Itemize
+if 
+\begin_inset Formula $\phi$
+\end_inset
+
+ was evaluated on 
+\begin_inset Formula $3$
+\end_inset
+
+ time points:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+then extract the values of the constant phase shift and the amplitude of
+ the oscillating part using the derivation in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "subsec:Calculating-the-zero'th energy amplitude"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+:
+\begin_inset Formula 
+\begin{align*}
+{\color{brown}\phi_{\text{const}}} & =\frac{\phi\left(t_{0}\right)+\phi\left(t_{2}\right)}{2}\\
+\varphi & \equiv\tan^{-1}\left(\frac{\phi\left(t_{0}\right)-\phi_{\text{const}}}{\phi\left(t_{1}\right)-\phi_{\text{const}}}\right)\\
+{\color{teal}C_{\text{amplitude of oscilating phase}}} & =\frac{\phi\left(t_{1}\right)-\phi_{\text{const}}}{\cos\left(\varphi\right)}=\frac{\phi\left(t_{0}\right)-\phi_{\text{const}}}{\sin\left(\varphi\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+The phase mask is then given by the expression 
+\begin_inset Formula ${\color{brown}e^{i\phi_{\text{const}}}}\cdot{\color{teal}J_{0}\left(C_{\text{amplitude of oscilating phase}}\right)}$
+\end_inset
+
+, as derived in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:after_energy_filter_general"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ (and mentioned in the beginning of this document).
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+If there are more then 
+\begin_inset Formula $3$
+\end_inset
+
+ points in time for the evaluated 
+\begin_inset Formula $\phi$
+\end_inset
+
+:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+evaluate the amplitude of the middle band using 
+\family typewriter
+np.fft.fft
+\family default
+.
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Standard
+Finally, multiply the resulted phase mask with the input wave to get the
+ output wave
+\end_layout
+
 \begin_layout Subsection
 
 \family typewriter
@@ -1795,10 +2787,195 @@ Example code:
 \end_layout
 
 \begin_layout Standard
-This is an example of a code to run the simulation: 
-\series bold
-\color red
-To add.
+\begin_inset listings
+lstparams "language=Python,basicstyle={\ttfamily},style=mystyle"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+from microscope import *
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+l_1 = 1064e-9
+\end_layout
+
+\begin_layout Plain Layout
+
+l_2 = 532e-9
+\end_layout
+
+\begin_layout Plain Layout
+
+NA_1 = 0.05
+\end_layout
+
+\begin_layout Plain Layout
+
+N_POINTS = 128  # Resolution of image
+\end_layout
+
+\begin_layout Plain Layout
+
+pixel_size = 1e-10
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+input_coordinate_system = CoordinateSystem(dxdydz=(pixel_size, pixel_size),
+ n_points=(N_POINTS, N_POINTS))
+\end_layout
+
+\begin_layout Plain Layout
+
+first_wave = WaveFunction(psi=np.ones((N_POINTS, N_POINTS)),
+\end_layout
+
+\begin_layout Plain Layout
+
+                          coordinates=input_coordinate_system,
+\end_layout
+
+\begin_layout Plain Layout
+
+                          E0=Joules_of_keV(300))
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+dummy_sample = SamplePropagator(dummy_potential=f'letters_{N_POINTS}',
+\end_layout
+
+\begin_layout Plain Layout
+
+                                coordinates_for_dummy_potential=CoordinateSystem
+(axes=(input_coordinate_system.x_axis,
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                                       
+                input_coordinate_system.y_axis,
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                                       
+                np.linspace(-5e-10, 5e-10, 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                                       
+                )))
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
+\end_layout
+
+\begin_layout Plain Layout
+
+second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
+\end_layout
+
+\begin_layout Plain Layout
+
+cavity_2f_analytical = CavityAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1,
+ NA_1=NA_1, ring_cavity=False,
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                  starting_E_in_auto_E_search=1e
+6)
+\end_layout
+
+\begin_layout Plain Layout
+
+aberration_propagator = AberrationsPropagator(Cs=1e-8, defocus=1e-10, astigmatis
+m_parameter=0,
+\end_layout
+
+\begin_layout Plain Layout
+
+                                              astigmatism_orientation=0)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+M = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens,
+ aberration_propagator],
+\end_layout
+
+\begin_layout Plain Layout
+
+               print_progress=True,
+\end_layout
+
+\begin_layout Plain Layout
+
+               n_electrons_per_square_angstrom=50)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+pic = M.take_a_picture(first_wave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.imshow(pic.values)
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.title('image')
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.show()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Part
@@ -1806,7 +2983,14 @@ Analytical derivations
 \end_layout
 
 \begin_layout Section
-Review of Osip's paper
+Review of Osip's paper 
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Review-of-Osip's"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1849,7 +3033,7 @@ Start with the Schrodinger equation:
 
 \begin_inset Formula 
 \[
-\psi\left(t\right)\stackrel{\text{Schrodinger Eq.}}{=}e^{\frac{i}{\hbar}\intop\kaliHemiltonian dt^{\prime}}\psi\left(0\right)=e^{\frac{i}{\hbar}\intop\left[\frac{1}{2}mv^{\prime2}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{r}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot\boldsymbol{v}^{\prime}\left(t^{\prime}\right)\right]dt^{\prime}}\psi\left(0\right)
+\psi\left(t\right)\stackrel{\text{Schrodinger Eq.}}{=}e^{\frac{i}{\hbar}\intop\kaliHemiltonian dt^{\prime}}\psi\left(0\right)=e^{\frac{i}{\hbar}\intop\left[\frac{1}{2}mv^{\prime2}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{x}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot\boldsymbol{v}^{\prime}\left(t^{\prime}\right)\right]dt^{\prime}}\psi\left(0\right)
 \]
 
 \end_inset
@@ -1857,7 +3041,7 @@ Start with the Schrodinger equation:
 And so the total phase acquired is:
 \begin_inset Formula 
 \begin{equation}
-\phi\left(t\right)=\frac{1}{\hbar}\intop\left[\frac{1}{2}mv^{\prime2}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{r}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot\boldsymbol{v}^{\prime}\left(t^{\prime}\right)\right]dt^{\prime}\label{eq:e_13}
+\phi\left(t\right)=\frac{1}{\hbar}\intop\left[\frac{1}{2}mv^{\prime2}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{x}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot\boldsymbol{v}^{\prime}\left(t^{\prime}\right)\right]dt^{\prime}\label{eq:e_13}
 \end{equation}
 
 \end_inset
@@ -1867,9 +3051,20 @@ Since we are in Gibbs gauge, and
 \end_inset
 
 , the electric field is:
+\end_layout
+
+\begin_layout Standard
+To first order the location of the electron in this frame is 
+\begin_inset Formula $\boldsymbol{x}^{\prime}\left(t^{\prime}\right)=\boldsymbol{x}_{0}$
+\end_inset
+
+ (the initial position at rest) and so:
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula 
 \[
-\boldsymbol{E}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)\stackrel{\text{Wikipedia says there is a minus here}}{=}-\frac{\partial}{\partial t}\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
+\boldsymbol{E}^{\prime}\left(\boldsymbol{x}_{0}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\approx\boldsymbol{E}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)=-\frac{\partial}{\partial t^{\prime}}\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
 \]
 
 \end_inset
@@ -1877,7 +3072,7 @@ Since we are in Gibbs gauge, and
 And the force:
 \begin_inset Formula 
 \[
-\boldsymbol{F}^{\prime}=-e\boldsymbol{E}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)=e\frac{\partial}{\partial t}\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
+\boldsymbol{F}^{\prime}\left(t^{\prime}\right)=-e\boldsymbol{E}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)=e\frac{\partial}{\partial t}\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
 \]
 
 \end_inset
@@ -1889,7 +3084,7 @@ And the force:
 And so 
 \begin_inset Formula 
 \[
-\Delta\boldsymbol{p}=\intop_{0}^{t^{\prime}}F^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime\prime}\right)dt^{\prime\prime}=e\intop_{0}^{t^{\prime}}\frac{\partial}{\partial t}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime\prime}\right)dt^{\prime\prime}=e\boldsymbol{A^{\prime}}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
+\Delta\boldsymbol{p}\left(t^{\prime}\right)=\intop_{0}^{t^{\prime}}F^{\prime}\left(t^{\prime\prime}\right)dt^{\prime\prime}=e\intop_{0}^{t^{\prime}}\frac{\partial}{\partial t}\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime\prime}\right)dt^{\prime\prime}=e\boldsymbol{A^{\prime}}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)
 \]
 
 \end_inset
@@ -1926,7 +3121,7 @@ noprefix "false"
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align}
-\phi\left(t\right) & =\frac{1}{\hbar}\intop_{0}^{t}\left[\frac{1}{2}m{\color{brown}v^{\prime2}}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{r}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot{\color{brown}\boldsymbol{v}^{\prime}\left(t^{\prime}\right)}\right]dt^{\prime}\nonumber \\
+\phi\left(\boldsymbol{x}_{0}^{\prime},t\right) & =\frac{1}{\hbar}\intop_{0}^{t}\left[\frac{1}{2}m{\color{brown}v^{\prime2}}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{x}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot{\color{brown}\boldsymbol{v}^{\prime}\left(t^{\prime}\right)}\right]dt^{\prime}\nonumber \\
  & =\frac{1}{\hbar}\intop_{0}^{t}\left[\frac{1}{2}m\left({\color{brown}\frac{e}{m}A^{\prime}\left(\boldsymbol{x}_{0},t^{\prime}\right)}\right)^{2}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0},t^{\prime}\right)\cdot\left({\color{brown}\frac{e}{m}A^{\prime}\left(\boldsymbol{x}_{0},t^{\prime}\right)}\right)\right]dt^{\prime}\nonumber \\
  & =\frac{1}{\hbar}\intop_{0}^{t}\left[\frac{1}{2}{\color{brown}\frac{e^{2}}{m}A^{2}\left(\boldsymbol{x}_{0},t^{\prime}\right)}-\frac{e^{2}}{m}\boldsymbol{A}^{\prime2}\left(\boldsymbol{x}_{0},t^{\prime}\right)\cdot\right]dt^{\prime}\nonumber \\
  & =-\frac{1}{\hbar}\intop_{0}^{t}\frac{e^{2}}{2m}\boldsymbol{A}^{\prime2}\left(\boldsymbol{x}_{0},t^{\prime}\right)dt^{\prime}\label{eq:e_15}
@@ -2127,9 +3322,9 @@ A_{z}\stackrel{\left({\color{blue}\ref{eq:S_4}}\right)}{=}\partial_{z}G+\tilde{A
 \begin_layout Standard
 Guess solution of the form:
 \begin_inset Formula 
-\[
-G\left(\boldsymbol{x},t\right)=c\beta\intop_{-\infty}^{t}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}
-\]
+\begin{equation}
+G\left(\boldsymbol{x},t\right)=c\beta\intop_{-\infty}^{t}A_{z}\left(z-c\beta\left(t-t^{\prime}\right),t^{\prime}\right)dt^{\prime}\label{eq:G_def}
+\end{equation}
 
 \end_inset
 
@@ -2440,25 +3635,77 @@ noprefix "false"
  we get:
 \begin_inset Formula 
 \begin{align*}
-\phi\left(t\right) & \stackrel{{\color{blue}\eqref{eq:e_15}}}{=}-\frac{1}{\hbar}\intop_{0}^{t}\frac{e^{2}}{2m}\boldsymbol{A}^{\prime2}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)dt^{\prime}\\
- & =-\frac{1}{\hbar}\intop_{0}^{t}\frac{e^{2}}{2m}\left({\color{green}\left(\boldsymbol{A}\left(x,y,z\left(t\right),t\right)-\nabla G\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(x,y,z\left(t\right),t\right)-\partial_{z}G\right)^{2}}\right)\left(\frac{1}{\gamma}dt\right)
+\phi\left(\boldsymbol{x}_{0}^{\prime},t\right) & \stackrel{{\color{blue}\eqref{eq:e_15}}}{=}-\frac{1}{\hbar}\intop_{-\infty}^{t}\frac{e^{2}}{2m}\boldsymbol{A}^{\prime2}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)dt^{\prime}
 \end{align*}
 
 \end_inset
 
-Setting 
+In the lab's frame 
+\begin_inset Formula $\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)$
+\end_inset
+
+ become 
+\begin_inset Formula $\left(x_{0},y_{0},z_{0}+\beta cT,T\right)=\left(x,y,z\left(T\right),T\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $dt^{\prime}$
+\end_inset
+
+ becomes 
+\begin_inset Formula $\frac{1}{\gamma}dT$
+\end_inset
+
+ and so we get: 
+\begin_inset Formula 
+\[
+\phi\left(x_{0},y_{0},z_{0},t\right)=-\frac{1}{\hbar}\intop_{-\infty}^{t}\frac{e^{2}}{2m}\left({\color{green}\left(\boldsymbol{A}\left(x_{0},y_{0},z\left(T\right),T\right)-\nabla G\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}-\partial_{z}G\right)^{2}}\right){\color{gray}\underset{dt^{\prime}}{\underbrace{{\normalcolor \left(\frac{1}{\gamma}dT\right)}}}}
+\]
+
+\end_inset
+
+(Also 
+\begin_inset Formula $\nabla G,A_{z},\partial_{z}G$
+\end_inset
+
+ are evaluated at 
+\begin_inset Formula $\left(x_{0},y_{0},z\left(T\right),T\right)$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+changing variables for comfort:
 \begin_inset Formula 
 \begin{align*}
-z\left(t\right) & =z_{0}+\beta ct\iff dt=\frac{1}{\beta c}dz & t\left(z\right) & =\frac{z-z_{0}}{\beta c}
+z & =z_{0}+\beta cT\Rightarrow & T\left(z,t_{0}\right) & =t_{0}+\frac{1}{\beta c}z & dT & =\frac{1}{\beta c}dz
 \end{align*}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 we get:
 \begin_inset Formula 
-\begin{equation}
-\boxed{\phi\left(t_{0}\right)=-\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\left(\boldsymbol{A}\left(\boldsymbol{x},t\left(z,t_{0}\right)\right)-\nabla G\left(\boldsymbol{x},t\left(z,t_{0}\right)\right)\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(\boldsymbol{x},t\left(z,t_{0}\right)\right)-\partial_{z}G\left(\boldsymbol{x},t\left(z,t_{0}\right)\right)\right)^{2}}\right)dz}\label{eq:e_3}
-\end{equation}
+\[
+\phi\left(z,t_{0}\right)=-\frac{1}{\hbar}\intop_{-\infty}^{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\left(\boldsymbol{A}\left(x,y,z,T\left(z,t_{0}\right)\right)-\nabla G\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)-\partial_{z}G\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)\right)^{2}}\right)dz
+\]
+
+\end_inset
+
+And in total after passing through the whole potential (taking 
+\begin_inset Formula $z\rightarrow\infty$
+\end_inset
+
+) we get:
+\begin_inset Formula 
+\begin{align}
+ & \boxed{\phi\left(t_{0}\right)=-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\left(\boldsymbol{A}\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)-\nabla G\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)-\partial_{z}G\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)\right)^{2}}\right)dz}\tag{e\_3}\label{eq:e_3}\\
+ & T\left(z,t_{0}\right)=t_{0}+\frac{1}{\beta c}z\nonumber 
+\end{align}
 
 \end_inset
 
@@ -2507,9 +3754,9 @@ And for the special case of
 :
 \begin_inset Formula 
 \begin{align}
-\phi\left(t\right) & =-\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\cancel{A_{x}^{2}}+\cancel{2A_{x}\partial_{x}G}+\left(\partial_{x}G\right)^{2}+A_{y}^{2}+A_{z}^{2}}-{\color{blue}\beta^{2}A_{z}^{2}+\cancel{2A_{z}\partial_{z}G}-\cancel{\left(\partial_{z}G\right)^{2}}}\right)dz\nonumber \\
- & =-\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left(A_{y}^{2}+\left(1-{\color{blue}\beta^{2}}\right)A_{z}^{2}+\left(\partial_{x}G\right)^{2}\right)dz\nonumber \\
- & =-\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left(A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)+\left(1-{\color{blue}\beta^{2}}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)+\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}\right)dz\label{eq:e_18}
+\phi\left(t\right) & =-\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\cancel{A_{x}^{2}}+\cancel{2A_{x}\partial_{x}G}+\left(\partial_{x}G\right)^{2}+A_{y}^{2}+A_{z}^{2}}-{\color{blue}\beta^{2}A_{z}^{2}+\cancel{2A_{z}\partial_{z}G}-\cancel{\left(\partial_{z}G\right)^{2}}}\right)dz\nonumber \\
+ & =-\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left(A_{y}^{2}+\left(1-{\color{blue}\beta^{2}}\right)A_{z}^{2}+\left(\partial_{x}G\right)^{2}\right)dz\nonumber \\
+ & =-\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left(A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)+\left(1-{\color{blue}\beta^{2}}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)+\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}\right)dz\label{eq:e_18}
 \end{align}
 
 \end_inset
@@ -2674,13 +3921,13 @@ G & =c\beta\intop_{-\infty}^{t}A_{z}\left(\boldsymbol{x}-\beta c\left(t-T\right)
 
 
 \begin_inset Formula 
-\[
-\boldsymbol{A}=A\frac{w_{0}}{w\left(x\right)}e^{-\frac{\left(y^{2}+z^{2}\right)}{w^{2}\left(x\right)}}\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot\begin{pmatrix}0\\
+\begin{equation}
+\boldsymbol{A}={\color{gray}\underset{A_{\text{envelope}\left(x,y,z\right)}}{\underbrace{{\normalcolor A\frac{w_{0}}{w\left(x\right)}e^{-\frac{\left(y^{2}+z^{2}\right)}{w^{2}\left(x\right)}}\cos\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)}}}}\cdot\begin{pmatrix}0\\
 0\\
 \sin\theta\cos\left(\omega t-\varepsilon\right)\\
 \cos\theta\cos\left(\omega t\right)
-\end{pmatrix}
-\]
+\end{pmatrix}\label{eq:A_envelope}
+\end{equation}
 
 \end_inset
 
@@ -2831,6 +4078,8 @@ Make sure the derivative with respect to z is negligible - remember that
 \series default
 \color inherit
 )
+\size small
+
 \begin_inset Formula 
 \[
 \nabla G\approx\hat{x}\cdot A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\frac{1}{\omega}c\beta\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot\left(k_{l}+k_{l}\frac{y^{2}+z^{2}}{2}{\color{gray}\underset{\frac{d}{dx}\frac{1}{R\left(x\right)}=\frac{d}{dx}\left(\frac{x}{x^{2}+x_{R}^{2}}\right)}{\underbrace{{\normalcolor \frac{x_{R}^{2}-x^{2}}{\left(x^{2}+x_{R}^{2}\right)^{2}}}}}}+{\color{gray}\underset{\frac{d}{dx}\psi\left(x\right)}{\underbrace{{\normalcolor \frac{\frac{1}{x_{R}}}{1+\left(\frac{x}{x_{R}}\right)^{2}}}}}}\right)
@@ -2838,11 +4087,15 @@ Make sure the derivative with respect to z is negligible - remember that
 
 \end_inset
 
+
+\size default
 (Also for a moving wave the result will be the same, as the 
 \begin_inset Formula $\cos$
 \end_inset
 
  will be replaced with complex exponent)
+\size footnotesize
+
 \begin_inset Formula 
 \[
 =\hat{x}\cdot A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\cancel{{\color{purple}\frac{1}{\omega}c}}\beta\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot{\color{gray}\underset{\text{Same but with }\lambda\text{ only and no }k_{l},x_{R}}{\underbrace{{\normalcolor \left(\cancel{{\color{purple}\frac{2\pi}{\lambda}}}+{\color{purple}\cancel{\frac{2\pi}{\lambda}}}\frac{y^{2}+z^{2}}{2}\cdot\frac{\left(\frac{\lambda}{\pi\cdot\left(NA\right)^{2}}\right)^{2}-x^{2}}{\left(x^{2}+\left(\frac{\lambda}{\pi\cdot\left(NA\right)^{2}}\right)^{2}\right)^{2}}+\frac{\frac{\cancel{{\color{purple}2\pi}}\cdot\left(NA\right)^{2}}{2\cancel{{\color{purple}\lambda}}}}{1+\left(\frac{\pi\cdot\left(NA\right)^{2}}{\lambda}\cdot x\right)^{2}}\right)}}}}
@@ -2850,11 +4103,15 @@ Make sure the derivative with respect to z is negligible - remember that
 
 \end_inset
 
+
+\size default
 Recalling that 
 \begin_inset Formula $\frac{2\pi}{\lambda}=\frac{1}{\nicefrac{c}{\omega}}$
 \end_inset
 
 , we can write:
+\size footnotesize
+
 \begin_inset Formula 
 \[
 =\hat{x}\cdot\beta A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot\left({\color{purple}1}+{\color{purple}1}\cdot{\color{gray}\underset{\text{small correction}}{\underbrace{{\normalcolor \frac{y^{2}+z^{2}}{2\lambda^{2}}}}}}\cdot\frac{\left(\frac{1}{\pi\cdot\left(NA\right)^{2}}\right)^{2}-\left(\frac{x}{\lambda}\right)^{2}}{\left(\frac{x^{2}}{\lambda^{2}}+\frac{1}{\left(\pi\cdot\left(NA\right)^{2}\right)^{2}}\right)^{2}}+{\color{gray}\underset{<6\%\text{ for NA}=0.3}{\underbrace{{\normalcolor \frac{2\left(NA\right)^{2}}{1+\left(\pi\cdot\left(NA\right)^{2}\cdot\frac{x}{\lambda}\right)^{2}}}}}}\right)\approx
@@ -2862,6 +4119,8 @@ Recalling that
 
 \end_inset
 
+
+\size default
 
 \begin_inset Formula 
 \[
@@ -2891,7 +4150,7 @@ noprefix "false"
  we get:
 \begin_inset Formula 
 \begin{align*}
-\phi\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left({\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz
+\phi\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz
 \end{align*}
 
 \end_inset
@@ -2904,12 +4163,26 @@ defining:
 
 \end_inset
 
-And with approximation:
+Plugging in the wave of the form 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A_envelope"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we get:
 \begin_inset Formula 
 \begin{align*}
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}} & \left[{\color{gray}\overset{y}{\overbrace{{\normalcolor {\color{red}\left(A_{\text{envelope}}^{2}\left(y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}}}}}\right.\\
- & +{\color{gray}\overset{z}{\overbrace{{\normalcolor {\color{blue}\left(1-\beta^{2}\right)\cdot A_{\text{envelope}}^{2}\left(y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\theta\cos^{2}\left(\omega t\left(z\right)\right)}}}}}\\
- & +{\color{gray}\underset{x}{\underbrace{{\normalcolor \left.{\color{green}\beta^{2}A_{\text{envelope}}^{2}\left(y,z\right)\sin^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\left(\theta\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]}}}}
+\phi\left(x,y\right)=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z} & \left[{\color{gray}\overset{A_{y}}{\overbrace{{\normalcolor {\color{red}\left(A_{\text{envelope}}^{2}\left(x,y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}}}}}\right.\\
+ & +{\color{gray}\overset{A_{z}}{\overbrace{{\normalcolor {\color{blue}\left(1-\beta^{2}\right)\cdot A_{\text{envelope}}^{2}\left(x,y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\theta\cos^{2}\left(\omega t\left(z\right)\right)}}}}}\\
+ & +{\color{gray}\underset{A_{x}}{\underbrace{{\normalcolor \left.{\color{green}\beta^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)\sin^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\left(\theta\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]}}}}dz
 \end{align*}
 
 \end_inset
@@ -2917,8 +4190,8 @@ And with approximation:
 
 \begin_inset Formula 
 \begin{align*}
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}} & A_{\text{envelope}}^{2}\left(y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}\right.\\
- & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]\right]
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z} & A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}\right.\\
+ & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]\right]dz
 \end{align*}
 
 \end_inset
@@ -2930,8 +4203,8 @@ The integragtion over
  will just add a half factor and we get:
 \begin_inset Formula 
 \begin{align*}
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}} & \frac{1}{2}A_{\text{envelope}}^{2}\left(y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\right)}\right.\\
- & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)}\right]\right]
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z} & \frac{1}{2}A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\right)}\right.\\
+ & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)}\right]\right]dz
 \end{align*}
 
 \end_inset
@@ -2951,7 +4224,7 @@ The red and the first blue parts are simply
 ):
 \begin_inset Formula 
 \[
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}}\frac{1}{2}A_{\text{envelope}}^{2}\left(y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z}\frac{1}{2}A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]dz
 \]
 
 \end_inset
@@ -2959,7 +4232,7 @@ The red and the first blue parts are simply
 
 \begin_inset Formula 
 \[
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}}\frac{1}{2}A_{\text{envelope}}^{2}\left(y,z\right)\left[{\color{red}\frac{1}{2}+\frac{1}{2}\cos\left(2\varphi\left(x\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z}\frac{1}{2}A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\frac{1}{2}+\frac{1}{2}\cos\left(2\varphi\left(x\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]dz
 \]
 
 \end_inset
@@ -2967,11 +4240,45 @@ The red and the first blue parts are simply
 
 \begin_inset Formula 
 \begin{equation}
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z_{0}}^{z_{1}}\frac{1}{2}A_{\text{envelope}}^{2}\left(y,z\right){\color{red}\frac{1}{2}}\left[{\color{red}1}+\left({\color{red}1}-2\cos^{2}\left(\theta\right)\beta^{2}\right)\cos\left(2\varphi\left(x\right)\right)\right]\label{eq:ponderomotive_integral_final_result_standing_wave}
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z}\frac{1}{2}A_{\text{envelope}}^{2}\left(x,y,z\right){\color{red}\frac{1}{2}}\left[{\color{red}1}+\left({\color{red}1}-2\cos^{2}\left(\theta\right)\beta^{2}\right)\cos\left(2\varphi\left(x\right)\right)\right]dz\label{eq:ponderomotive_integral_final_result_standing_wave}
 \end{equation}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+If we ignore the fact that 
+\begin_inset Formula $\varphi\left(x\right)$
+\end_inset
+
+ is 
+\begin_inset Formula $z$
+\end_inset
+
+-dependent due to the curvature term, we can write:
+\begin_inset Formula 
+\begin{align*}
+\phi & =-{\color{gray}\overset{\phi_{0}\left(x,y\right)}{\overbrace{{\normalcolor \frac{e^{2}}{4m\gamma\beta c\hbar}\intop_{z}A_{\text{envelope}}^{2}\left(x,y,z\right)dz}}}}\cdot\frac{1}{2}\biggl[1+{\color{gray}\overset{\rho\left(\theta,\beta\right)}{\overbrace{{\normalcolor \left(1-2\cos^{2}\left(\theta\right)\beta^{2}\right)}}}}\cos\left(2\varphi\left(x\right)\right)\biggr]\\
+ & =-\phi_{0}\left(x,y\right)\cdot\frac{1}{2}\left[1+\rho\left(\theta,\beta\right)\cos\left(2\varphi\left(x\right)\right)\right]
+\end{align*}
+
+\end_inset
+
+Where we defined:
+\begin_inset Formula 
+\begin{align}
+\phi_{0} & =\frac{e^{2}}{4m\gamma\beta c\hbar}\intop_{z}A_{\text{envelope}}^{2}\left(x,y,z\right)dz\label{eq:phi_0_def}\\
+\rho\left(\theta,\beta\right) & =1-2\cos^{2}\left(\theta\right)\beta^{2}\label{eq:rho_def}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 And for a moving wave (that does not have the 
 \begin_inset Formula $\cos\left(\varphi\left(x\right)\right)$
 \end_inset
@@ -2979,15 +4286,89 @@ And for a moving wave (that does not have the
  grating in it, but only the slowly varying envelope):
 \begin_inset Formula 
 \begin{align}
-\phi\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}}{2m\gamma\beta c}\left({\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz\nonumber \\
-= & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}A_{\text{envelope}}^{2}\left(y,z\right)}{2m\gamma\beta c}\left({\color{red}\sin^{2}\theta\cancel{\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)}}+{\color{blue}\left(1-\beta^{2}\right)\cdot\left(\cdot\cos\theta\cancel{\cos\left(\omega t\left(z\right)\right)}\right)^{2}}+{\color{green}\left(\beta^{2}\cos^{2}\left(\theta\right)\cancel{\sin^{2}\left(\omega t\left(z\right)\right)}\right)}\right)dz\nonumber \\
-= & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}A_{\text{envelope}}^{2}\left(y,z\right)}{4m\gamma\beta c}\left({\color{gray}\underset{=1}{\underbrace{{\normalcolor {\color{red}\sin^{2}\left(\theta\right)}+{\color{blue}\cos^{2}\left(\theta\right)}}}}}-\cancel{{\color{blue}\beta^{2}\cos^{2}\left(\theta\right)}+{\color{green}\left(\beta^{2}\cdot\cos^{2}\left(\theta\right)\right)}}\right)dz\nonumber \\
-= & -\frac{1}{\hbar}\intop_{z_{0}}^{z_{1}}\frac{e^{2}A_{\text{envelope}}^{2}\left(y,z\right)}{4m\gamma\beta c}dz\label{eq:ponderomotive_integral_final_result_moving_wave}
+\phi_{\text{running wave}}\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz\nonumber \\
+= & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{2m\gamma\beta c}\left({\color{red}\sin^{2}\theta\cancel{\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)}}+{\color{blue}\left(1-\beta^{2}\right)\cdot\left(\cdot\cos\theta\cancel{\cos\left(\omega t\left(z\right)\right)}\right)^{2}}+{\color{green}\left(\beta^{2}\cos^{2}\left(\theta\right)\cancel{\sin^{2}\left(\omega t\left(z\right)\right)}\right)}\right)dz\nonumber \\
+= & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{4m\gamma\beta c}\left({\color{gray}\underset{=1}{\underbrace{{\normalcolor {\color{red}\sin^{2}\left(\theta\right)}+{\color{blue}\cos^{2}\left(\theta\right)}}}}}-\cancel{{\color{blue}\beta^{2}\cos^{2}\left(\theta\right)}+{\color{green}\left(\beta^{2}\cdot\cos^{2}\left(\theta\right)\right)}}\right)dz\nonumber \\
+= & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{4m\gamma\beta c}dz\label{eq:ponderomotive_integral_final_result_moving_wave}
 \end{align}
 
 \end_inset
 
 
+\begin_inset Formula 
+\[
+\phi_{\text{running wave}}=-\phi_{0}\left(x,y\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Interaction with an oscillating laser
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Interaction with an oscillating laser"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let us review the case where the intensity of 
+\begin_inset Formula $A^{2}$
+\end_inset
+
+ oscillates as a function of time.
+ since we are going to deal with the case of exactly two monochromatic laser
+ beams, we can already now denote the oscillations frequency as 
+\begin_inset Formula $\Delta\omega$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Since the laser intensity is oscillating 
+\begin_inset Formula $\phi\left(x,y,t\right)$
+\end_inset
+
+ will have the form 
+\begin_inset Formula 
+\begin{equation}
+\phi\left(x,y,t\right)=\phi_{\text{const}}\left(x,y\right)+C\cos\left(\Delta\omega t\right)\label{eq:oscillating_phase_shift}
+\end{equation}
+
+\end_inset
+
+Therefore, the output wave as a function of frequency will look like so:
+\begin_inset Formula 
+\[
+\psi_{\text{output}}=\psi_{\text{input}}\cdot e^{i\phi\left(x,y,t\right)}=\psi_{\text{input}}\cdot e^{i\phi_{\text{const}}\left(x,y\right)+C\cos\left(\Delta\omega t\right)}=\psi_{\text{input}}\cdot e^{i\phi_{\text{const}}\left(x,y\right)}\cdot\sum_{q\in\kaliInteger}J_{q}\left(C\right)\cdot e^{iq\Delta\omega t}
+\]
+
+\end_inset
+
+Adding an energy filter to filter out all the frequencies that are not the
+ 
+\begin_inset Formula $q=0$
+\end_inset
+
+ frequency, we get:
+\begin_inset Formula 
+\begin{align}
+\psi_{\text{output of energy filter}} & =\psi_{\text{input}}\cdot e^{i\phi_{\text{const}}\left(x,y\right)}\cdot J_{0}\left(C\right)+{\color{gray}\underset{\text{Filtered out}}{\underbrace{{\normalcolor \cancel{{\color{gray}\sum_{q\in\kaliInteger\setminus\left\{ 1\right\} }J_{q}\left(C\right)\cdot e^{iq\Delta\omega t}}}}}}}\nonumber \\
+ & =\psi_{\text{input}}\cdot e^{i\phi_{\text{const}}\left(x,y\right)}\cdot J_{0}\left(C\right)\label{eq:after_energy_filter_general}
+\end{align}
+
+\end_inset
+
+In practice, in the electron microscope, the energy filter does not sit
+ in the focal plane but rather further down the microscope, but we can considere
+d the filtered electrons as if as they were filtered on spot in the focal
+ plane.
 \end_layout
 
 \begin_layout Section
@@ -3381,7 +4762,7 @@ Choose
 
 \begin_inset Formula 
 \begin{equation}
-\boxed{\beta_{\text{lattice}}=\frac{1-\frac{\omega_{1}}{\omega_{2}}}{1+\frac{\omega_{1}}{\omega_{2}}}=\frac{1-\frac{\lambda_{2}}{\lambda_{1}}}{1+\frac{\lambda_{2}}{\lambda_{1}}}}\label{eq:beta_lattice}
+\boxed{\beta_{\text{lattice}}=\frac{1-\frac{\omega_{1}}{\omega_{2}}}{1+\frac{\omega_{1}}{\omega_{2}}}=\frac{1-\frac{\lambda_{2}}{\lambda_{1}}}{1+\frac{\lambda_{2}}{\lambda_{1}}}=\frac{\lambda_{1}-\lambda_{2}}{\lambda_{1}+\lambda_{2}}}\label{eq:beta_lattice}
 \end{equation}
 
 \end_inset
@@ -3702,7 +5083,7 @@ name "subsec:The cavity effect on a pencil beam"
 
 \begin_layout Standard
 Assume we turn on the microscope and electrons are propagating through it.
- after passing through the sample, the electron wave will scatter, and each
+ After passing through the sample, the electron wave will scatter, and each
  Fourier component of it will be concentrated to a thin column wave at some
  
 \begin_inset Formula $x_{0},y_{0}$
@@ -3736,148 +5117,51 @@ Linear transformation of rotation and then lorentz transformation (required
 \end_layout
 
 \begin_layout Standard
-\begin_inset Note Note
-status collapsed
+In the previous section 
+\color blue
 
-\begin_layout Plain Layout
-\begin_inset Formula 
-\[
-\begin{pmatrix}\tilde{x}\\
-\tilde{y}\\
-\tilde{z}\\
-c\tilde{t}
-\end{pmatrix}={\color{gray}\underset{R}{\underbrace{{\normalcolor \begin{pmatrix}\cos\theta & 0 & -\sin\theta & 0\\
-0 & 1 & 0 & 0\\
-\sin\theta & 0 & \cos\theta & 0\\
-0 & 0 & 0 & 1
-\end{pmatrix}}}}}\begin{pmatrix}x\\
-y\\
-z\\
-ct
-\end{pmatrix}
-\]
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sec:Field Derivations"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
 
-\begin_inset Formula 
-\[
-\begin{pmatrix}x^{\prime}\\
-y^{\prime}\\
-z^{\prime}\\
-ct^{\prime}
-\end{pmatrix}={\color{gray}\underset{L}{\underbrace{{\normalcolor \begin{pmatrix}\gamma & 0 & 0 & -\gamma\beta\\
-0 & 1 & 0 & 0\\
-0 & 0 & 1 & 0\\
--\gamma\beta & 0 & 0 & 1
-\end{pmatrix}}}}}\begin{pmatrix}\tilde{x}\\
-\tilde{y}\\
-\tilde{z}\\
-c\tilde{t}
-\end{pmatrix}
-\]
-
-\end_inset
-
-And in total:
-\begin_inset Formula 
-\[
-\begin{pmatrix}x^{\prime}\\
-y^{\prime}\\
-z^{\prime}\\
-ct^{\prime}
-\end{pmatrix}={\color{gray}\underset{R}{\underbrace{{\normalcolor \begin{pmatrix}\gamma & 0 & 0 & -\gamma\beta\\
-0 & 1 & 0 & 0\\
-0 & 0 & 1 & 0\\
--\gamma\beta & 0 & 0 & \gamma
-\end{pmatrix}}}}}{\color{gray}\underset{L}{\underbrace{{\normalcolor \begin{pmatrix}\cos\theta & 0 & -\sin\theta & 0\\
-0 & 1 & 0 & 0\\
-\sin\theta & 0 & \cos\theta & 0\\
-0 & 0 & 0 & 1
-\end{pmatrix}}}}}\begin{pmatrix}x\\
-y\\
-z\\
-ct
-\end{pmatrix}={\color{gray}\underset{T}{\underbrace{{\normalcolor \begin{pmatrix}\gamma\cos\theta & 0 & -\gamma\sin\theta & -\gamma\beta\\
-0 & 1 & 0 & 0\\
-\sin\theta & 0 & \cos\theta & 0\\
--\gamma\beta\cos\theta & 0 & \gamma\beta\sin\theta & \gamma
-\end{pmatrix}}}}}\begin{pmatrix}x\\
-y\\
-z\\
-ct
-\end{pmatrix}=\begin{pmatrix}\gamma\left(x\cos\theta-z\sin\theta\right)-\gamma\beta ct\\
-y\\
-x\sin\theta+z\cos\theta\\
-\gamma\beta\left(-x\cos\theta+z\sin\theta\right)+\gamma ct
-\end{pmatrix}
-\]
-
-\end_inset
-
-And the inverse:
-\begin_inset Formula 
-\begin{align*}
-R^{-1} & =\begin{pmatrix}\cos\theta & 0 & \sin\theta & 0\\
-0 & 1 & 0 & 0\\
--\sin\theta & 0 & \cos\theta & 0\\
-0 & 0 & 0 & 1
-\end{pmatrix}\\
-L^{-1} & =\begin{pmatrix}\gamma & 0 & 0 & \gamma\beta\\
-0 & 1 & 0 & 0\\
-0 & 0 & 1 & 0\\
-\gamma\beta & 0 & 0 & 1
-\end{pmatrix}
-\end{align*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-T^{-1}=\left(R^{-1}L^{-1}\right)=\begin{pmatrix}\cos\theta & 0 & \sin\theta & 0\\
-0 & 1 & 0 & 0\\
--\sin\theta & 0 & \cos\theta & 0\\
-0 & 0 & 0 & 1
-\end{pmatrix}\begin{pmatrix}\gamma & 0 & 0 & \gamma\beta\\
-0 & 1 & 0 & 0\\
-0 & 0 & 1 & 0\\
-\gamma\beta & 0 & 0 & 1
-\end{pmatrix}=\begin{pmatrix}\gamma\cos\theta & 0 & \sin\theta & \gamma\beta\cos\theta\\
-0 & 1 & 0 & 0\\
--\gamma\sin\theta & 0 & \cos\theta & -\gamma\beta\sin\theta\\
-\gamma\beta & 0 & 0 & \gamma
-\end{pmatrix}
-\]
-
-\end_inset
-
-And so:
-\begin_inset Formula 
-\[
-\begin{pmatrix}y\\
-z\\
-x\\
-ct
-\end{pmatrix}=\begin{pmatrix}\gamma x^{\prime}\cos\theta+z^{\prime}\sin\theta+\gamma\beta ct^{\prime}\cos\theta\\
-y\\
--\gamma x^{\prime}\sin\theta+z^{\prime}\cos\theta-\gamma\beta ct^{\prime}\sin\theta\\
-\gamma\beta x^{\prime}+\gamma ct^{\prime}
-\end{pmatrix}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
+\color inherit
+ we found there is a moving reference frame where the laser intensity is
+ composed of one standing wave and two constant terms.
+ let us approach the problem from this reference frame.
 \end_layout
 
 \begin_layout Standard
-denote with 
+Since this frame is moving with respect to some tilted axis (the cavity
+ is tilted, according to 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sec:alpha_cavity_derivation"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+), transforming the coordinates to this reference frame involve both rotation
+ and Lorentz transform.
+\end_layout
+
+\begin_layout Standard
+Let us denote with 
+\begin_inset Formula $r$
+\end_inset
+
+ the coordinates in the microscope's frame, with 
 \begin_inset Formula $\tilde{r}$
 \end_inset
 
@@ -3885,7 +5169,22 @@ denote with
 \begin_inset Formula $r^{\prime}$
 \end_inset
 
- the coordinates in the rotated and then moving frame:
+ the coordinates in the rotated and moving frame.
+ 
+\begin_inset Formula $\beta$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ are the velocity and Lorentz factor of the moving frame.
+ later the velocity and the lorentz factor of the electron will be denoted
+ as 
+\begin_inset Formula $\beta_{e},\gamma_{e}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3934,12 +5233,12 @@ c\tilde{t}
 
 And in total:
 \begin_inset Formula 
-\[
+\begin{align*}
 \begin{pmatrix}x^{\prime}\\
 y^{\prime}\\
 z^{\prime}\\
 ct^{\prime}
-\end{pmatrix}={\color{gray}\underset{R}{\underbrace{{\normalcolor \begin{pmatrix}\gamma & 0 & 0 & -\gamma\beta\\
+\end{pmatrix} & ={\color{gray}\underset{R}{\underbrace{{\normalcolor \begin{pmatrix}\gamma & 0 & 0 & -\gamma\beta\\
 0 & 1 & 0 & 0\\
 0 & 0 & 1 & 0\\
 -\gamma\beta & 0 & 0 & 1
@@ -3959,12 +5258,13 @@ ct
 y\\
 z\\
 ct
-\end{pmatrix}=\begin{pmatrix}\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\\
+\end{pmatrix}=\\
+ & =\begin{pmatrix}\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\\
 y\\
 -\sin\alpha x+\cos\alpha z\\
 -\gamma\beta\left(x\cos\alpha+z\sin\alpha\right)+\gamma ct
 \end{pmatrix}
-\]
+\end{align*}
 
 \end_inset
 
@@ -4032,7 +5332,7 @@ y\\
 \end_layout
 
 \begin_layout Subsection
-Applying the transformation on the wave function
+Describing the wave function and the laser field in the moving frame
 \end_layout
 
 \begin_layout Standard
@@ -4269,7 +5569,7 @@ red
 :
 \begin_inset Formula 
 \[
-E_{\text{laser,lattic'es frame, ring cavity}}\left(x^{\prime},y^{\prime},z^{\prime},t^{\prime}\right)={\color{teal}E_{0,\text{envelope}}\left(\gamma x^{\prime}+\gamma\beta ct^{\prime},y^{\prime},z^{\prime}\right)}\cdot\left[2e^{i\omega t}\cos\left(\varphi\left(x^{\prime}\right)\right)+\right]
+E_{\text{laser,lattic'es frame, ring cavity}}\left(x^{\prime},y^{\prime},z^{\prime},t^{\prime}\right)={\color{teal}E_{0,\text{envelope}}\left(\gamma x^{\prime}+\gamma\beta ct^{\prime},y^{\prime},z^{\prime}\right)}\cdot2e^{i\omega t}\cos\left(\varphi\left(x^{\prime}\right)\right)
 \]
 
 \end_inset
@@ -4449,6 +5749,123 @@ red
 
 \end_layout
 
+\begin_layout Subsection
+Calculating the interaction between the electron and the laser intensity
+\end_layout
+
+\begin_layout Standard
+We saw in equations 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ponderomotive_integral_final_result_standing_wave"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ and 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ponderomotive_integral_final_result_moving_wave"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ how the different intensity factors contribute to the phase of the electron.
+\end_layout
+
+\begin_layout Standard
+to implement those calculations here, we want to first find the velocity
+ of the electron in the moving frame.
+\end_layout
+
+\begin_layout Standard
+What are 
+\begin_inset Formula $\beta_{e}^{\prime},\gamma_{e}^{\prime}$
+\end_inset
+
+ in the moving frame?
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+{\color{gray}\underset{\text{Lab's frame}}{\underbrace{{\normalcolor \beta_{e}\hat{z}}}}}\xrightarrow[\text{rotate by }\alpha\text{ in }xy\text{ plane}]{}{\color{gray}\underset{\text{rotated frame}}{\underbrace{{\normalcolor \beta_{e}\hat{z}\cos\alpha-\beta_{e}\sin\alpha\hat{x}}}}}\xrightarrow[\text{lorentz transform in }\hat{x}]{}\frac{\frac{1}{\gamma_{c}}\beta_{e}\cos\alpha}{1-\beta_{e}\sin\alpha\cdot\beta_{c}}\hat{z}+\frac{-\beta_{e}\sin\alpha+\beta_{c}}{1-\beta_{e}\sin\alpha\cdot\beta_{c}}\hat{x}
+\]
+
+\end_inset
+
+If we choose now to set 
+\begin_inset Formula $-\beta_{e}\sin\alpha+\beta_{c}=0\iff\alpha=\sin^{-1}\left(\frac{\beta_{c}}{\beta_{e}}\right)$
+\end_inset
+
+, then the electron will not move in the horizontal axis, and it's trajectory
+ will be 
+\begin_inset Formula $\boldsymbol{r}^{\prime}\left(t\right)=\begin{pmatrix}x_{0}^{\prime}\\
+y_{0}^{\prime}\\
+z_{0}^{\prime}+\beta_{e}^{\prime}ct^{\prime}
+\end{pmatrix}$
+\end_inset
+
+, which is assumed in the derivation of the interaction in section 
+\bar under
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sec:Review-of-Osip's"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
+, and in particular in equation 
+\bar under
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "eq:ponderomotive_integral_final_result_standing_wave"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
+.
+ under this choice of 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ we can write: 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{v}_{e}^{\prime}=\beta_{e}^{\prime}\hat{z}=\frac{\frac{1}{\gamma_{c}}\beta_{e}\cos\alpha}{1-\beta_{e}\sin\alpha\cdot\beta_{c}}\hat{z}\label{eq:beta_e_moving_frame}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 In the paper 
 \bar under
@@ -4489,9 +5906,9 @@ red
  in the paper) and so we get:
 \begin_inset Formula 
 \begin{align}
-\phi_{0}\left(x^{\prime}=\frac{x_{0}}{\cos\alpha},y^{\prime}=y_{0}\right) & =\frac{e^{2}}{4mc\beta\gamma\hbar}\cdot\intop A_{0}^{2}\left(y,z\right)dz\nonumber \\
- & =\intop{\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}}dz\nonumber \\
- & \stackrel{{\color{blue}\eqref{eq:gaussian_beam_potential_total_phase}}}{=}\frac{e^{2}}{\hbar4mc\beta_{e}\gamma_{e}\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{w_{0}^{2}E_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}e^{-\frac{2y_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}\label{eq:phi_0_first_time}
+\phi_{0}\left(x^{\prime}=\frac{x_{0}}{\cos\alpha},y^{\prime}=y_{0}\right) & =\frac{e^{2}}{4mc\beta_{e}^{\prime}\gamma_{e}^{\prime}\hbar}\cdot\intop A_{0}^{2}\left(y,z\right)dz\nonumber \\
+ & =\frac{e^{2}}{4mc\beta_{e}^{\prime}\gamma_{e}^{\prime}\hbar}\cdot\intop{\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}}dz\nonumber \\
+ & \stackrel{{\color{blue}\eqref{eq:gaussian_beam_potential_total_phase}}}{=}\frac{e^{2}}{\hbar4mc\beta_{e}^{\prime}\gamma_{e}^{\prime}\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{w_{0}^{2}E_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}e^{-\frac{2y_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}\label{eq:phi_0_first_time}
 \end{align}
 
 \end_inset
@@ -4519,7 +5936,7 @@ noprefix "false"
 \end_inset
 
  term will end up as 
-\begin_inset Formula ${\color{green}2+2\rho\left(\theta,\beta\right)\cos\left(2kx^{\prime}\right)}$
+\begin_inset Formula ${\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}$
 \end_inset
 
  but from equation
@@ -4540,7 +5957,16 @@ noprefix "false"
 \begin_inset Formula ${\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}$
 \end_inset
 
-.
+:
+\begin_inset Formula 
+\begin{align*}
+\phi\left(x_{0},y_{0}\right) & ={\color{gray}\overset{\text{Do not appear in a ring cavity}}{\overbrace{{\normalcolor \phi_{{\color{red}\text{red term}}}\left(x_{0},y_{0}\right)+\phi_{{\color{blue}\text{blue term}}}\left(x_{0},y_{0}\right)}}}}+\phi_{{\color{green}\text{green term}}}\left(x_{0},y_{0}\right)\\
+ & =\phi_{0}\left(x_{0},y_{0}\right)\cdot\left[{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}\right]
+\end{align*}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Remark
@@ -4550,6 +5976,7 @@ I was searching for some time where did we use the smart choice of the cavity
 \end_inset
 
 , that appears in 
+\bar under
 \color blue
 
 \begin_inset CommandInset ref
@@ -4562,6 +5989,7 @@ noprefix "false"
 \end_inset
 
 
+\bar default
 \color inherit
 .
  The answer is here on the last equation 
@@ -4624,6 +6052,7 @@ pencil
 \end_inset
 
 ), and using the derivation from 
+\bar under
 \color blue
 
 \begin_inset CommandInset ref
@@ -4636,6 +6065,7 @@ noprefix "false"
 \end_inset
 
 
+\bar default
 \color inherit
 , we see that a single packet of electron that moved in the 
 \begin_inset Formula $z$
@@ -4675,7 +6105,7 @@ noprefix "false"
 y^{\prime}\\
 \gamma x^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
 \gamma\beta x^{\prime}+\gamma ct^{\prime}
-\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\theta},y_{0}\right)\left({\color{green}2+2\rho\left(\theta,\beta\right)\cos\left(2kx^{\prime}\right)}+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}}}}}\right)}
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\theta},y_{0}\right)\left({\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}}}}}\right)}
 \]
 
 \end_inset
@@ -4706,17 +6136,18 @@ x^{\prime}\rightarrow\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\R
 
 And so after transforming back to the lab's frame the phase will be:
 \begin_inset Formula 
-\[
-{\color{gray}\underset{\text{Lattice's frame}}{\underbrace{{\normalcolor \gamma\psi_{x_{0},y_{0}}\begin{pmatrix}\gamma x^{\prime}\cos\alpha-z^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\cos\alpha\\
+\begin{align*}
+{\normalcolor {\color{gray}\overset{\text{Lattice's frame}}{\overbrace{{\normalcolor \gamma\psi_{x_{0},y_{0}}\begin{pmatrix}\gamma x^{\prime}\cos\alpha-z^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\cos\alpha\\
 y^{\prime}\\
 \gamma x^{\prime}\sin\alpha+z^{\prime}\cos\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
 \gamma\beta x^{\prime}+\gamma ct^{\prime}
-\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+2\cos\left(2\varphi\left(x^{\prime}\right)\right)+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}}}}{\color{gray}\underset{T}{\underbrace{{\normalcolor \rightarrow}}}}{\color{gray}\underset{\text{Lab's frame}}{\underbrace{{\normalcolor \psi_{x_{0},y_{0}}\begin{pmatrix}x\\
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left({\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}\right)}}}}}} & \xrightarrow[\text{Lorentz transform and rotation}]{}\\
+{\color{gray}\underset{\text{Lab's frame}}{\underbrace{{\normalcolor \psi_{x_{0},y_{0}}\begin{pmatrix}x\\
 y\\
 z\\
 t
-\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+2\rho\left(\theta,\beta\right)\cos\left(2k\left(\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\right)\right)+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}}}}
-\]
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left({\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2k\left(\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\right)\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}\right)}}}}}
+\end{align*}
 
 \end_inset
 
@@ -4735,7 +6166,7 @@ Approximating again the wave function to be non-zero only at around
 y\\
 z\\
 t
-\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+2\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor \left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}\right)}\label{eq:analytical cavity effect - total modulation}
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor \left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}\right)}\label{eq:analytical cavity effect - total modulation}
 \end{equation}
 
 \end_inset
@@ -4743,7 +6174,7 @@ t
 And the middle band will be:
 \begin_inset Formula 
 \[
-e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+\text{Const}\right)}={\color{gray}\underset{\text{No t dependance}}{\underbrace{{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}}}}\cdot{\color{teal}e^{i\rho\left(\theta,\beta\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2\sin\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{2\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)\right)}}=
+e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+\text{Const}\right)}={\color{gray}\underset{\text{No t dependance}}{\underbrace{{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}}}}\cdot{\color{teal}e^{i\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2\sin\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{2\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)\right)}}=
 \]
 
 \end_inset
@@ -4759,7 +6190,7 @@ e^{i\left[{\color{brown}A_{0}}+{\color{teal}A\sin\left(\omega t\right)}\right]}=
 We get:
 \begin_inset Formula 
 \[
-={\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}\sum_{q=-\infty}^{\infty}J_{q}\left(\rho\left(\theta,\beta\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)e^{iq\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{4\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)}}\Rightarrow
+={\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}\sum_{q=-\infty}^{\infty}J_{q}\left(\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)e^{iq\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{4\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)}}\Rightarrow
 \]
 
 \end_inset
@@ -4779,7 +6210,27 @@ t
 y\\
 z\\
 t
-\end{pmatrix}\cdot{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}\cdot{\color{teal}J_{0}\left(\rho\left(\theta,\beta\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\label{eq:e_35}
+\end{pmatrix}\cdot{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}J_{0}\left(\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_35}\label{eq:e_35}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And for a ring cavity:
+\begin_inset Formula 
+\begin{equation}
+\psi_{x_{0},y_{0}}\begin{pmatrix}x\\
+y\\
+z\\
+t
+\end{pmatrix}\xrightarrow{\text{Passing through the cavity}}\psi_{x_{0},y_{0}}\begin{pmatrix}x\\
+y\\
+z\\
+t
+\end{pmatrix}\cdot{\color{brown}e^{i2\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)}}\cdot{\color{teal}J_{0}\left(\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_36}\label{eq:e_38}
 \end{equation}
 
 \end_inset
@@ -5064,7 +6515,7 @@ In the next figure we can see that for the electron to experience a constant
 
 \end_inset
 
-:
+
 \end_layout
 
 \begin_layout Standard
@@ -5640,14 +7091,14 @@ Given this, we know
 
  should be around:
 \begin_inset Formula 
-\[
-dz<\frac{\lambda}{1+\frac{1}{\beta}}
-\]
+\begin{equation}
+dz<\lambda_{\text{eff}}<\frac{\lambda}{1+\frac{1}{\beta}}\tag{e\_40}\label{eq:e_40}
+\end{equation}
 
 \end_inset
 
 in practice, playing with it, I found that 
-\begin_inset Formula $dz=\frac{\lambda}{\left(1+\frac{1}{\beta}\right)}$
+\begin_inset Formula $dz=\frac{\lambda}{3\left(1+\frac{1}{\beta}\right)}$
 \end_inset
 
  is enough, and smaller 
@@ -5754,21 +7205,11 @@ G\left(z+dz,t\left(z\right)\right) & =\intop_{-\infty}^{z+dz}A_{z}\left(Z,t\left
 
 And the derivative is:
 \begin_inset Formula 
-\begin{align*}
-\frac{\partial G}{\partial z} & =\lim_{dz\rightarrow0}\left[\frac{G\left(z,t\left(z\right)-\frac{dz}{\beta c}\right)+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\cdot dz-G\left(z,t\left(z\right)\right)}{dz}\right]\\
- & =\lim_{dz\rightarrow0}\left[\frac{G\left(z,t\left(z\right)-\frac{dz}{\beta c}\right)-G\left(z,t\left(z\right)\right)}{dz}\right]+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\\
- & =-\frac{1}{\beta c}\frac{\partial G}{\partial t}+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)
-\end{align*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{align*}
-\lim_{dz\rightarrow0}\left[\frac{G\left(z+dz,t\right)-G\left(z,t\right)}{dz}\right] & =\lim_{dz\rightarrow0}\frac{1}{dz}\left[\intop_{-\infty}^{t}A_{z}\left(z+dz-\beta c\left(t-T\right),T\right)dT-\intop_{-\infty}^{t}A_{z}\left(z-\beta c\left(t-T\right),T\right)dT\right]\\
- & =\intop_{-\infty}^{t}\left[\lim_{dz\rightarrow0}\frac{A_{z}\left(z+dz-\beta c\left(t-T\right),T\right)-A_{z}\left(z+dz-\beta c\left(t-T\right),T\right)}{dz}\right]dT\\
- & =\lim_{dz\rightarrow0}\intop_{-\infty}^{t}\frac{\partial A\left(z-\beta c\left(t-T\right),T\right)}{\partial z}dT
-\end{align*}
+\begin{align}
+\frac{\partial G}{\partial z} & =\lim_{dz\rightarrow0}\left[\frac{G\left(z,t\left(z\right)-\frac{dz}{\beta c}\right)+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\cdot dz-G\left(z,t\left(z\right)\right)}{dz}\right]\nonumber \\
+ & =\lim_{dz\rightarrow0}\left[\frac{G\left(z,t\left(z\right)-\frac{dz}{\beta c}\right)-G\left(z,t\left(z\right)\right)}{dz}\right]+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\nonumber \\
+\frac{\partial G}{\partial z} & =-\frac{1}{\beta c}\frac{\partial G}{\partial t}+A_{z}\left(z,\left(t\left(z\right)-\frac{dz}{\beta c}\right)\right)\label{eq:e_39}
+\end{align}
 
 \end_inset
 
@@ -6119,7 +7560,7 @@ will result in a skewed
  like so:
 \begin_inset Formula 
 \[
-\begin{array}{c|ccccc}
+A\left(Z,T^{\prime}\right)=\begin{array}{c|ccccc}
  & t_{0}+\frac{Z}{\beta c} & t_{{\color{brown}1}}+\frac{Z}{\beta c} & t_{{\color{red}2}}+\frac{Z}{\beta c} & t_{3}+\frac{Z}{\beta c} & t_{4}+\frac{Z}{\beta c}\\
 \hline z_{0} & A_{00} & {\color{green}A_{0{\color{brown}1}}} & {\color{blue}A_{0{\color{red}2}}} & A_{03}\\
 z_{1} & A_{11} & {\color{green}A_{12}} & {\color{blue}A_{13}} & A_{14}\\
@@ -6141,7 +7582,7 @@ And now the value of
  can be achieved by simply taking the cumulative integral:
 \begin_inset Formula 
 \[
-G=\texttt{np.cumsum(A(Z,T'),axis=0)}\begin{array}{c|ccccc}
+G=\texttt{np.cumsum(A(Z,T'),axis=0)}=\begin{array}{c|ccccc}
  & t_{0}+\frac{Z}{\beta c} & t_{1}+\frac{Z}{\beta c} & t_{2}+\frac{Z}{\beta c} & t_{3}+\frac{Z}{\beta c} & t_{4}+\frac{Z}{\beta c}\\
 \hline z_{0} & G_{00} & G_{01} & G_{02} & G_{03}\\
 z_{1} & G_{11} & G_{12} & G_{13} & G_{14}\\
@@ -6171,6 +7612,652 @@ np.cumsum
 .
 \end_layout
 
+\begin_layout Subsubsection
+Shift and scale of the 
+\begin_inset Formula $z$
+\end_inset
+
+ axis along which we integrate:
+\end_layout
+
+\begin_layout Standard
+Since the laser has a gaussian intensity profile, we wish to integrate mostly
+ around the center of the intensity.
+ Since the width of the intensity varies for different 
+\begin_inset Formula $x$
+\end_inset
+
+ values, we wish to adjust the interval 
+\begin_inset Formula $\left[z_{\min},z_{\max}\right]$
+\end_inset
+
+ for different 
+\begin_inset Formula $x$
+\end_inset
+
+ values.
+\end_layout
+
+\begin_layout Standard
+Additionaly, we want to shift is to always be centered around the center
+ of the spot, which is not always at 
+\begin_inset Formula $z=0$
+\end_inset
+
+, since the cavity is tilted.
+\end_layout
+
+\begin_layout Standard
+The intensity width goes like 
+\begin_inset Formula $w\left(x\right)$
+\end_inset
+
+ in the cavity's axis, and therefore in the lab's axis (with respect to
+ which the cavity's axes are rotated by an angle 
+\begin_inset Formula $\alpha$
+\end_inset
+
+), the width will be approximately 
+\begin_inset Formula $\frac{w\left(x\right)}{\cos\left(\alpha\right)}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If we wish to integrate along 
+\begin_inset Formula $\pm5\sigma$
+\end_inset
+
+ of the intensity, then we get in total that the formula is (and a drawing
+ to emphasize it right afterwards):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left[z_{\min},z_{\max}\right]\left(x_{\text{lab}}\right)=\left[{\color{brown}z_{\text{center}}\left(x\right)}-{\color{teal}5w_{\text{lab}}\left(x\right)},{\color{brown}z_{\text{center}}\left(x\right)}+{\color{teal}5w_{\text{lab}}\left(x\right)}\right]=\left[{\color{brown}x\tan\left(\alpha\right)}-{\color{teal}5\frac{w\left(\frac{x}{\cos\alpha}\right)}{\cos\alpha}},{\color{brown}x\tan\left(\alpha\right)}+{\color{teal}5\frac{w\left(\frac{x}{\cos\alpha}\right)}{\cos\alpha}}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Those claculation take part in 
+\family typewriter
+CavityNumericalPropagator.generate_z_vector
+\family default
+ and
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+CavityNumericalPropagator
+\family default
+.
+\family typewriter
+generate_coordinates_lattice
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+tikzset{every picture/.style={line width=0.75pt}} %set default line width
+ to 0.75pt        
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1,xscale=1]
+\end_layout
+
+\begin_layout Plain Layout
+
+%uncomment if require: 
+\backslash
+path (0,1283); %set diagram left start at 0, and has height of 1283
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Arc [id:dp4706962850885832] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw  [draw opacity=0] (88.95,1016.06) ..
+ controls (93.43,977.8) and (106.16,939.89) ..
+ (127.79,904.98) ..
+ controls (147.94,872.44) and (173.86,845.64) ..
+ (203.41,825.11) -- (358.33,1047.76) -- cycle ; 
+\backslash
+draw  [color={rgb, 255:red, 80; green, 110; blue, 146 }  ,draw opacity=0.65
+ ] (88.95,1016.06) ..
+ controls (93.43,977.8) and (106.16,939.89) ..
+ (127.79,904.98) ..
+ controls (147.94,872.44) and (173.86,845.64) ..
+ (203.41,825.11) ;  
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Arc [id:dp7511853212311856] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw  [draw opacity=0] (488.94,1265.46) ..
+ controls (521.19,1244.4) and (549.46,1216.11) ..
+ (571.08,1181.19) ..
+ controls (591.23,1148.65) and (603.67,1113.51) ..
+ (608.89,1077.9) -- (340.53,1038.42) -- cycle ; 
+\backslash
+draw  [color={rgb, 255:red, 80; green, 110; blue, 146 }  ,draw opacity=0.65
+ ] (488.94,1265.46) ..
+ controls (521.19,1244.4) and (549.46,1216.11) ..
+ (571.08,1181.19) ..
+ controls (591.23,1148.65) and (603.67,1113.51) ..
+ (608.89,1077.9) ;  
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Arc [id:dp486517813017733] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw  [draw opacity=0] (605.19,1100.01) ..
+ controls (526.89,1083.07) and (450.1,1052.69) ..
+ (378.1,1008.1) ..
+ controls (302.67,961.38) and (238.85,903.01) ..
+ (187.54,836.75) -- (757.72,395.11) -- cycle ; 
+\backslash
+draw  [color={rgb, 255:red, 212; green, 109; blue, 121 }  ,draw opacity=1
+ ] (605.19,1100.01) ..
+ controls (526.89,1083.07) and (450.1,1052.69) ..
+ (378.1,1008.1) ..
+ controls (302.67,961.38) and (238.85,903.01) ..
+ (187.54,836.75) ;  
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Arc [id:dp6153354127841617] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw  [draw opacity=0] (515.91,1246.91) ..
+ controls (465.85,1184.36) and (404.44,1129.15) ..
+ (332.44,1084.56) ..
+ controls (257,1037.85) and (176.31,1006.73) ..
+ (94.13,990.32) -- (-47.19,1697.55) -- cycle ; 
+\backslash
+draw  [color={rgb, 255:red, 212; green, 109; blue, 121 }  ,draw opacity=1
+ ] (515.91,1246.91) ..
+ controls (465.85,1184.36) and (404.44,1129.15) ..
+ (332.44,1084.56) ..
+ controls (257,1037.85) and (176.31,1006.73) ..
+ (94.13,990.32) ;  
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+%Straight Lines [id:da4665721156143676] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw [color={rgb, 255:red, 56; green, 154; blue, 119 }  ,draw opacity=1
+ ]   (335.88,957.28) -- (335.88,1112.4) ;
+\end_layout
+
+\begin_layout Plain Layout
+
+%Straight Lines [id:da8884817206656099] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw [color={rgb, 255:red, 56; green, 154; blue, 119 }  ,draw opacity=1
+ ]   (253.2,870) -- (253.2,1093.73) ;
+\end_layout
+
+\begin_layout Plain Layout
+
+%Curve Lines [id:da1005169813179072] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw [color={rgb, 255:red, 128; green, 128; blue, 128 }  ,draw opacity=1
+ ]   (245.31,1093.48) ..
+ controls (220.05,1093.17) and (205.59,1010.64) ..
+ (222.16,988.5) ..
+ controls (222.16,988.5) and (206.03,975.36) ..
+ (206.03,975.36) ..
+ controls (206.03,975.36) and (222.47,963.8) ..
+ (222.47,963.8) ..
+ controls (206.46,940.07) and (223.63,869.7) ..
+ (248.08,870) ;
+\end_layout
+
+\begin_layout Plain Layout
+
+%Curve Lines [id:da9797867537049694] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw [color={rgb, 255:red, 128; green, 128; blue, 128 }  ,draw opacity=1
+ ]   (341.23,1110.35) ..
+ controls (358.44,1110.14) and (368.29,1053.92) ..
+ (357,1038.83) ..
+ controls (357,1038.83) and (367.99,1029.88) ..
+ (367.99,1029.88) ..
+ controls (367.99,1029.88) and (356.79,1022) ..
+ (356.79,1022) ..
+ controls (367.69,1005.84) and (355.99,957.9) ..
+ (339.34,958.1) ;
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Ellipse [id:dp2850907647879364] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw (333.97,1036.11) node(x){}  [color={rgb, 255:red, 65; green, 117; blue,
+ 5 }  ,draw opacity=1 ][fill={rgb, 255:red, 65; green, 117; blue, 5 }  ,fill
+ opacity=1 ] (333.97,1036.11) ..
+ controls (333.97,1034.67) and (335.14,1033.5) ..
+ (336.58,1033.5) ..
+ controls (338.02,1033.5) and (339.19,1034.67) ..
+ (339.19,1036.11) ..
+ controls (339.19,1037.55) and (338.02,1038.71) ..
+ (336.58,1038.71) ..
+ controls (335.14,1038.71) and (333.97,1037.55) ..
+ (333.97,1036.11) -- cycle ;
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Ellipse [id:dp8806257636025729] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw [color={rgb, 255:red, 65; green, 117; blue, 5 }  ,draw opacity=1 ][fill={rg
+b, 255:red, 65; green, 117; blue, 5 }  ,fill opacity=1 ] (251.37,984.97) ..
+ controls (251.37,983.61) and (252.48,982.5) ..
+ (253.85,982.5) ..
+ controls (255.21,982.5) and (256.32,983.61) ..
+ (256.32,984.97) ..
+ controls (256.32,986.34) and (255.21,987.44) ..
+ (253.85,987.44) ..
+ controls (252.48,987.44) and (251.37,986.34) ..
+ (251.37,984.97) -- cycle ;
+\end_layout
+
+\begin_layout Plain Layout
+
+%Straight Lines [id:da19191212610614783] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw [color={rgb, 255:red, 0; green, 0; blue, 0 }  ,draw opacity=0.19 ] 
+  (127.41,905.4) -- (251.85,982.97) -- (336.27,1035.6) -- (570.99,1181.94) ;
+\end_layout
+
+\begin_layout Plain Layout
+
+%Straight Lines [id:da4608470972960743] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw [color={rgb, 255:red, 0; green, 0; blue, 0 }  ,draw opacity=0.19 ] 
+  (x.east) -- +(0:5cm) ;  % (x.east) + (100,0)(664,1082)
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Arc [id:dp28653026255979386] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw  [draw opacity=0] (457.37,1082.39) ..
+ controls (457.29,1090.61) and (454.73,1098.27) ..
+ (450.37,1104.7) -- (414.01,1082) -- cycle ;
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw  [color={rgb, 255:red, 0; green, 0; blue, 0 }  ,draw opacity=0.19 ]
+ (380,1036.83) ..
+ controls (379.92,1045.06) and (377.36,1052.71) ..
+ (373,1059.14) ;  
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Rectangle [id:dp620931617323325] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw   (406.33,805.94) -- (642.58,805.94) -- (642.58,940.94) -- (406.33,940.94)
+ -- cycle ;
+\end_layout
+
+\begin_layout Plain Layout
+
+%Straight Lines [id:da5446122042604924] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw [color={rgb, 255:red, 56; green, 154; blue, 119 }  ,draw opacity=1
+ ]   (419,825.28) -- (419,853.28) ;
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Arc [id:dp18666544293171095] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw  [draw opacity=0] (425.94,889.51) ..
+ controls (418.8,886.67) and (413,881.17) ..
+ (409.78,874.23) -- (437,861.61) -- cycle ; 
+\backslash
+draw  [color={rgb, 255:red, 212; green, 109; blue, 121 }  ,draw opacity=1
+ ] (425.94,889.51) ..
+ controls (418.8,886.67) and (413,881.17) ..
+ (409.78,874.23) ;  
+\end_layout
+
+\begin_layout Plain Layout
+
+%Shape: Arc [id:dp7033357697936864] 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw  [draw opacity=0] (410.44,927.22) ..
+ controls (413.27,920.07) and (418.77,914.28) ..
+ (425.71,911.05) -- (438.33,938.28) -- cycle ; 
+\backslash
+draw  [color={rgb, 255:red, 80; green, 110; blue, 146 }  ,draw opacity=0.65
+ ] (410.44,927.22) ..
+ controls (413.27,920.07) and (418.77,914.28) ..
+ (425.71,911.05) ;  
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+% Text Node
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw (435.33,820.28) node [anchor=north west][inner sep=0.75pt]  [xscale=1,yscale=1
+] [align=left] {curves along which we do
+\backslash
+
+\backslash
+the integration};
+\end_layout
+
+\begin_layout Plain Layout
+
+% Text Node
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw (434.67,879.61) node [anchor=north west][inner sep=0.75pt]  [xscale=1,yscale=1
+] [align=left] {Laser intensity profile};
+\end_layout
+
+\begin_layout Plain Layout
+
+% Text Node
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw (434.67,913.28) node [anchor=north west][inner sep=0.75pt]  [xscale=1,yscale=1
+] [align=left] {Mirrors};
+\end_layout
+
+\begin_layout Plain Layout
+
+% Text Node
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw (370.98,1015) node [anchor=north west][inner sep=0.75pt]  [font=
+\backslash
+normalsize,xscale=1,yscale=1]  {$
+\backslash
+frac{10
+\backslash
+cdot w(
+\backslash
+frac{x_{1}}{
+\backslash
+cos
+\backslash
+alpha})}{
+\backslash
+cos( 
+\backslash
+alpha )}$};
+\end_layout
+
+\begin_layout Plain Layout
+
+% Text Node
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw (261.84,975.92) node [anchor=north west][inner sep=0.75pt]  [font=
+\backslash
+normalsize,xscale=1,yscale=1]  {$x_{2}
+\backslash
+tan
+\backslash
+left(
+\backslash
+alpha
+\backslash
+right)$};
+\end_layout
+
+\begin_layout Plain Layout
+
+% Text Node
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw (273,1025.71) node [anchor=north west][inner sep=0.75pt]  [font=
+\backslash
+normalsize,xscale=1,yscale=1]  {$x_{1}
+\backslash
+tan
+\backslash
+left(
+\backslash
+alpha
+\backslash
+right)$};
+\end_layout
+
+\begin_layout Plain Layout
+
+% Text Node
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw (x)+(10:0.7cm) node [anchor=north west][inner sep=0.75pt]  [font=
+\backslash
+normalsize,xscale=1,yscale=1]  {$
+\backslash
+alpha $};
+\end_layout
+
+\begin_layout Plain Layout
+
+% Text Node
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw (150,960) node [anchor=north west][inner sep=0.75pt]  [font=
+\backslash
+normalsize,xscale=1,yscale=1]  {$
+\backslash
+frac{10
+\backslash
+cdot w(
+\backslash
+frac{x_{2}}{
+\backslash
+cos
+\backslash
+alpha})}{
+\backslash
+cos( 
+\backslash
+alpha )}$};
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{tikzpicture}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Calculating the zero'th energy amplitude with just 3 points in time:
 \begin_inset CommandInset label
@@ -6189,7 +8276,7 @@ We have a phase of the form:
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\phi\left(x,y,t\right)=\phi_{0}\left(x,y\right)+A\left(x,y\right)\cdot\sin\left(\Delta\omega+\varphi\left(x,y\right)\right)
+\phi\left(x,y,t\right)=\phi_{\text{const}}\left(x,y\right)+C\left(x,y\right)\cdot\sin\left(\Delta\omega+\varphi\left(x,y\right)\right)
 \]
 
 \end_inset
@@ -6206,7 +8293,7 @@ Since
  separately, then we can omit them for abbreviation: 
 \begin_inset Formula 
 \[
-\phi\left(t\right)=\phi_{0}+A\cdot\sin\left(\Delta\omega+\varphi\right)
+\phi\left(t\right)=\phi_{\text{const}}+C\cdot\sin\left(\Delta\omega+\varphi\right)
 \]
 
 \end_inset
@@ -6224,9 +8311,9 @@ t_{2} & =\frac{\pi}{\Delta\omega}
 So that:
 \begin_inset Formula 
 \begin{alignat*}{2}
-\phi\left(t_{0}\right) & =\phi_{0}+A\sin\left(0+\varphi\right) & =\phi_{0}+A\sin\left(\varphi\right)\\
-\phi\left(t_{1}\right) & =\phi_{0}+A\sin\left(\frac{\pi}{2\cancel{\Delta\omega}}\cancel{\Delta\omega}+\varphi\right) & =\phi_{0}+A\cos\left(\varphi\right)\\
-\phi\left(t_{2}\right) & =\phi_{0}+A\sin\left(\frac{\pi}{\cancel{\Delta\omega}}\cancel{\Delta\omega}+\varphi\right) & =\phi_{0}-A\sin\left(\varphi\right)
+\phi\left(t_{0}\right) & =\phi_{\text{const}}+C\sin\left(0+\varphi\right) & =\phi_{\text{const}}+C\sin\left(\varphi\right)\\
+\phi\left(t_{1}\right) & =\phi_{\text{const}}+C\sin\left(\frac{\pi}{2\cancel{\Delta\omega}}\cancel{\Delta\omega}+\varphi\right) & =\phi_{\text{const}}+C\cos\left(\varphi\right)\\
+\phi\left(t_{2}\right) & =\phi_{\text{const}}+C\sin\left(\frac{\pi}{\cancel{\Delta\omega}}\cancel{\Delta\omega}+\varphi\right) & =\phi_{\text{const}}-C\sin\left(\varphi\right)
 \end{alignat*}
 
 \end_inset
@@ -6237,8 +8324,8 @@ So that:
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-\phi\left(t_{0}\right) & =\phi_{0}+\cancel{A\sin\left(\varphi\right)}\\
-\phi\left(t_{2}\right) & =\phi_{0}-\cancel{A\sin\left(\varphi\right)}{\color{gray}\ \backslash+}
+\phi\left(t_{0}\right) & =\phi_{\text{const}}+\cancel{C\sin\left(\varphi\right)}\\
+\phi\left(t_{2}\right) & =\phi_{\text{const}}-\cancel{C\sin\left(\varphi\right)}{\color{gray}\ \backslash+}
 \end{align*}
 
 \end_inset
@@ -6246,7 +8333,7 @@ So that:
 
 \begin_inset Formula 
 \[
-\boxed{\phi_{0}=\frac{\phi\left(t_{0}\right)+\phi\left(t_{2}\right)}{2}}
+\boxed{\phi_{\text{const}}=\frac{\phi\left(t_{0}\right)+\phi\left(t_{2}\right)}{2}}
 \]
 
 \end_inset
@@ -6254,8 +8341,8 @@ So that:
 
 \begin_inset Formula 
 \begin{align*}
-\phi\left(t_{0}\right) & =\phi_{0}+A\sin\left(\varphi\right){\color{gray}\ \backslash-\phi_{0}}\\
-\phi\left(t_{1}\right) & =\phi_{0}+A\cos\left(\varphi\right){\color{gray}\ \backslash-\phi_{0}}
+\phi\left(t_{0}\right) & =\phi_{\text{const}}+C\sin\left(\varphi\right){\color{gray}\ \backslash-\phi_{\text{const}}}\\
+\phi\left(t_{1}\right) & =\phi_{\text{const}}+C\cos\left(\varphi\right){\color{gray}\ \backslash-\phi_{\text{const}}}
 \end{align*}
 
 \end_inset
@@ -6263,8 +8350,8 @@ So that:
 
 \begin_inset Formula 
 \begin{align*}
-\phi\left(t_{0}\right)-\phi_{0} & =\cancel{A}\sin\left(\varphi\right)\\
-\phi\left(t_{1}\right)-\phi_{0} & =\cancel{A}\cos\left(\varphi\right){\color{gray}\ \backslash:}
+\phi\left(t_{0}\right)-\phi_{\text{const}} & =\cancel{C}\sin\left(\varphi\right)\\
+\phi\left(t_{1}\right)-\phi_{\text{const}} & =\cancel{C}\cos\left(\varphi\right){\color{gray}\ \backslash:}
 \end{align*}
 
 \end_inset
@@ -6272,7 +8359,7 @@ So that:
 
 \begin_inset Formula 
 \[
-\tan\left(\varphi\right)=\frac{\phi\left(t_{0}\right)-\phi_{0}}{\phi\left(t_{1}\right)-\phi_{0}}{\color{gray}\ \backslash\tan^{-1}}
+\tan\left(\varphi\right)=\frac{\phi\left(t_{0}\right)-\phi_{\text{const}}}{\phi\left(t_{1}\right)-\phi_{\text{const}}}{\color{gray}\ \backslash\tan^{-1}}
 \]
 
 \end_inset
@@ -6280,7 +8367,7 @@ So that:
 
 \begin_inset Formula 
 \[
-\boxed{\varphi=\tan^{-1}\left(\frac{\phi\left(t_{0}\right)-\phi_{0}}{\phi\left(t_{1}\right)-\phi_{0}}\right)}
+\boxed{\varphi=\tan^{-1}\left(\frac{\phi\left(t_{0}\right)-\phi_{\text{const}}}{\phi\left(t_{1}\right)-\phi_{\text{const}}}\right)}
 \]
 
 \end_inset
@@ -6304,7 +8391,7 @@ And now if
 :
 \begin_inset Formula 
 \begin{equation}
-\boxed{A={\color{gray}\underset{\text{All are known by this point}}{\underbrace{{\normalcolor \frac{\phi\left(t_{1}\right)-\phi_{0}}{\cos\left(\varphi\right)}}}}}}\tag{e\_27}\label{eq:e_27}
+\boxed{C={\color{gray}\underset{\text{All are known by this point}}{\underbrace{{\normalcolor \frac{\phi\left(t_{1}\right)-\phi_{\text{const}}}{\cos\left(\varphi\right)}}}}}}\tag{e\_27}\label{eq:e_27}
 \end{equation}
 
 \end_inset
@@ -6320,8 +8407,88 @@ And otherwise we can substitute it in the equation for
  and get:
 \begin_inset Formula 
 \[
-\boxed{A={\color{gray}\underset{\text{All are known by this point}}{\underbrace{{\normalcolor \frac{\phi\left(t_{0}\right)-\phi_{0}}{\sin\left(\varphi\right)}}}}}}
+\boxed{C={\color{gray}\underset{\text{All are known by this point}}{\underbrace{{\normalcolor \frac{\phi\left(t_{0}\right)-\phi_{\text{const}}}{\sin\left(\varphi\right)}}}}}}
 \]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Extracting the amplitude required for a given phase shift based on one sample
+\end_layout
+
+\begin_layout Standard
+Suppose the phase shift given to the electron as a function of the amplitude
+ is:
+\begin_inset Formula 
+\[
+\phi=aE^{2}
+\]
+
+\end_inset
+
+For some unknown 
+\begin_inset Formula $a$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If we evaluate the function once, we get:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\phi_{1}=aE_{1}^{2}{\color{lightgray}\ \backslash:E_{1}^{2}}
+\]
+
+\end_inset
+
+Isolating 
+\begin_inset Formula $a$
+\end_inset
+
+, we get:
+\begin_inset Formula 
+\[
+a=\frac{\phi_{1}}{E_{1}^{2}}
+\]
+
+\end_inset
+
+Now, we are interesting in the amplitude that will result in 
+\begin_inset Formula $\phi_{2}=\frac{\pi}{2}$
+\end_inset
+
+ phase shift:
+\begin_inset Formula 
+\[
+\frac{\pi}{2}=\phi_{2}=aE_{2}^{2}=\frac{\phi_{1}}{E_{1}^{2}}E_{2}^{2}{\color{lightgray}\ \backslash:\frac{\phi_{1}}{E_{1}^{2}}}
+\]
+
+\end_inset
+
+Isolate 
+\begin_inset Formula $E_{2}$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\frac{E_{1}^{2}}{\phi_{1}}\phi_{2}=E_{2}^{2}{\color{lightgray}\ \backslash\sqrt{}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{E_{2}=E_{1}\sqrt{\frac{\phi_{2}}{\phi_{1}}}}\tag{e\_41}\label{eq:e_41}
+\end{equation}
 
 \end_inset
 
