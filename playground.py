@@ -16,7 +16,7 @@ dummy_sample = SamplePropagator(dummy_potential=f'letters_{N_POINTS}',
                                                                                        input_coordinate_system.y_axis,
                                                                                        np.linspace(-5e-10, 5e-10, 2)
                                                                                        )))
-dummy_sample.sample.values *= 30
+dummy_sample.sample.values *= 10
 first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
 second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
 cavity_2f_analytical = CavityAnalyticalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=NA_1, ring_cavity=False,
@@ -26,28 +26,22 @@ cavity_2f_numerical = CavityNumericalPropagator(l_1=l_1, l_2=l_2, E_1=-1, NA_1=N
 aberration_propagator = AberrationsPropagator(Cs=1e-8, defocus=1e-10, astigmatism_parameter=0,
                                               astigmatism_orientation=0)
 
-# M_a = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens, aberration_propagator],
-#                print_progress=True,
-#                n_electrons_per_square_angstrom=50)
+M_a = Microscope([dummy_sample, first_lens, cavity_2f_analytical, second_lens, aberration_propagator],
+               print_progress=True,
+               n_electrons_per_square_angstrom=50)
 
 M_n = Microscope([dummy_sample, first_lens, cavity_2f_numerical, second_lens, aberration_propagator],
                print_progress=True,
                n_electrons_per_square_angstrom=50)
 
 
-# pic_a = M_a.take_a_picture(first_wave)
+pic_a = M_a.take_a_picture(first_wave)
 pic_n = M_n.take_a_picture(first_wave)
 
-# asd = np.real(np.angle(M_a.propagation_steps[0].output_wave.psi))
-# M_a.plot_step(dummy_sample)
+M_a.plot_step(dummy_sample)
 
-# plt.imshow(asd, cmap='gray')
-# plt.colorbar()
+# plt.imshow(pic_a.values)
+# plt.title('image_a')
 # plt.show()
-# # plt.imshow(pic_a.values)
-# # plt.title('image_a')
-# # plt.show()
-# #
-# # plt.imshow(pic_b.values)
-# # plt.title('image_a')
-# # plt.show()
+
+

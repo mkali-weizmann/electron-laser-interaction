@@ -651,19 +651,19 @@ class SamplePropagator(Propagator):
                     2 * (lengths[1] / 4) ** 2) + Z ** 2 / (2 * (lengths[0] / 8) ** 2)))
         elif potential_type == 'a letter':
             potential_2d = np.load("example_letter.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2]))
+            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         elif potential_type == 'letters':
             potential_2d = np.load("Data Arrays\\Static Data\\letters_1024.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.grids[0].shape[2]))
+            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         elif potential_type == 'letters_256':
             potential_2d = np.load("Data Arrays\\Static Data\\letters_256.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2]))
+            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         elif potential_type == 'letters_128':
             potential_2d = np.load("Data Arrays\\Static Data\\letters_128.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2]))
+            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         elif potential_type == 'letters_64':
             potential_2d = np.load("Data Arrays\\Static Data\\letters_64.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2]))
+            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         else:
             raise NotImplementedError(f"Potential {potential_type} is not implemented, enter 'one gaussian' or "
                                       "'two gaussians' or 'a letter'")
