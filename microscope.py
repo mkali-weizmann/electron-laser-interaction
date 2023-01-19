@@ -688,6 +688,38 @@ class SamplePropagator(Propagator):
         plt.show()
 
 
+class DummyPhaseMask(Propagator):
+    def __init__(self,
+                 phase_mask: Optional[np.ndarray] = None,
+                 mask_width_meters: Optional[float] = -1,
+                 mask_phase: Optional[float] = np.pi / 2,
+                 mask_attenuation: Optional[float] = 1):
+
+        self.phase_mask: Optional[np.ndarray] = phase_mask
+        self.mask_width_meters: Optional[float] = mask_width_meters
+        self.mask_phase: Optional[float] = mask_phase
+        self.mask_attenuation: Optional[float] = mask_attenuation
+
+    def propagate(self, input_wave: WaveFunction) -> WaveFunction:
+        return WaveFunction(input_wave.psi * self.generate_dummy_potential(input_wave),
+                            input_wave.coordinates, input_wave.E0)
+
+    def generate_dummy_potential(self, input_wave: WaveFunction) -> np.ndarray:
+        if self.phase_mask is not None:
+            return self.phase_mask
+        else:
+            coordinates = input_wave.coordinates
+            X, Y = coordinates.grids
+            mask = np.ones_like(X, dtype=np.complex128)
+            mask_value = self.mask_attenuation * np.exp(1j * self.mask_phase)
+            if self.mask_width_meters == -1:
+                mask[X.shape[0] // 2, X.shape[1] // 2] = mask_value
+            else:
+                mask_indices = X**2 + Y**2 < self.mask_width_meters**2
+                mask[mask_indices] = mask_value
+            return mask
+
+
 class LorentzNRotationPropagator(Propagator):
     # Rotate the wavefunction by theta and makes a lorentz transformation on it by beta_lattice
     def __init__(self, beta: float, theta: float):
@@ -745,6 +777,7 @@ class AberrationsPropagator(Propagator):
                                     input_wave.coordinates.dx)  # this is f and not k
         fft_freq_y = np.fft.fftfreq(input_wave.psi.shape[1],
                                     input_wave.coordinates.dy)  # this is f and not k
+        fft_freq_x, fft_freq_y = np.fft.fftshift(fft_freq_x), np.fft.fftshift(fft_freq_y)
         aberrations_mask = self.aberrations_mask(fft_freq_x, fft_freq_y, input_wave.E0)
         psi_FFT_aberrated = psi_FFT * aberrations_mask
         psi_aberrated = np.fft.ifftn(psi_FFT_aberrated, norm='ortho')
@@ -752,14 +785,14 @@ class AberrationsPropagator(Propagator):
         return output_wave
 
     def aberrations_mask(self, f_x: np.array, f_y: np.array, E0: float):
-        k_x, k_y = np.meshgrid(f_x, f_y, indexing='ij')
-        k_squared = k_x ** 2 + k_y ** 2
-        phi_k = np.arctan2(k_y, k_x)
+        f_x, f_y = np.meshgrid(f_x, f_y, indexing='ij')
+        f_squared = f_x ** 2 + f_y ** 2
+        phi_k = np.arctan2(f_y, f_x)
         f_defocus_aberration = self.defocus + \
                                self.astigmatism_parameter * np.cos(2 * (phi_k - self.astigmatism_orientation))
         lambda_electron = l_of_E(E0)
         phase = np.pi * ((
-                                     1 / 2) * self.Cs * lambda_electron ** 3 * k_squared ** 2 - f_defocus_aberration * lambda_electron * k_squared)
+                                     1 / 2) * self.Cs * lambda_electron ** 3 * f_squared ** 2 - f_defocus_aberration * lambda_electron * f_squared)
         return np.exp(1j * phase)  # Check sign!
 
 
