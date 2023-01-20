@@ -10,11 +10,11 @@ from scipy.special import erf, erfi, erfc
 
 def plot_3d_complex(x_real, y_complex):
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    ax = fig.add_subplot(111, projection="3d")
     ax.plot(x_real, np.real(y_complex), np.imag(y_complex))
-    ax.set_xlabel('t')
-    ax.set_ylabel('y_real')
-    ax.set_zlabel('y_imag')
+    ax.set_xlabel("t")
+    ax.set_ylabel("y_real")
+    ax.set_zlabel("y_imag")
     plt.show()
 
 
@@ -41,7 +41,7 @@ def w(x):
 
 
 def R_inverse(x):
-    return x / (x ** 2 + x_R ** 2)
+    return x / (x**2 + x_R**2)
 
 
 def psi(x):
@@ -49,12 +49,11 @@ def psi(x):
 
 
 def x_grating(x, y, z):
-    return np.cos(k_l * (x + (y ** 2 + z ** 2) * R_inverse(x)) + psi(x))
+    return np.cos(k_l * (x + (y**2 + z**2) * R_inverse(x)) + psi(x))
 
 
 def envelope(x, y, z):
-    return w_0 / w(x) * np.exp(
-        np.clip(-(y ** 2 + z ** 2) / (w(x) ** 2), a_min=-500, a_max=None))
+    return w_0 / w(x) * np.exp(np.clip(-(y**2 + z**2) / (w(x) ** 2), a_min=-500, a_max=None))
 
 
 def temporal_component(t):
@@ -74,9 +73,12 @@ def A_z_integrand_variable_change(Z, x, y, z, t):
 
 
 def G_integral(x, y, z, t):
-    return C_LIGHT * beta / omega_l * \
-           integrate.quad(A_z_integrand, min([t_z(-16 * w_0), t - t_z(16 * w_0)]), t, args=(x, y, z, t), epsabs=1e-20)[
-               0]
+    return (
+        C_LIGHT
+        * beta
+        / omega_l
+        * integrate.quad(A_z_integrand, min([t_z(-16 * w_0), t - t_z(16 * w_0)]), t, args=(x, y, z, t), epsabs=1e-20)[0]
+    )
 
 
 def s(t, n=1000):
@@ -91,7 +93,7 @@ def G_discrete_integral(x, y, z, t):
 
 
 def G_Osip(x, y, z, t):
-    return C_LIGHT * beta / omega_l ** 2 * envelope(x, y, z) * x_grating(x, y, z) * np.sin(omega_l * t)
+    return C_LIGHT * beta / omega_l**2 * envelope(x, y, z) * x_grating(x, y, z) * np.sin(omega_l * t)
 
 
 def I_integrand(s, x, y, z, t):
@@ -99,7 +101,7 @@ def I_integrand(s, x, y, z, t):
     R_tilde_inverse_squared = k_l * (beta * C_LIGHT) ** 2 * R_inverse(x)
     t_tilde = t - z / (beta * C_LIGHT)
     a_squared = 1 / (1 / sigma_tilde_squared + 1j * R_tilde_inverse_squared)
-    return np.real(np.exp(-(s - t_tilde) ** 2 / a_squared + 1j * omega_l * s))
+    return np.real(np.exp(-((s - t_tilde) ** 2) / a_squared + 1j * omega_l * s))
 
 
 def I_numerical(x, y, z, t):
@@ -111,8 +113,9 @@ def I(x, y, z, t):
     R_tilde_inverse_squared = k_l * (beta * C_LIGHT) ** 2 * R_inverse(x)
     t_tilde = t - z / (beta * C_LIGHT)
     a_squared = 1 / (1 / sigma_tilde_squared + 1j * R_tilde_inverse_squared)
-    coefficient = 1 / 2 * np.sqrt(a_squared) * np.exp(1j * t_tilde * omega_l - a_squared * omega_l ** 2 / 4) * np.sqrt(
-        pi)
+    coefficient = (
+        1 / 2 * np.sqrt(a_squared) * np.exp(1j * t_tilde * omega_l - a_squared * omega_l**2 / 4) * np.sqrt(pi)
+    )
     erf_term = erfc((t_tilde - t + 1 / 2 * 1j * a_squared * omega_l) / np.sqrt(a_squared))
     I_values = np.real(coefficient * erf_term)
     return I_values
@@ -120,7 +123,7 @@ def I(x, y, z, t):
 
 def G_mine(x, y, z, t):
     I_values = I(x, y, z, t)
-    y_envelope = w_0 / w(x) * np.exp(-y ** 2 / (w(x) ** 2))
+    y_envelope = w_0 / w(x) * np.exp(-(y**2) / (w(x) ** 2))
     return beta * C_LIGHT / omega_l * I_values * y_envelope
 
 
@@ -128,6 +131,7 @@ def G_mine(x, y, z, t):
 #     z = np.linspace(z_boundaries[0], z_boundaries[1], n)
 #
 #     return
+
 
 def z_for_loop(x, y, z, t, func):
     results_array = np.zeros_like(z)
@@ -144,7 +148,6 @@ def phi_integrand(z, x, y, t):
     G_values = G_discrete_integral(x, y, z, t)
     A_values = A_z(x, y, z, t)
     return
-
 
 
 # %%
@@ -239,15 +242,12 @@ z_max = 3
 x_0 = -1.1
 y_0 = -1
 z = np.linspace(-z_max, z_max, 1000)
-t = (z_max-z) / (C_LIGHT * beta) + t_0
-G_Osip_values = z_for_loop(x_0*w_0, y_0*w_0, z*w_0, t*w_0, G_Osip)
-G_discrete_integral_values = z_for_loop(x_0*w_0, y_0*w_0, z*w_0, t*w_0, G_discrete_integral)
-plt.plot(z, G_Osip_values, label='Osip')
-plt.plot(z, G_discrete_integral_values, label='discrete integral')
-plt.xlabel('z')
-plt.ylabel('G')
+t = (z_max - z) / (C_LIGHT * beta) + t_0
+G_Osip_values = z_for_loop(x_0 * w_0, y_0 * w_0, z * w_0, t * w_0, G_Osip)
+G_discrete_integral_values = z_for_loop(x_0 * w_0, y_0 * w_0, z * w_0, t * w_0, G_discrete_integral)
+plt.plot(z, G_Osip_values, label="Osip")
+plt.plot(z, G_discrete_integral_values, label="discrete integral")
+plt.xlabel("z")
+plt.ylabel("G")
 plt.legend()
 plt.show()
-
-
-
