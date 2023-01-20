@@ -377,12 +377,13 @@ def find_amplitude_for_phase(starting_E: float=1e7, desired_phase: float = pi / 
 
 ############################################################################################################
 
+Lengths = Tuple[float, ...]
 
-@dataclass()
+@dataclass
 class CoordinateSystem:
     def __init__(self,
                  axes: Optional[Tuple[np.ndarray, ...]] = None,  # The axes of the incoming wave function
-                 lengths: Optional[Tuple[float, ...]] = None,  # the lengths of the sample in the x, y directions
+                 lengths: Optional[Lengths] = None,  # the lengths of the sample in the x, y directions
                  n_points: Optional[Tuple[int, ...]] = None,  # the number of points in the x, y directions
                  dxdydz: Optional[Tuple[float, ...]] = None):  # the step size in the x, y directions
 
@@ -482,17 +483,13 @@ class CoordinateSystem:
         return limits
 
 
-@dataclass()
+@dataclass(slots=True)
 class SpatialFunction:
-    def __init__(self,
-                 function_values: np.ndarray,  # The values of the function
-                 coordinates: CoordinateSystem,  # The coordinate system on which it is evaluated
-                 ):
-        self.values: np.ndarray = function_values
-        self.coordinates = coordinates
+    values: np.ndarray  # The values of the function
+    coordinates: CoordinateSystem  # The coordinate system on which it is evaluated
 
 
-@dataclass()
+@dataclass
 class WaveFunction(SpatialFunction):
     def __init__(self,
                  psi: np.ndarray,  # The input wave function in one z=const plane
@@ -500,7 +497,7 @@ class WaveFunction(SpatialFunction):
                  E0: float,  # Energy of the particle
                  ):
         super().__init__(psi, coordinates)
-        self.E0: float = E0
+        self.E0 = E0
 
     @property
     def psi(self) -> np.ndarray:
@@ -885,7 +882,7 @@ class CavityPropagator(Propagator):
         else:
             return min(self.l_1 / (pi * np.arcsin(self.NA_1)), self.l_2 / (pi * np.arcsin(self.NA_2)))
 
-    @property  # The velocity at which the standing wave is propagaing
+    @property  # The velocity at which the standing wave is propagating
     def beta_lattice(self) -> float:
         if self.E_2 is not None:
             return (self.l_1 - self.l_2) / (self.l_1 + self.l_2)
