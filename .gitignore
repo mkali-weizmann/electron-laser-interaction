@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .idea/
-"Simulation Notes.lyx~"
+Simulation\ Notes.lyx~
 
 # C extensions
 *.so

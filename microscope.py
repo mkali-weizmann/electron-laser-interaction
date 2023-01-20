@@ -513,7 +513,7 @@ class CoordinateSystem:
         return limits
 
 
-@dataclass(slots=True)
+@dataclass
 class SpatialFunction:
     values: np.ndarray  # The values of the function
     coordinates: CoordinateSystem  # The coordinate system on which it is evaluated
