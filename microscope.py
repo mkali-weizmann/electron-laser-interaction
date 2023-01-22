@@ -560,7 +560,7 @@ class WaveFunction(SpatialFunction):
     def beta(self):
         return beta_of_E(self.E0)
 
-    def plot(self, fig=None, ax=None, clip=True, title=None, psi_subscript: str = ''):
+    def plot(self, fig=None, ax=None, clip=True, title=None, psi_subscript: str = ""):
         if ax is None:
             fig, ax = plt.subplots(1, 2)
 
@@ -652,8 +652,8 @@ class Microscope:
         output_wave = step.output_wave
         fig, ax = plt.subplots(2, 2, figsize=(12, 12))
 
-        input_wave.plot(fig, ax[0], clip=clip, psi_subscript='i')
-        output_wave.plot(fig, ax[1], clip=clip, psi_subscript='o')
+        input_wave.plot(fig, ax[0], clip=clip, psi_subscript="i")
+        output_wave.plot(fig, ax[1], clip=clip, psi_subscript="o")
 
         if title is not None:
             fig.suptitle(title)
@@ -887,19 +887,20 @@ class CavityPropagator(Propagator):
         NA_2: Optional[float] = -1,
         theta_polarization: float = np.pi / 2,
         alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
+        alpha_cavity_deviation: float = 0,
         ring_cavity: bool = False,
         ignore_past_files: bool = False,
     ):
 
-        self.l_1: float = l_1  # Laser's frequency
-        self.E_1: float = E_1  # Laser's amplitude
+        self.l_1 = l_1  # Laser's frequency
+        self.E_1 = E_1  # Laser's amplitude
         if E_2 == -1:
             # -1 means that the second laser is defined by the condition for equal amplitudes in the lattices' frame
-            self.E_2: float = E_1 * (l_1 / l_2)
+            self.E_2 = E_1 * (l_1 / l_2)
         else:
-            self.E_2: float = E_2
+            self.E_2 = E_2
         self.l_2 = l_2
-        self.NA_1: float = NA_1  # Cavity's numerical aperture
+        self.NA_1 = NA_1  # Cavity's numerical aperture
         if NA_2 == -1:
             if l_2 is None:
                 self.NA_2 = None
@@ -907,12 +908,13 @@ class CavityPropagator(Propagator):
                 self.NA_2 = NA_1 * np.sqrt(self.l_2 / self.l_1)  # From equation "NA ratios" in the documentation file.
         else:
             self.NA_2 = NA_2
-        self.alpha_cavity: Optional[float] = alpha_cavity  # cavity angle with respect to microscope's x-axis. positive
+        self.alpha_cavity = alpha_cavity  # cavity angle with respect to microscope's x-axis. positive
         # # number means the part of the cavity in the positive x direction is tilted downwards toward the positive z
         # direction.
-        self.theta_polarization: float = theta_polarization  # polarization angle of the laser
-        self.ring_cavity: bool = ring_cavity
-        self.ignore_past_files: bool = ignore_past_files
+        self.theta_polarization = theta_polarization  # polarization angle of the laser
+        self.ring_cavity = ring_cavity
+        self.ignore_past_files = ignore_past_files
+        self.alpha_cavity_deviation = alpha_cavity_deviation
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         phase_and_amplitude_mask = self.load_or_calculate_phase_and_amplitude_mask(input_wave)
@@ -1024,7 +1026,7 @@ class CavityPropagator(Propagator):
 
     def beta_electron2alpha_cavity(self, beta_electron: Optional[float] = None) -> float:
         if beta_electron is not None and self.alpha_cavity is None:
-            return np.arcsin(self.beta_lattice / beta_electron)
+            return np.arcsin(self.beta_lattice / beta_electron) + self.alpha_cavity_deviation
         elif beta_electron is None and self.alpha_cavity is None:
             raise ValueError("Either beta_electron or alpha_cavity must be given")
         else:
@@ -1032,7 +1034,7 @@ class CavityPropagator(Propagator):
                 "alpha_cavity is not None. Using the value given by the user, Note that the calculations assume"
                 "that the lattice satisfy sin(alpha_cavity) = beta_lattice / beta_electron"
             )
-            return self.alpha_cavity
+            return self.alpha_cavity + self.alpha_cavity_deviation
 
 
 class CavityAnalyticalPropagator(CavityPropagator):
@@ -1046,6 +1048,7 @@ class CavityAnalyticalPropagator(CavityPropagator):
         NA_2: Optional[float] = -1,
         theta_polarization: float = np.pi / 2,
         alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
+        alpha_cavity_deviation: float = 0,
         ring_cavity: bool = True,
         starting_E_in_auto_E_search: float = 1e7,
         ignore_past_files: bool = False,
@@ -1063,11 +1066,22 @@ class CavityAnalyticalPropagator(CavityPropagator):
                 NA_2=NA_2,
                 theta_polarization=theta_polarization,
                 alpha_cavity=alpha_cavity,
+                alpha_cavity_deviation=alpha_cavity_deviation,
                 ring_cavity=ring_cavity,
             )
 
         super().__init__(
-            l_1, l_2, E_1, E_2, NA_1, NA_2, theta_polarization, alpha_cavity, ring_cavity, ignore_past_files
+            l_1,
+            l_2,
+            E_1,
+            E_2,
+            NA_1,
+            NA_2,
+            theta_polarization,
+            alpha_cavity,
+            alpha_cavity_deviation,
+            ring_cavity,
+            ignore_past_files,
         )
 
     def phase_and_amplitude_mask(self, input_wave: WaveFunction):
@@ -1175,6 +1189,7 @@ class CavityNumericalPropagator(CavityPropagator):
         NA_2: Optional[float] = -1,
         theta_polarization: float = np.pi / 2,
         alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
+        alpha_cavity_deviation: float = 0,
         ring_cavity: bool = True,
         ignore_past_files: bool = False,
         print_progress: bool = True,
@@ -1197,6 +1212,7 @@ class CavityNumericalPropagator(CavityPropagator):
                 NA_2=NA_2,
                 theta_polarization=theta_polarization,
                 alpha_cavity=alpha_cavity,
+                alpha_cavity_deviation=alpha_cavity_deviation,
                 ring_cavity=ring_cavity,
                 n_t=n_t,
                 ignore_past_files=ignore_past_files,
@@ -1210,6 +1226,7 @@ class CavityNumericalPropagator(CavityPropagator):
             NA_2,
             theta_polarization,
             alpha_cavity,
+            alpha_cavity_deviation,
             ring_cavity,
             ignore_past_files,
         )
@@ -1337,7 +1354,11 @@ class CavityNumericalPropagator(CavityPropagator):
         )  # The Z is returned so that it can be used later in the integration of the integrand
         # over z.
 
-    def generate_coordinates_lattice( self, x: [float, np.ndarray], y: [float, np.ndarray], t: [float, np.ndarray],
+    def generate_coordinates_lattice(
+        self,
+        x: [float, np.ndarray],
+        y: [float, np.ndarray],
+        t: [float, np.ndarray],
         beta_electron: float,
     ):
 
