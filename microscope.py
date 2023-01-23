@@ -9,6 +9,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import os.path
 from scipy import integrate
 from matplotlib.widgets import Slider
+import re
 
 M_ELECTRON = 9.1093837e-31
 C_LIGHT = 299792458
@@ -638,7 +639,7 @@ class Microscope:
             output_wave = self.propagation_steps[-1].output_wave
 
         output_wave_intensity = np.abs(output_wave.psi) ** 2
-        expected_electrons_per_pixel = output_wave_intensity * self.n_electrons_per_square_angstrom
+        expected_electrons_per_pixel = output_wave_intensity * (self.n_electrons_per_square_angstrom * output_wave.psi.size)
         output_wave_intensity_shot_noise = np.random.poisson(expected_electrons_per_pixel)  # This actually assumes an
         # independent shot noise for each pixel, which is not true, but it's a good approximation for many pixels.
         return SpatialFunction(
@@ -922,17 +923,9 @@ class CavityPropagator(Propagator):
         return WaveFunction(output_wave, input_wave.coordinates, input_wave.E0)
 
     def load_or_calculate_phase_and_amplitude_mask(self, input_wave: WaveFunction):
-        setup_file_path = self.setup_to_path(input_wave=input_wave)
-        # if this setup was calculated once in the past and the user did not ask to ignore past files, load the file
-        if os.path.isfile(setup_file_path) and not self.ignore_past_files:
-            phase_and_amplitude_mask = np.load(setup_file_path)
-            return phase_and_amplitude_mask
-        else:
-            phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
-            np.save(setup_file_path, phase_and_amplitude_mask)
-            return phase_and_amplitude_mask
+        raise NotImplementedError
 
-    def phase_and_amplitude_mask(self, input_wave: WaveFunction) -> np.array:
+    def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results=False) -> np.array:
         raise NotImplementedError
 
     def setup_to_path(self, input_wave: WaveFunction) -> np.array:
@@ -1084,14 +1077,28 @@ class CavityAnalyticalPropagator(CavityPropagator):
             ignore_past_files,
         )
 
-    def phase_and_amplitude_mask(self, input_wave: WaveFunction):
+    def load_or_calculate_phase_and_amplitude_mask(self, input_wave: WaveFunction):
+        setup_file_path = self.setup_to_path(input_wave=input_wave)
+        # if this setup was calculated once in the past and the user did not ask to ignore past files, load the file
+        if os.path.isfile(setup_file_path) and not self.ignore_past_files:
+            phase_and_amplitude_mask = np.load(setup_file_path)
+            return phase_and_amplitude_mask
+        else:
+            phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
+            np.save(setup_file_path, phase_and_amplitude_mask)
+            return phase_and_amplitude_mask
+
+    def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results: bool = False):
         phi_0 = self.phi_0(input_wave)
         constant_phase_shift = self.constant_phase_shift(phi_0)
         if self.E_2 is not None:  # For the case of a double laser:
             attenuation_factor = self.attenuation_factor(input_wave, phi_0)
         else:
             attenuation_factor = 1
-        return np.exp(-1j * constant_phase_shift) * attenuation_factor  # ARBITRARY - I FIXED
+        phase_and_amplitude_mask = attenuation_factor * np.exp(-1j * constant_phase_shift)
+        if save_results:
+            np.save(self.setup_to_path(input_wave), phase_and_amplitude_mask)
+        return phase_and_amplitude_mask
         # A SIGN MISTAKE BY ADDING A SIGN
 
     def constant_phase_shift(
@@ -1237,7 +1244,60 @@ class CavityNumericalPropagator(CavityPropagator):
         self.n_z = n_z
         self.batches_calculation_numel_maximal = batches_calculation_numel_maximal
 
-    def phase_and_amplitude_mask(self, input_wave: WaveFunction):
+    def load_or_calculate_phase_and_amplitude_mask(self, input_wave: WaveFunction):
+        setup_file_path = self.setup_to_path(input_wave=input_wave)
+
+        # If it exists exactly as is:
+        if os.path.isfile(setup_file_path) and not self.ignore_past_files:
+            phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(setup_file_path)
+
+        # For the case it exists but with a different amplitude:
+        else:
+            E_1_pattern = "E1(.*?)_"
+            E_2_pattern = "E2(.*?)_"
+            phase_masks_path = "Data Arrays\\Phase Masks\\"
+            general_file_name = setup_file_path[len(phase_masks_path) :].replace('.', r'\.').replace('+', r'\+')
+            general_file_name = re.sub(E_1_pattern, E_1_pattern, general_file_name)
+            general_file_name = re.sub(E_2_pattern, E_2_pattern, general_file_name)
+            pattern_re = re.compile(general_file_name)
+            existing_files = os.listdir(phase_masks_path)
+            existing_files_with_same_setup = list(filter(lambda x: bool(re.search(pattern_re, x)), existing_files))
+
+            # If it does indeed exist in a different amplitude:
+            if len(existing_files_with_same_setup) > 0 and not self.ignore_past_files:
+                first_file_path = existing_files_with_same_setup[0]  # There should be only one file with the same
+                # setup, and if there are more, then they are equivalent, so anyway we can take the first one.
+                E_1_original = float(re.search(E_1_pattern, first_file_path).group(1))
+                E_2_original = float(re.search(E_2_pattern, first_file_path).group(1))
+                E_1_ratio, E_2_ratio = self.E_1 / E_1_original, self.E_2 / E_2_original
+
+                # If the two frequencies don't have the same ratio to the original ones or the original calculation
+                # was done using a Fourier Transform then we can't use it:
+                if np.abs((E_1_ratio - E_2_ratio) / E_1_ratio) > 1e-2 or self.n_t != 3:
+                    phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
+
+                # If the original setup had different amplitudes but the same setup then we can use the same phase mask
+                # and just adjust the phase and attenuation factor. this is true due to the derivation in equation
+                # e_42 in the simulation notes.
+                else:
+                    phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(
+                        setup_file_path=phase_masks_path+existing_files_with_same_setup[0], amplitudes_ratio_squared=(self.E_1 / E_1_original) ** 2
+                    )
+
+            else:
+                phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave, save_results=True)
+        return phase_and_amplitude_mask
+
+    def setup_to_phase_and_amplitude_mask(self, setup_file_path: str, amplitudes_ratio_squared: float = 1):
+        phase_and_amplitude_mask = np.load(setup_file_path)
+        phi_const_original = phase_and_amplitude_mask[:, :, 0]
+        C_original = phase_and_amplitude_mask[:, :, 1]
+        phase_and_amplitude_mask = np.exp(1j * phi_const_original * amplitudes_ratio_squared) * jv(
+            0, C_original * amplitudes_ratio_squared
+        )
+        return phase_and_amplitude_mask
+
+    def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results: bool = False):
         phi_values = self.phi(input_wave)
         phase_factor = np.exp(1j * phi_values)
         if self.E_2 is None:  # If there is only one mode, then the phase is constant in time and there is no amplitude
@@ -1265,10 +1325,14 @@ class CavityNumericalPropagator(CavityPropagator):
                 )
                 C = C_computed_with_sin + C_computed_with_cos
                 phase_and_amplitude_mask = jv(0, C) * np.exp(1j * phi_const)
+                if save_results:
+                    np.save(self.setup_to_path(input_wave=input_wave), np.stack((phi_const, C), axis=2))
             else:
                 # NOT ACCURATE UNLESS N_T IS BIG!
                 energy_bands = np.fft.fft(phase_factor, axis=-1, norm="forward")
                 phase_and_amplitude_mask = energy_bands[:, :, 0]
+                if save_results:
+                    np.save(self.setup_to_path(input_wave=input_wave), phase_and_amplitude_mask)
         if self.debug_mode:
             np.save(
                 "Data Arrays\\Debugging Arrays\\phase_amplitude_mask.npy",
@@ -1494,12 +1558,12 @@ class CavityNumericalPropagator(CavityPropagator):
             N_2_str = "None"
             l_2_str = "None"
         else:
-            E_2_str = f"{self.E_2:.2e}"
+            E_2_str = f"{self.E_2:.5g}"
             N_2_str = f"{self.NA_2 * 100:.4g}"
             l_2_str = f"{self.l_2 * 1e9:.4g}"
         path = (
             f"Data Arrays\\Phase Masks\\2f_n_l1{self.l_1 * 1e9:.4g}_l2{l_2_str}_"
-            f"E1{self.E_1:.3g}_E2{E_2_str}_NA1{self.NA_1 * 100:.4g}_NA2{N_2_str}_"
+            f"E1{self.E_1:.5g}_E2{E_2_str}_NA1{self.NA_1 * 100:.4g}_NA2{N_2_str}_"
             f"alpha{self.beta_electron2alpha_cavity(input_wave.beta) / 2 * np.pi * 360:.0f}_"
             f"theta{self.theta_polarization * 100:.4g}_E{input_wave.E0:.2g}_Ring{self.ring_cavity}_"
             f"Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nt{self.n_t}_"
