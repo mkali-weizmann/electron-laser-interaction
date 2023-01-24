@@ -415,7 +415,9 @@ def find_power_for_phase(
             print(f"For P={Es[-1]:.2e} the phase is phi={resulted_phase:.2f}")
         return Es[-1]
 
+
 ############################################################################################################
+
 
 @dataclass
 class CoordinateSystem:
@@ -1060,10 +1062,20 @@ class CavityAnalyticalPropagator(CavityPropagator):
     ):
 
         if power_1 == -1:
-            power_1 = find_power_for_phase(starting_power=starting_P_in_auto_P_search, cavity_type="analytical",
-                                           print_progress=True, l_1=l_1, l_2=l_2, power_2=power_2, NA_1=NA_1, NA_2=NA_2,
-                                           theta_polarization=theta_polarization, alpha_cavity=alpha_cavity,
-                                           alpha_cavity_deviation=alpha_cavity_deviation, ring_cavity=ring_cavity)
+            power_1 = find_power_for_phase(
+                starting_power=starting_P_in_auto_P_search,
+                cavity_type="analytical",
+                print_progress=True,
+                l_1=l_1,
+                l_2=l_2,
+                power_2=power_2,
+                NA_1=NA_1,
+                NA_2=NA_2,
+                theta_polarization=theta_polarization,
+                alpha_cavity=alpha_cavity,
+                alpha_cavity_deviation=alpha_cavity_deviation,
+                ring_cavity=ring_cavity,
+            )
 
         super().__init__(
             l_1,
@@ -1211,11 +1223,22 @@ class CavityNumericalPropagator(CavityPropagator):
     ):
 
         if power_1 == -1:
-            power_1 = find_power_for_phase(starting_power=starting_P_in_auto_P_search, cavity_type="numerical",
-                                           print_progress=True, l_1=l_1, l_2=l_2, power_2=power_2, NA_1=NA_1, NA_2=NA_2,
-                                           theta_polarization=theta_polarization, alpha_cavity=alpha_cavity,
-                                           alpha_cavity_deviation=alpha_cavity_deviation, ring_cavity=ring_cavity,
-                                           n_t=n_t, ignore_past_files=ignore_past_files)
+            power_1 = find_power_for_phase(
+                starting_power=starting_P_in_auto_P_search,
+                cavity_type="numerical",
+                print_progress=True,
+                l_1=l_1,
+                l_2=l_2,
+                power_2=power_2,
+                NA_1=NA_1,
+                NA_2=NA_2,
+                theta_polarization=theta_polarization,
+                alpha_cavity=alpha_cavity,
+                alpha_cavity_deviation=alpha_cavity_deviation,
+                ring_cavity=ring_cavity,
+                n_t=n_t,
+                ignore_past_files=ignore_past_files,
+            )
         super().__init__(
             l_1,
             l_2,
@@ -1274,7 +1297,8 @@ class CavityNumericalPropagator(CavityPropagator):
                 else:
                     phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(
                         setup_file_path=phase_masks_path + existing_files_with_same_setup[0],
-                        powers_ratio=self.power_1 / power_1_original)
+                        powers_ratio=self.power_1 / power_1_original,
+                    )
 
             else:
                 phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave, save_results=True)
@@ -1284,9 +1308,7 @@ class CavityNumericalPropagator(CavityPropagator):
         phase_and_amplitude_mask = np.load(setup_file_path)
         phi_const_original = phase_and_amplitude_mask[:, :, 0]
         C_original = phase_and_amplitude_mask[:, :, 1]
-        phase_and_amplitude_mask = np.exp(1j * phi_const_original * powers_ratio) * jv(
-            0, C_original * powers_ratio
-        )
+        phase_and_amplitude_mask = np.exp(1j * phi_const_original * powers_ratio) * jv(0, C_original * powers_ratio)
         return phase_and_amplitude_mask
 
     def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results: bool = False):
@@ -1617,4 +1639,3 @@ class CavityNumericalPropagator(CavityPropagator):
             return A * np.cos(self.theta_polarization) * np.cos(alpha_cavity)
         else:
             raise ValueError("component_index must be in [0, 1, 2, 'x', 'y', 'z']")
-
