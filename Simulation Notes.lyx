@@ -718,7 +718,7 @@ denoted in the code as
 E_1, E_2
 \family default
 ), numerical apertures 
-\begin_inset Formula $\text{NA}_{1},\text{NA}_{2}$
+\begin_inset Formula $\kaliNA_{1},\kaliNA_{2}$
 \end_inset
 
 
@@ -1501,11 +1501,11 @@ __init__
 \end_deeper
 \begin_layout Enumerate
 The ratio used in the simulation between 
-\begin_inset Formula $\text{NA}_{1}$
+\begin_inset Formula $\kaliNA_{1}$
 \end_inset
 
  and 
-\begin_inset Formula $\text{NA}_{2}$
+\begin_inset Formula $\kaliNA_{2}$
 \end_inset
 
  is derived in section 
@@ -1542,7 +1542,7 @@ noprefix "false"
 \begin_deeper
 \begin_layout Enumerate
 Also here, when initiating the object and setting the value of 
-\begin_inset Formula $\text{NA}_{1}$
+\begin_inset Formula $\kaliNA_{1}$
 \end_inset
 
 , the values 
@@ -3555,7 +3555,7 @@ Continuing only with the second element:
 
 \begin_inset Formula 
 \[
-\beta\stackrel{?}{\ll}kw=\frac{2\cancel{k}}{\cancel{k}NA}=\frac{2}{NA}\kaliV
+\beta\stackrel{?}{\ll}kw=\frac{2\cancel{k}}{\cancel{k}\kaliNA}=\frac{2}{\kaliNA}\kaliV
 \]
 
 \end_inset
@@ -4098,7 +4098,7 @@ Make sure the derivative with respect to z is negligible - remember that
 
 \begin_inset Formula 
 \[
-=\hat{x}\cdot A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\cancel{{\color{purple}\frac{1}{\omega}c}}\beta\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot{\color{gray}\underset{\text{Same but with }\lambda\text{ only and no }k_{l},x_{R}}{\underbrace{{\normalcolor \left(\cancel{{\color{purple}\frac{2\pi}{\lambda}}}+{\color{purple}\cancel{\frac{2\pi}{\lambda}}}\frac{y^{2}+z^{2}}{2}\cdot\frac{\left(\frac{\lambda}{\pi\cdot\left(NA\right)^{2}}\right)^{2}-x^{2}}{\left(x^{2}+\left(\frac{\lambda}{\pi\cdot\left(NA\right)^{2}}\right)^{2}\right)^{2}}+\frac{\frac{\cancel{{\color{purple}2\pi}}\cdot\left(NA\right)^{2}}{2\cancel{{\color{purple}\lambda}}}}{1+\left(\frac{\pi\cdot\left(NA\right)^{2}}{\lambda}\cdot x\right)^{2}}\right)}}}}
+=\hat{x}\cdot A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\cancel{{\color{purple}\frac{1}{\omega}c}}\beta\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot{\color{gray}\underset{\text{Same but with }\lambda\text{ only and no }k_{l},x_{R}}{\underbrace{{\normalcolor \left(\cancel{{\color{purple}\frac{2\pi}{\lambda}}}+{\color{purple}\cancel{\frac{2\pi}{\lambda}}}\frac{y^{2}+z^{2}}{2}\cdot\frac{\left(\frac{\lambda}{\pi\cdot\left(\kaliNA\right)^{2}}\right)^{2}-x^{2}}{\left(x^{2}+\left(\frac{\lambda}{\pi\cdot\left(\kaliNA\right)^{2}}\right)^{2}\right)^{2}}+\frac{\frac{\cancel{{\color{purple}2\pi}}\cdot\left(\kaliNA\right)^{2}}{2\cancel{{\color{purple}\lambda}}}}{1+\left(\frac{\pi\cdot\left(\kaliNA\right)^{2}}{\lambda}\cdot x\right)^{2}}\right)}}}}
 \]
 
 \end_inset
@@ -4114,7 +4114,7 @@ Recalling that
 
 \begin_inset Formula 
 \[
-=\hat{x}\cdot\beta A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot\left({\color{purple}1}+{\color{purple}1}\cdot{\color{gray}\underset{\text{small correction}}{\underbrace{{\normalcolor \frac{y^{2}+z^{2}}{2\lambda^{2}}}}}}\cdot\frac{\left(\frac{1}{\pi\cdot\left(NA\right)^{2}}\right)^{2}-\left(\frac{x}{\lambda}\right)^{2}}{\left(\frac{x^{2}}{\lambda^{2}}+\frac{1}{\left(\pi\cdot\left(NA\right)^{2}\right)^{2}}\right)^{2}}+{\color{gray}\underset{<6\%\text{ for NA}=0.3}{\underbrace{{\normalcolor \frac{2\left(NA\right)^{2}}{1+\left(\pi\cdot\left(NA\right)^{2}\cdot\frac{x}{\lambda}\right)^{2}}}}}}\right)\approx
+=\hat{x}\cdot\beta A\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}}{w^{2}\left(x\right)}}\sin\left(k_{l}x+k_{l}\frac{y^{2}+z^{2}}{2R\left(x\right)}-\psi\left(x\right)\right)\cdot I\left(x,y,z,t\right)\cdot\cos\theta\cdot\left({\color{purple}1}+{\color{purple}1}\cdot{\color{gray}\underset{\text{small correction}}{\underbrace{{\normalcolor \frac{y^{2}+z^{2}}{2\lambda^{2}}}}}}\cdot\frac{\left(\frac{1}{\pi\cdot\left(\kaliNA\right)^{2}}\right)^{2}-\left(\frac{x}{\lambda}\right)^{2}}{\left(\frac{x^{2}}{\lambda^{2}}+\frac{1}{\left(\pi\cdot\left(\kaliNA\right)^{2}\right)^{2}}\right)^{2}}+{\color{gray}\underset{<6\%\text{ for \kaliNA}=0.3}{\underbrace{{\normalcolor \frac{2\left(\kaliNA\right)^{2}}{1+\left(\pi\cdot\left(\kaliNA\right)^{2}\cdot\frac{x}{\lambda}\right)^{2}}}}}}\right)\approx
 \]
 
 \end_inset
@@ -4820,11 +4820,23 @@ Choosing equal amplitudes::
 
 \begin_inset Formula 
 \begin{equation}
-\boxed{E_{2}=E_{1}\cdot\frac{\lambda_{1}}{\lambda_{2}}}\label{eq:E_ratio}
+\boxed{E_{2}=E_{1}\cdot\frac{\lambda_{1}}{\lambda_{2}}}\tag{Amplitudes Ratio}\label{eq:E_ratio}
 \end{equation}
 
 \end_inset
 
+And for the intensity and the power:
+\begin_inset Formula 
+\[
+P_{2}\propto I_{2}=I_{1}\cdot\left(\frac{\lambda_{1}}{\lambda_{2}}\right)^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 Denoting 
 \begin_inset Formula 
 \begin{equation}
@@ -5531,7 +5543,7 @@ E_{\text{laser,lattic'es frame}}\left(x^{\prime},y^{\prime},z^{\prime},t^{\prime
 
 \begin_inset Formula 
 \[
-={\color{teal}E_{0,\text{envelope}}\left(\gamma x^{\prime}+\gamma\beta ct^{\prime},y^{\prime},z^{\prime}\right)}\cdot\left[{\color{red}\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\varphi_{-}\left(x^{\prime}\right)\right)}}+2e^{i\omega t}\cos\left(\varphi\left(x^{\prime}\right)\right)+{\color{blue}\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\varphi_{+}\left(x^{\prime}\right)\right)}}\right]\tag{{\color{blue}\ref{eq:wave_in_moving_frame}}}
+={\color{teal}E_{0,\text{envelope}}\left(\gamma x^{\prime}+\gamma\beta ct^{\prime},y^{\prime},z^{\prime}\right)}\cdot\left[{\color{red}\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\varphi_{-}\left(x^{\prime}\right)\right)}}+{\color{green}2e^{i\omega t^{\prime}}\cos\left(\varphi\left(x^{\prime}\right)\right)}+{\color{blue}\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\varphi_{+}\left(x^{\prime}\right)\right)}}\right]\tag{{\color{blue}\ref{eq:wave_in_moving_frame}}}
 \]
 
 \end_inset
@@ -6389,7 +6401,7 @@ We know that:
  & =\frac{2\pi^{2}\cdot w_{0}^{2}}{\lambda^{2}\cdot L}\\
  & =\frac{2\pi^{2}\cdot w_{0}^{2}}{\lambda^{2}\cdot L}\cdot\frac{\pi^{2}}{\lambda^{2}}\cdot\frac{\lambda^{2}}{\pi^{2}}\\
  & =\frac{2{\color{teal}\pi^{4}\cdot w_{0}^{4}}}{{\color{teal}\lambda^{2}}\cdot L}\cdot\frac{\lambda^{2}}{\pi^{2}}\\
- & =\frac{2\lambda^{2}}{{\color{teal}NA^{4}}\cdot L\cdot\pi^{2}}{\color{lightgray}\ \backslash\cdot\frac{NA^{4}}{u}}
+ & =\frac{2\lambda^{2}}{{\color{teal}\kaliNA^{4}}\cdot L\cdot\pi^{2}}{\color{lightgray}\ \backslash\cdot\frac{\kaliNA^{4}}{u}}
 \end{split}
 \end{equation}
 
@@ -6398,7 +6410,7 @@ We know that:
 
 \begin_inset Formula 
 \[
-{\color{teal}NA^{4}}=\frac{2\lambda^{2}}{L\pi^{2}u}\Rightarrow
+{\color{teal}\kaliNA^{4}}=\frac{2\lambda^{2}}{L\pi^{2}u}\Rightarrow
 \]
 
 \end_inset
@@ -6406,7 +6418,7 @@ We know that:
 
 \begin_inset Formula 
 \[
-NA^{4}\propto\lambda^{2}{\color{lightgray}\ \backslash\sqrt[4]{}}
+\kaliNA^{4}\propto\lambda^{2}{\color{lightgray}\ \backslash\sqrt[4]{}}
 \]
 
 \end_inset
@@ -6414,7 +6426,7 @@ NA^{4}\propto\lambda^{2}{\color{lightgray}\ \backslash\sqrt[4]{}}
 
 \begin_inset Formula 
 \[
-NA\propto\sqrt{\lambda}
+\kaliNA\propto\sqrt{\lambda}
 \]
 
 \end_inset
@@ -6422,7 +6434,7 @@ NA\propto\sqrt{\lambda}
 
 \begin_inset Formula 
 \begin{equation}
-NA_{2}=NA_{1}\cdot\sqrt{\frac{\lambda_{2}}{\lambda_{1}}}\tag{NA ratios}\label{eq:e_34}
+\kaliNA_{2}=\kaliNA_{1}\cdot\sqrt{\frac{\lambda_{2}}{\lambda_{1}}}\tag{NA ratios}\label{eq:e_34}
 \end{equation}
 
 \end_inset
@@ -6436,11 +6448,11 @@ Thus if we have
 \end_inset
 
 , and 
-\begin_inset Formula $NA_{1}=0.1$
+\begin_inset Formula $\kaliNA_{1}=0.1$
 \end_inset
 
  then 
-\begin_inset Formula $NA_{2}=0.1\cdot\frac{1}{\sqrt{2}}$
+\begin_inset Formula $\kaliNA_{2}=0.1\cdot\frac{1}{\sqrt{2}}$
 \end_inset
 
 
@@ -7706,7 +7718,7 @@ generate_coordinates_lattice
 
 \begin_layout Standard
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -8276,7 +8288,7 @@ We have a phase of the form:
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\phi\left(x,y,t\right)=\phi_{\text{const}}\left(x,y\right)+C\left(x,y\right)\cdot\sin\left(\Delta\omega+\varphi\left(x,y\right)\right)
+\phi\left(x,y,t\right)=\phi_{\text{const}}\left(x,y\right)+C\left(x,y\right)\cdot\sin\left(\Delta\omega t+\varphi\left(x,y\right)\right)
 \]
 
 \end_inset
@@ -8291,9 +8303,13 @@ Since
 \end_inset
 
  separately, then we can omit them for abbreviation: 
+\begin_inset Formula $C\left(x,y\right)\rightarrow C,\ \ \phi_{\text{const}}\left(x,y\right)\rightarrow\phi_{\text{const}}$
+\end_inset
+
+ 
 \begin_inset Formula 
 \[
-\phi\left(t\right)=\phi_{\text{const}}+C\cdot\sin\left(\Delta\omega+\varphi\right)
+\phi\left(t\right)=\phi_{\text{const}}+C\cdot\sin\left(\Delta\omega t+\varphi\right)
 \]
 
 \end_inset
@@ -8415,6 +8431,167 @@ And otherwise we can substitute it in the equation for
 
 \end_layout
 
+\begin_layout Subsubsection
+Extracting 
+\begin_inset Formula $C$
+\end_inset
+
+ and 
+\begin_inset Formula $\phi_{\text{const}}$
+\end_inset
+
+ of another amplitude from previous calculation
+\end_layout
+
+\begin_layout Standard
+Suppose we once calculated 
+\begin_inset Formula $\phi_{\text{const}}$
+\end_inset
+
+ and 
+\begin_inset Formula $C$
+\end_inset
+
+ from the previous section for some 
+\begin_inset Formula $E_{1}$
+\end_inset
+
+, and now we wish to do the same calculation for the same setup but with
+ a different 
+\begin_inset Formula $E_{1}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+From equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_3"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we see that the total phase shift is given by an expression of the form:
+\begin_inset Formula 
+\[
+\phi\left(x,y,z,t_{0}\right)=\intop\left|I\left(x,y,z,t_{0}\right)\right|^{2}dx
+\]
+
+\end_inset
+
+Since this term is a sum of two lasers, each one contributing to the integrand
+ an expression of the form 
+\begin_inset Formula $I_{1,2}\left(t_{0},z\right)e^{i\omega_{1,2}t_{0}}$
+\end_inset
+
+, we get:
+\begin_inset Formula 
+\begin{align*}
+\intop\left|I\left(t_{0},z\right)\right|^{2}dz & =\intop\left|I_{1}\left(t_{0},z\right)e^{i\omega_{1}t_{0}}+I_{2}\left(t_{0},z\right)e^{i\omega_{1}t_{0}}\right|^{2}dz\\
+ & =\intop\left|I_{1}^{2}\right|\left(t_{0},z\right)+\left|I_{2}^{2}\right|\left(t_{0},z\right)+2\cos\left(\Delta\omega t_{0}\right)\cdot\left|I_{1}\left(t_{0},z\right)I_{2}\left(t_{0},z\right)\right|dz
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And if 
+\begin_inset Formula $I_{1,2}^{2}$
+\end_inset
+
+ go like some 
+\begin_inset Formula $E_{0}^{2}$
+\end_inset
+
+ (for both 
+\begin_inset Formula $_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $_{2}$
+\end_inset
+
+, as in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:E_0_def"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+) so it is of the form:
+\begin_inset Formula 
+\[
+I_{i}^{2}=\hat{I}_{i}^{2}\cdot E_{0}^{2}
+\]
+
+\end_inset
+
+then we can express the integral as:
+\begin_inset Formula 
+\[
+\intop\left|I\left(t_{0}+\Delta t,z\right)\right|^{2}dz=E_{0}^{2}\intop_{z}\left|I_{1}^{2}\right|\left(t_{0},z\right)+\left|I_{2}^{2}\right|\left(t_{0},z\right)dz+E_{0}^{2}2\cos\left(\Delta\omega t_{0}\right)\intop_{z}\left|I_{1}\left(t_{0},z\right)I_{2}\left(t_{0},z\right)\right|dz
+\]
+
+\end_inset
+
+And therefore we see that under increase of 
+\begin_inset Formula $E_{0}\rightarrow E_{0}^{\prime}$
+\end_inset
+
+ we will have separate increase of:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\left\{ \phi_{\text{const}}\left(E\right),C\left(E_{0}\right)\right\} \xrightarrow[E_{0}\rightarrow E_{0}^{\prime}]{}\left\{ \phi_{\text{const}}\left(E_{0}\right)\cdot\left(\frac{E_{0}^{\prime}}{E_{0}}\right)^{2},C\left(E_{0}\right)\cdot\left(\frac{E_{0}^{\prime}}{E_{0}}\right)^{2}\right\} \tag{e\_42}\label{eq:e_42}
+\end{equation}
+
+\end_inset
+
+Checking the difference between the extrapolated value according to 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_42"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ and the actual value achieved by calculating everything again, for amplitudes
+ save in a 
+\family typewriter
+:.5g
+\family default
+ accuracy, resulted in relative errors of around 
+\begin_inset Formula $10^{-4}$
+\end_inset
+
+ (between the value calculated again and the value achieved by extrapolation).
+\end_layout
+
 \begin_layout Subsection
 Extracting the amplitude required for a given phase shift based on one sample
 \end_layout
@@ -8493,6 +8670,152 @@ Isolate
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+Power to amplitude relation
+\end_layout
+
+\begin_layout Standard
+If the gaussian beam has the shape:
+\begin_inset Formula 
+\[
+E=E_{0}\cdot\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}+z^{2}}{w^{2}\left(x\right)}}\cdot e^{i\varphi\left(x,y,z\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then the intensity has the form:
+\begin_inset Formula 
+\[
+I=E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(x\right)}e^{-2\frac{y^{2}+z^{2}}{w^{2}\left(x\right)}}=E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(x\right)}e^{-\frac{y^{2}+z^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}
+\]
+
+\end_inset
+
+And for 
+\begin_inset Formula $x=0$
+\end_inset
+
+ we have: (using the Intensity definition from 
+\bar under
+\color blue
+
+\begin_inset CommandInset href
+LatexCommand href
+name "wikipedia"
+target "https://en.wikipedia.org/wiki/Intensity_(physics)"
+literal "false"
+
+\end_inset
+
+
+\bar default
+\color inherit
+)
+\begin_inset Formula 
+\[
+I\left(0,y,z\right)=\frac{c\varepsilon_{0}}{2}\cdot\left|E\right|^{2}=\frac{c\varepsilon_{0}}{2}E_{0}^{2}\cancel{\frac{w_{0}^{2}}{w_{0}^{2}}}e^{-\frac{y^{2}+z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}=\frac{c\varepsilon_{0}}{2}E_{0}^{2}e^{-\frac{y^{2}+z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}={\color{green}\left(\sqrt{2\pi}\cdot\frac{w_{0}}{\sqrt{2}}\right)^{2}}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\frac{1}{{\color{green}\sqrt{2\pi}\cdot\frac{w_{0}}{\sqrt{2}}}}e^{-\frac{y^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}\cdot\frac{1}{{\color{green}\sqrt{2\pi}\cdot\frac{w_{0}}{\sqrt{2}}}}e^{-\frac{z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}=
+\]
+
+\end_inset
+
+Integrating over 
+\begin_inset Formula $dy,dz$
+\end_inset
+
+ we get:
+\begin_inset Formula 
+\begin{align*}
+P & =\intop_{y,z}I\left(0,y,z\right)dydz\\
+= & \intop_{y,z}\frac{c\varepsilon_{0}}{2}E_{0}^{2}e^{-\frac{y^{2}+z^{2}}{\frac{1}{2}w_{0}^{2}}}dydz\\
+= & \intop_{\theta}\intop_{r}\frac{c\varepsilon_{0}}{2}E_{0}^{2}e^{-\frac{r^{2}}{\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}}}drrd\theta\\
+= & 2\pi\frac{c\varepsilon_{0}}{2}E_{0}^{2}\intop_{\tilde{r}}re^{-\left(\frac{r}{\left(\frac{w_{0}}{\sqrt{2}}\right)}\right)^{2}}dr\\
+\stackrel{r\rightarrow\tilde{r}=\frac{r}{\left(\frac{w_{0}}{\sqrt{2}}\right)}}{=} & 2\pi\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\intop_{\tilde{r}}\tilde{r}e^{-\tilde{r}^{2}}d\tilde{r}\\
+\stackrel{\tilde{r}^{2}\rightarrow s,ds=\frac{1}{2}\tilde{r}d\tilde{r}}{=} & 2\pi\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\intop_{s}\frac{1}{2}e^{-s}ds\\
+= & 2\pi\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\left.\frac{1}{2}e^{-s}\right|_{\infty}^{0}\\
+ & =2\pi\frac{w_{0}^{2}}{4}\frac{c\varepsilon_{0}}{2}E_{0}^{2}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}
+\]
+
+\end_inset
+
+Or also:
+\begin_inset Formula 
+\[
+P=\intop_{y,z}I\left(0,y,z\right)dydz=\intop_{{\color{brown}y},{\color{teal}z}}\left(\sqrt{2\pi}\cdot\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}{\color{brown}\frac{1}{\sqrt{2\pi}\cdot\frac{w_{0}}{2}}e^{-\frac{y^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}}\cdot{\color{teal}\frac{1}{\sqrt{2\pi}\cdot\frac{w_{0}}{2}}e^{-\frac{z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}}{\color{brown}dy}{\color{teal}dz}=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\left(\sqrt{2\pi}\cdot\frac{w_{0}}{2}\right)^{2}E_{0}^{2}\frac{c\varepsilon_{0}}{2}{\color{gray}\underset{=1}{\underbrace{{\normalcolor {\color{brown}\intop_{y}\frac{1}{\sqrt{2\pi}\cdot\frac{w_{0}}{2}}e^{-\frac{y^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}dy}}}}}\cdot{\color{gray}\underset{=1}{\underbrace{{\normalcolor {\color{teal}\intop_{z}\frac{1}{\sqrt{2\pi}\cdot\frac{w_{0}}{2}}e^{-\frac{z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}dz}}}}}=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+=\left(\sqrt{2\pi}\cdot\frac{w_{0}}{2}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}=
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}
+\]
+
+\end_inset
+
+Using 
+\begin_inset Formula $w_{0}=\frac{\lambda}{\pi\cdot\kaliNA}$
+\end_inset
+
+, we can also write:
+\begin_inset Formula 
+\[
+P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}=P=\frac{\pi c\varepsilon_{0}}{4}\left(\frac{\lambda}{\pi\cdot\kaliNA}\right)^{2}E_{0}^{2}=\frac{c\varepsilon_{0}\lambda^{2}}{4\pi\cdot\kaliNA^{2}}E_{0}^{2}
+\]
+
+\end_inset
+
+Or alternatively:
+\begin_inset Formula 
+\begin{equation}
+\boxed{E_{0}=\frac{2\kaliNA}{\lambda}\sqrt{\frac{\pi P}{c\varepsilon_{0}}}}\tag{e\_43}\label{eq:e_43}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the two dimen
 \end_layout
 
 \begin_layout Standard

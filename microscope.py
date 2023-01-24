@@ -16,7 +16,7 @@ C_LIGHT = 299792458
 H_BAR = 1.054571817e-34
 E_CHARGE = 1.602176634e-19
 FINE_STRUCTURE_CONST = 7.299e-3
-
+EPSILON_ELECTRICITY = 8.8541878128e-12
 np.seterr(all="raise")
 
 
@@ -347,13 +347,13 @@ def divide_calculation_to_batches(
     return output
 
 
-def find_amplitude_for_phase(
-    starting_E: float = 1e7,
+def find_power_for_phase(
+    starting_power: float = 1e3,
     desired_phase: float = pi / 2,
     cavity_type: str = "numerical",
     print_progress=True,
     mode: str = "analytical",
-    plot_in_numerical_option: bool = False,
+    plot_in_numerical_option: bool = True,
     **kwargs,
 ):
 
@@ -361,72 +361,68 @@ def find_amplitude_for_phase(
     input_wave = WaveFunction(psi=np.ones((1, 1)), coordinates=input_coordinate_system, E0=Joules_of_keV(300))
     # Based on equation e_41 from the simulation notes:
     if mode == "analytical":
-        x_1 = starting_E
+        x_1 = starting_power
         if cavity_type == "numerical":
-            C_1 = CavityNumericalPropagator(E_1=x_1, **kwargs)
+            C_1 = CavityNumericalPropagator(power_1=x_1, **kwargs)
         elif cavity_type == "analytical":
-            C_1 = CavityAnalyticalPropagator(E_1=x_1, **kwargs)
+            C_1 = CavityAnalyticalPropagator(power_1=x_1, **kwargs)
         else:
             raise ValueError(f"Unknown cavity type {cavity_type}")
         mask_1 = C_1.phase_and_amplitude_mask(input_wave=input_wave)
         y_1 = np.real(np.angle(mask_1[0, 0]))
         y_2_supposed = -desired_phase
-        x_2 = np.sqrt(y_2_supposed * x_1**2 / y_1)
+        x_2 = y_2_supposed * x_1 / y_1
 
         if cavity_type == "numerical":
-            C_2 = CavityNumericalPropagator(E_1=x_2, **kwargs)
+            C_2 = CavityNumericalPropagator(power_1=x_2, **kwargs)
         else:
-            C_2 = CavityAnalyticalPropagator(E_1=x_2, **kwargs)
+            C_2 = CavityAnalyticalPropagator(power_1=x_2, **kwargs)
 
         mask_2 = C_2.phase_and_amplitude_mask(input_wave=input_wave)
         y_2_resulted = np.real(np.angle(mask_2[0, 0]))
         if print_progress:
-            print(f"for E_1 = {x_2:.1e} the resulted phase is {y_2_resulted / np.pi:.2f} pi")
+            print(f"for power_1 = {x_2:.1e} the resulted phase is {y_2_resulted / np.pi:.2f} pi")
         return x_2
     elif mode == "numerical":
         # Brute force search:
         phases = []
         resulted_phase = 0
-        E = starting_E
+        P = starting_power
         Es = []
         while resulted_phase + desired_phase > 0:
             if cavity_type == "numerical":
-                C = CavityNumericalPropagator(E_1=E, **kwargs)
+                C = CavityNumericalPropagator(power_1=P, **kwargs)
             elif cavity_type == "analytical":
-                C = CavityAnalyticalPropagator(E_1=E, **kwargs)
+                C = CavityAnalyticalPropagator(power_1=P, **kwargs)
             else:
                 raise ValueError("cavity_type must be either 'numerical' or 'analytical'")
             phase_and_amplitude_mask = C.phase_and_amplitude_mask(input_wave=input_wave)
             resulted_phase = np.real(np.angle(phase_and_amplitude_mask[0, 0]))
             phases.append(resulted_phase)
             if print_progress:
-                print(f"For E={E:.2e} the phase is phi={resulted_phase:.2f}")
-            Es.append(E)
-            E *= 1.01
+                print(f"For P={P:.2e} the phase is phi={resulted_phase:.2f}")
+            Es.append(P)
+            P *= 1.01
 
         if plot_in_numerical_option:
             plt.plot(Es, np.real(phases))
             plt.axhline(-desired_phase, color="r")
             plt.ylabel("Phase [rad]")
-            plt.xlabel("E_{1} [J]")
-            plt.title("phase of x=y=0 as a function of E_1 amplitude")
+            plt.xlabel("$power_{1}$ [W]")
+            plt.title("phase of x=y=0 as a function of power_1")
             plt.show()
         if print_progress:
-            print(f"For E={Es[-1]:.2e} the phase is phi={resulted_phase:.2f}")
+            print(f"For P={Es[-1]:.2e} the phase is phi={resulted_phase:.2f}")
         return Es[-1]
 
-
 ############################################################################################################
-
-Lengths = Tuple[float, ...]
-
 
 @dataclass
 class CoordinateSystem:
     def __init__(
         self,
         axes: Optional[Tuple[np.ndarray, ...]] = None,  # The axes of the incoming wave function
-        lengths: Optional[Lengths] = None,  # the lengths of the sample in the x, y directions
+        lengths: Optional[Tuple[int, ...]] = None,  # the lengths of the sample in the x, y directions
         n_points: Optional[Tuple[int, ...]] = None,  # the number of points in the x, y directions
         dxdydz: Optional[Tuple[float, ...]] = None,
     ):  # the step size in the x, y directions
@@ -639,7 +635,9 @@ class Microscope:
             output_wave = self.propagation_steps[-1].output_wave
 
         output_wave_intensity = np.abs(output_wave.psi) ** 2
-        expected_electrons_per_pixel = output_wave_intensity * (self.n_electrons_per_square_angstrom * output_wave.psi.size)
+        expected_electrons_per_pixel = output_wave_intensity * (
+            self.n_electrons_per_square_angstrom * output_wave.psi.size
+        )
         output_wave_intensity_shot_noise = np.random.poisson(expected_electrons_per_pixel)  # This actually assumes an
         # independent shot noise for each pixel, which is not true, but it's a good approximation for many pixels.
         return SpatialFunction(
@@ -820,11 +818,11 @@ class LensPropagator(Propagator):
         psi_FFT = np.fft.fftn(input_wave.psi, norm="ortho")
         fft_freq_x = np.fft.fftfreq(input_wave.psi.shape[0], input_wave.coordinates.dxdydz[0])
         fft_freq_y = np.fft.fftfreq(input_wave.psi.shape[1], input_wave.coordinates.dxdydz[1])
+        fft_freq_x = np.fft.fftshift(fft_freq_x)
+        fft_freq_y = np.fft.fftshift(fft_freq_y)
 
-        if self.fft_shift:
+        if self.fft_shift:  # fft_shift is required only once in the first lens.
             psi_FFT = np.fft.fftshift(psi_FFT)
-            fft_freq_x = np.fft.fftshift(fft_freq_x)
-            fft_freq_y = np.fft.fftshift(fft_freq_y)
 
         scale_factor = self.focal_length * l_of_E(input_wave.E0)
         new_axes = tuple([fft_freq_x * scale_factor, fft_freq_y * scale_factor])
@@ -882,8 +880,8 @@ class CavityPropagator(Propagator):
         self,
         l_1: float = 1064 * 1e-9,
         l_2: Optional[float] = 532 * 1e-9,
-        E_1: float = 1,
-        E_2: Optional[float] = -1,
+        power_1: float = -1,
+        power_2: Optional[float] = -1,
         NA_1: float = 0.1,
         NA_2: Optional[float] = -1,
         theta_polarization: float = np.pi / 2,
@@ -893,14 +891,17 @@ class CavityPropagator(Propagator):
         ignore_past_files: bool = False,
     ):
 
-        self.l_1 = l_1  # Laser's frequency
-        self.E_1 = E_1  # Laser's amplitude
-        if E_2 == -1:
+        self.l_1 = l_1  # l means lambda
+        self.l_2 = l_2  # l means lambda
+
+        self.power_1 = power_1  # The power is the integral over the electric field squared in the z,y plane
+        if power_2 == -1:
             # -1 means that the second laser is defined by the condition for equal amplitudes in the lattices' frame
-            self.E_2 = E_1 * (l_1 / l_2)
+            # this ratio is derived in equation "Amplitudes Ratio" in the simulation notes.
+            self.power_2 = self.power_1 * (l_1 / l_2) ** 2
         else:
-            self.E_2 = E_2
-        self.l_2 = l_2
+            self.power_2 = power_2
+
         self.NA_1 = NA_1  # Cavity's numerical aperture
         if NA_2 == -1:
             if l_2 is None:
@@ -933,6 +934,17 @@ class CavityPropagator(Propagator):
 
     def NA_lorentz_transform(self, NA):
         return np.sin(np.arctan(np.tan(np.arcsin(NA))) / gamma_of_beta(self.beta_lattice))
+
+    @property
+    def E_1(self):
+        return np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
+
+    @property
+    def E_2(self):
+        if self.power_2 is None:
+            return None
+        else:
+            return np.sqrt(np.pi * self.power_2 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_2 / self.l_2)
 
     @property
     def NA_min(self):
@@ -1035,39 +1047,29 @@ class CavityAnalyticalPropagator(CavityPropagator):
         self,
         l_1: float = 1064 * 1e-9,
         l_2: Optional[float] = 532 * 1e-9,
-        E_1: float = -1,
-        E_2: Optional[float] = -1,
+        power_1: float = -1,
+        power_2: Optional[float] = -1,
         NA_1: float = 0.1,
         NA_2: Optional[float] = -1,
         theta_polarization: float = np.pi / 2,
         alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
         alpha_cavity_deviation: float = 0,
         ring_cavity: bool = True,
-        starting_E_in_auto_E_search: float = 1e7,
+        starting_P_in_auto_P_search: float = 1e3,
         ignore_past_files: bool = False,
     ):
 
-        if E_1 == -1:
-            E_1 = find_amplitude_for_phase(
-                starting_E=starting_E_in_auto_E_search,
-                cavity_type="analytical",
-                print_progress=True,
-                l_1=l_1,
-                l_2=l_2,
-                E_2=E_2,
-                NA_1=NA_1,
-                NA_2=NA_2,
-                theta_polarization=theta_polarization,
-                alpha_cavity=alpha_cavity,
-                alpha_cavity_deviation=alpha_cavity_deviation,
-                ring_cavity=ring_cavity,
-            )
+        if power_1 == -1:
+            power_1 = find_power_for_phase(starting_power=starting_P_in_auto_P_search, cavity_type="analytical",
+                                           print_progress=True, l_1=l_1, l_2=l_2, power_2=power_2, NA_1=NA_1, NA_2=NA_2,
+                                           theta_polarization=theta_polarization, alpha_cavity=alpha_cavity,
+                                           alpha_cavity_deviation=alpha_cavity_deviation, ring_cavity=ring_cavity)
 
         super().__init__(
             l_1,
             l_2,
-            E_1,
-            E_2,
+            power_1,
+            power_2,
             NA_1,
             NA_2,
             theta_polarization,
@@ -1166,17 +1168,17 @@ class CavityAnalyticalPropagator(CavityPropagator):
     def setup_to_path(self, input_wave: WaveFunction) -> str:
         # This function is used to generate a unique name for each setup, such that we can load previous results if they
         # exist, and not calculate everything again in each run.
-        if self.E_2 is None:
-            E_2_str = "None"
+        if self.power_2 is None:
+            power_2_str = "None"
             N_2_str = "None"
             l_2_str = "None"
         else:
-            E_2_str = f"{self.E_2:.2e}"
+            power_2_str = f"{self.power_2:.2e}"
             N_2_str = f"{self.NA_2 * 100:.4g}"
             l_2_str = f"{self.l_2 * 1e9:.4g}"
         path = (
             f"Data Arrays\\Phase Masks\\2f_a_l1{self.l_1 * 1e9:.4g}_l2{l_2_str}_"
-            f"E1{self.E_1:.3g}_E2{E_2_str}_NA1{self.NA_1 * 100:.4g}_NA2{N_2_str}_"
+            f"P1{self.power_1:.3g}_E2{power_2_str}_NA1{self.NA_1 * 100:.4g}_NA2{N_2_str}_"
             f"alpha{self.beta_electron2alpha_cavity(input_wave.beta) / 2 * np.pi * 360:.0f}_"
             f"theta{self.theta_polarization * 100:.4g}_E{input_wave.E0:.2g}_Ring{self.ring_cavity}_"
             f"Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_"
@@ -1190,8 +1192,8 @@ class CavityNumericalPropagator(CavityPropagator):
         self,
         l_1: float = 1064 * 1e-9,
         l_2: Optional[float] = 532 * 1e-9,
-        E_1: float = -1,
-        E_2: Optional[float] = -1,
+        power_1: float = -1,
+        power_2: Optional[float] = -1,
         NA_1: float = 0.1,
         NA_2: Optional[float] = -1,
         theta_polarization: float = np.pi / 2,
@@ -1202,33 +1204,23 @@ class CavityNumericalPropagator(CavityPropagator):
         print_progress: bool = True,
         n_t: int = 3,
         n_z: Optional[int] = None,
-        starting_E_in_auto_E_search: float = 1e7,
+        starting_P_in_auto_P_search: float = 1e3,
         debug_mode: bool = False,
-        batches_calculation_numel_maximal: int = 1e4,
+        batches_calculation_numel_maximal: int = 1e4  # This determines how many x,y,t points are calculated in each
+        # batch
     ):
 
-        if E_1 == -1:
-            E_1 = find_amplitude_for_phase(
-                starting_E=starting_E_in_auto_E_search,
-                cavity_type="numerical",
-                print_progress=True,
-                l_1=l_1,
-                l_2=l_2,
-                E_2=E_2,
-                NA_1=NA_1,
-                NA_2=NA_2,
-                theta_polarization=theta_polarization,
-                alpha_cavity=alpha_cavity,
-                alpha_cavity_deviation=alpha_cavity_deviation,
-                ring_cavity=ring_cavity,
-                n_t=n_t,
-                ignore_past_files=ignore_past_files,
-            )
+        if power_1 == -1:
+            power_1 = find_power_for_phase(starting_power=starting_P_in_auto_P_search, cavity_type="numerical",
+                                           print_progress=True, l_1=l_1, l_2=l_2, power_2=power_2, NA_1=NA_1, NA_2=NA_2,
+                                           theta_polarization=theta_polarization, alpha_cavity=alpha_cavity,
+                                           alpha_cavity_deviation=alpha_cavity_deviation, ring_cavity=ring_cavity,
+                                           n_t=n_t, ignore_past_files=ignore_past_files)
         super().__init__(
             l_1,
             l_2,
-            E_1,
-            E_2,
+            power_1,
+            power_2,
             NA_1,
             NA_2,
             theta_polarization,
@@ -1253,12 +1245,12 @@ class CavityNumericalPropagator(CavityPropagator):
 
         # For the case it exists but with a different amplitude:
         else:
-            E_1_pattern = "E1(.*?)_"
-            E_2_pattern = "E2(.*?)_"
+            power_1_pattern = "P1(.*?)_"
+            power_2_pattern = "P2(.*?)_"
             phase_masks_path = "Data Arrays\\Phase Masks\\"
-            general_file_name = setup_file_path[len(phase_masks_path) :].replace('.', r'\.').replace('+', r'\+')
-            general_file_name = re.sub(E_1_pattern, E_1_pattern, general_file_name)
-            general_file_name = re.sub(E_2_pattern, E_2_pattern, general_file_name)
+            general_file_name = setup_file_path[len(phase_masks_path) :].replace(".", r"\.").replace("+", r"\+")
+            general_file_name = re.sub(power_1_pattern, power_1_pattern, general_file_name)
+            general_file_name = re.sub(power_2_pattern, power_2_pattern, general_file_name)
             pattern_re = re.compile(general_file_name)
             existing_files = os.listdir(phase_masks_path)
             existing_files_with_same_setup = list(filter(lambda x: bool(re.search(pattern_re, x)), existing_files))
@@ -1267,13 +1259,13 @@ class CavityNumericalPropagator(CavityPropagator):
             if len(existing_files_with_same_setup) > 0 and not self.ignore_past_files:
                 first_file_path = existing_files_with_same_setup[0]  # There should be only one file with the same
                 # setup, and if there are more, then they are equivalent, so anyway we can take the first one.
-                E_1_original = float(re.search(E_1_pattern, first_file_path).group(1))
-                E_2_original = float(re.search(E_2_pattern, first_file_path).group(1))
-                E_1_ratio, E_2_ratio = self.E_1 / E_1_original, self.E_2 / E_2_original
+                power_1_original = float(re.search(power_1_pattern, first_file_path).group(1))
+                power_2_original = float(re.search(power_2_pattern, first_file_path).group(1))
+                power_1_ratio, power_2_ratio = self.power_1 / power_1_original, self.power_2 / power_2_original
 
                 # If the two frequencies don't have the same ratio to the original ones or the original calculation
                 # was done using a Fourier Transform then we can't use it:
-                if np.abs((E_1_ratio - E_2_ratio) / E_1_ratio) > 1e-2 or self.n_t != 3:
+                if np.abs((power_1_ratio - power_2_ratio) / power_1_ratio) > 1e-2 or self.n_t != 3:
                     phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
 
                 # If the original setup had different amplitudes but the same setup then we can use the same phase mask
@@ -1281,19 +1273,19 @@ class CavityNumericalPropagator(CavityPropagator):
                 # e_42 in the simulation notes.
                 else:
                     phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(
-                        setup_file_path=phase_masks_path+existing_files_with_same_setup[0], amplitudes_ratio_squared=(self.E_1 / E_1_original) ** 2
-                    )
+                        setup_file_path=phase_masks_path + existing_files_with_same_setup[0],
+                        powers_ratio=self.power_1 / power_1_original)
 
             else:
                 phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave, save_results=True)
         return phase_and_amplitude_mask
 
-    def setup_to_phase_and_amplitude_mask(self, setup_file_path: str, amplitudes_ratio_squared: float = 1):
+    def setup_to_phase_and_amplitude_mask(self, setup_file_path: str, powers_ratio: float = 1):
         phase_and_amplitude_mask = np.load(setup_file_path)
         phi_const_original = phase_and_amplitude_mask[:, :, 0]
         C_original = phase_and_amplitude_mask[:, :, 1]
-        phase_and_amplitude_mask = np.exp(1j * phi_const_original * amplitudes_ratio_squared) * jv(
-            0, C_original * amplitudes_ratio_squared
+        phase_and_amplitude_mask = np.exp(1j * phi_const_original * powers_ratio) * jv(
+            0, C_original * powers_ratio
         )
         return phase_and_amplitude_mask
 
@@ -1553,17 +1545,17 @@ class CavityNumericalPropagator(CavityPropagator):
     def setup_to_path(self, input_wave: WaveFunction) -> str:
         # This function is used to generate a unique name for each setup, such that we can load previous results if they
         # exist, and not calculate everything again in each run.
-        if self.E_2 is None:
-            E_2_str = "None"
+        if self.power_2 is None:
+            power_2_str = "None"
             N_2_str = "None"
             l_2_str = "None"
         else:
-            E_2_str = f"{self.E_2:.5g}"
+            power_2_str = f"{self.power_2:.5g}"
             N_2_str = f"{self.NA_2 * 100:.4g}"
             l_2_str = f"{self.l_2 * 1e9:.4g}"
         path = (
             f"Data Arrays\\Phase Masks\\2f_n_l1{self.l_1 * 1e9:.4g}_l2{l_2_str}_"
-            f"E1{self.E_1:.5g}_E2{E_2_str}_NA1{self.NA_1 * 100:.4g}_NA2{N_2_str}_"
+            f"P1{self.power_1:.5g}_P2{power_2_str}_NA1{self.NA_1 * 100:.4g}_NA2{N_2_str}_"
             f"alpha{self.beta_electron2alpha_cavity(input_wave.beta) / 2 * np.pi * 360:.0f}_"
             f"theta{self.theta_polarization * 100:.4g}_E{input_wave.E0:.2g}_Ring{self.ring_cavity}_"
             f"Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nt{self.n_t}_"
@@ -1625,3 +1617,4 @@ class CavityNumericalPropagator(CavityPropagator):
             return A * np.cos(self.theta_polarization) * np.cos(alpha_cavity)
         else:
             raise ValueError("component_index must be in [0, 1, 2, 'x', 'y', 'z']")
+
