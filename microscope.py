@@ -1218,7 +1218,7 @@ class CavityNumericalPropagator(CavityPropagator):
         n_z: Optional[int] = None,
         starting_P_in_auto_P_search: float = 1e3,
         debug_mode: bool = False,
-        batches_calculation_numel_maximal: int = 1e4  # This determines how many x,y,t points are calculated in each
+        batches_calculation_numel_maximal: int = 1e5  # This determines how many x,y,t points are calculated in each
         # batch
     ):
 
@@ -1603,8 +1603,9 @@ class CavityNumericalPropagator(CavityPropagator):
                 / np.cos(alpha_cavity)
                 * (2 * integral_limit_in_spot_size_units)
             )
-            dz = self.min_l / (1 + 1 / beta_electron) / 3  # ARBITRARY - the term before the 3 factor is the effective
-            # wavelength seen by the electron, and we divide it by 3 to sample the wave in a higher frequency.
+            dz = self.min_l / (1 + 1 / beta_electron) / 0.5  # ARBITRARY - This value was determined by playing with the
+            # simulation and checking that the results are stable. the derivation is still not existent and I
+            # need to write it down.
             required_n_z_for_integration_over_maximal_interval = int(max_z_integration_interval / dz)
         else:
             required_n_z_for_integration_over_maximal_interval = self.n_z
