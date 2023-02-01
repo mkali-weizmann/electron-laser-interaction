@@ -381,7 +381,7 @@ def find_power_for_phase(
         mask_2 = C_2.phase_and_amplitude_mask(input_wave=input_wave)
         y_2_resulted = np.real(np.angle(mask_2[0, 0]))
         if print_progress:
-            print(f"for power_1 = {x_2:.1e} the resulted phase is {y_2_resulted / np.pi:.2f} pi")
+            print(f"for power_1 = {x_2:.1e} the resulted phase is {y_2_resulted / np.pi:.2f}pi={y_2_resulted:.2f} rads")
         return x_2
     elif mode == "numerical":
         # Brute force search:
@@ -400,7 +400,7 @@ def find_power_for_phase(
             resulted_phase = np.real(np.angle(phase_and_amplitude_mask[0, 0]))
             phases.append(resulted_phase)
             if print_progress:
-                print(f"For P={P:.2e} the phase is phi={resulted_phase:.2f}")
+                print(f"For P={P:.2e} the resulted phase is {resulted_phase / np.pi:.2f}pi={resulted_phase:.2f} rads")
             Es.append(P)
             P *= 1.01
 
@@ -1306,9 +1306,12 @@ class CavityNumericalPropagator(CavityPropagator):
 
     def setup_to_phase_and_amplitude_mask(self, setup_file_path: str, powers_ratio: float = 1):
         phase_and_amplitude_mask = np.load(setup_file_path)
-        phi_const_original = phase_and_amplitude_mask[:, :, 0]
-        C_original = phase_and_amplitude_mask[:, :, 1]
-        phase_and_amplitude_mask = np.exp(1j * phi_const_original * powers_ratio) * jv(0, C_original * powers_ratio)
+        if self.power_2 is None:
+            return phase_and_amplitude_mask
+        else:
+            phi_const_original = phase_and_amplitude_mask[:, :, 0]
+            C_original = phase_and_amplitude_mask[:, :, 1]
+            phase_and_amplitude_mask = np.exp(1j * phi_const_original * powers_ratio) * jv(0, C_original * powers_ratio)
         return phase_and_amplitude_mask
 
     def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results: bool = False):
@@ -1317,6 +1320,8 @@ class CavityNumericalPropagator(CavityPropagator):
         if self.E_2 is None:  # If there is only one mode, then the phase is constant in time and there is no amplitude
             # modulation.
             phase_and_amplitude_mask = phase_factor[:, :, 0]  # Assumes the phase is constant in time
+            if save_results:
+                np.save(self.setup_to_path(input_wave=input_wave), phase_and_amplitude_mask)
         else:
             if self.n_t == 3:
                 # This assumes that if there are exactly 3 time steps, then they are [0, pi/(2delta_w), pi/delta_w]:
