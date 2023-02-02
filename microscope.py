@@ -369,7 +369,7 @@ def find_power_for_phase(
         else:
             raise ValueError(f"Unknown cavity type {cavity_type}")
         mask_1 = C_1.phase_and_amplitude_mask(input_wave=input_wave)
-        y_1 = np.real(np.angle(mask_1[0, 0]))
+        y_1 = np.angle(mask_1[0, 0])
         y_2_supposed = -desired_phase
         x_2 = y_2_supposed * x_1 / y_1
 
@@ -617,7 +617,7 @@ class Microscope:
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         self.propagation_steps = []
         input_wave_psi_normalized = input_wave.psi / np.sqrt(np.sum(np.abs(input_wave.psi) ** 2))
-        input_wave_psi_normalized *= (
+        input_wave_psi_normalized *= np.sqrt(
             self.n_electrons_per_square_angstrom * 1e20 * input_wave.coordinates.dx * input_wave.coordinates.dy
         )
         input_wave = WaveFunction(input_wave_psi_normalized, input_wave.coordinates, input_wave.E0)  # Normalized
@@ -640,7 +640,10 @@ class Microscope:
         expected_electrons_per_pixel = output_wave_intensity * (
             self.n_electrons_per_square_angstrom * output_wave.psi.size
         )
-        output_wave_intensity_shot_noise = np.random.poisson(expected_electrons_per_pixel)  # This actually assumes an
+        if np.max(expected_electrons_per_pixel) > 1000000000:
+            output_wave_intensity_shot_noise = expected_electrons_per_pixel
+        else:
+            output_wave_intensity_shot_noise = np.random.poisson(expected_electrons_per_pixel)  # This actually assumes an
         # independent shot noise for each pixel, which is not true, but it's a good approximation for many pixels.
         return SpatialFunction(
             output_wave_intensity_shot_noise,
@@ -1253,7 +1256,10 @@ class CavityNumericalPropagator(CavityPropagator):
             ignore_past_files,
         )
 
-        self.n_t = n_t
+        if power_2 is None:
+            self.n_t = 1
+        else:
+            self.n_t = n_t
         self.print_progress = print_progress
         self.debug_mode = debug_mode
         self.n_z = n_z
@@ -1283,34 +1289,43 @@ class CavityNumericalPropagator(CavityPropagator):
                 first_file_path = existing_files_with_same_setup[0]  # There should be only one file with the same
                 # setup, and if there are more, then they are equivalent, so anyway we can take the first one.
                 power_1_original = float(re.search(power_1_pattern, first_file_path).group(1))
-                power_2_original = float(re.search(power_2_pattern, first_file_path).group(1))
-                power_1_ratio, power_2_ratio = self.power_1 / power_1_original, self.power_2 / power_2_original
-
-                # If the two frequencies don't have the same ratio to the original ones or the original calculation
-                # was done using a Fourier Transform then we can't use it:
-                if np.abs((power_1_ratio - power_2_ratio) / power_1_ratio) > 1e-2 or self.n_t != 3:
-                    phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
-
-                # If the original setup had different amplitudes but the same setup then we can use the same phase mask
-                # and just adjust the phase and attenuation factor. this is true due to the derivation in equation
-                # e_42 in the simulation notes.
-                else:
+                power_2_original = re.search(power_2_pattern, first_file_path).group(1)
+                if power_2_original == 'None':
                     phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(
                         setup_file_path=phase_masks_path + existing_files_with_same_setup[0],
                         powers_ratio=self.power_1 / power_1_original,
                     )
+                    return phase_and_amplitude_mask
+                else:
+                    power_2_original = float(power_2_original)
+                    power_1_ratio, power_2_ratio = self.power_1 / power_1_original, self.power_2 / power_2_original
 
+                    # If the two frequencies don't have the same ratio to the original ones or the original calculation
+                    # was done using a Fourier Transform then we can't use it:
+                    if np.abs((power_1_ratio - power_2_ratio) / power_1_ratio) > 1e-2 or self.n_t != 3:
+                        phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
+
+                    # If the original setup had different amplitudes but the same setup then we can use the same phase mask
+                    # and just adjust the phase and attenuation factor. this is true due to the derivation in equation
+                    # e_42 in the simulation notes.
+                    else:
+                        phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(
+                            setup_file_path=phase_masks_path + existing_files_with_same_setup[0],
+                            powers_ratio=self.power_1 / power_1_original,
+                        )
             else:
                 phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave, save_results=True)
         return phase_and_amplitude_mask
 
     def setup_to_phase_and_amplitude_mask(self, setup_file_path: str, powers_ratio: float = 1):
-        phase_and_amplitude_mask = np.load(setup_file_path)
+
         if self.power_2 is None:
-            return phase_and_amplitude_mask
+            phi_values = np.load(setup_file_path)
+            phase_and_amplitude_mask = np.exp(1j * phi_values * powers_ratio)
         else:
-            phi_const_original = phase_and_amplitude_mask[:, :, 0]
-            C_original = phase_and_amplitude_mask[:, :, 1]
+            phi_and_C_values = np.load(setup_file_path)
+            phi_const_original = phi_and_C_values[:, :, 0]
+            C_original = phi_and_C_values[:, :, 1]
             phase_and_amplitude_mask = np.exp(1j * phi_const_original * powers_ratio) * jv(0, C_original * powers_ratio)
         return phase_and_amplitude_mask
 
@@ -1321,7 +1336,7 @@ class CavityNumericalPropagator(CavityPropagator):
             # modulation.
             phase_and_amplitude_mask = phase_factor[:, :, 0]  # Assumes the phase is constant in time
             if save_results:
-                np.save(self.setup_to_path(input_wave=input_wave), phase_and_amplitude_mask)
+                np.save(self.setup_to_path(input_wave=input_wave), phi_values[:, :, 0])
         else:
             if self.n_t == 3:
                 # This assumes that if there are exactly 3 time steps, then they are [0, pi/(2delta_w), pi/delta_w]:
@@ -1409,15 +1424,18 @@ class CavityNumericalPropagator(CavityPropagator):
         Z, X, Y, T = self.generate_coordinates_lattice(x, y, t, beta_electron)
         A = self.rotated_gaussian_beam_A(Z=Z, X=X, Y=Y, T=T, beta_electron=beta_electron, save_to_file=save_to_file)
 
-        grad_G = self.grad_G(
-            Z,
-            X,
-            Y,
-            T,
-            beta_electron=beta_electron,
-            A_z=self.potential_envelope2vector_components(A, "z", beta_electron),
-            save_to_file=save_to_file,
-        )
+        if self.theta_polarization == np.pi / 2:  # No need to calculate G for the case when there is no A_z component:
+            grad_G = np.zeros((1, 1, 1, 1, 3))
+        else:
+            grad_G = self.grad_G(
+                Z,
+                X,
+                Y,
+                T,
+                beta_electron=beta_electron,
+                A_z=self.potential_envelope2vector_components(A, "z", beta_electron),
+                save_to_file=save_to_file,
+            )
 
         # from equation e_3 in the simulation notes.
         integrand = (  # Notice that the elements of grad_G are (z, x, y) and not (x, y, z).
@@ -1608,9 +1626,14 @@ class CavityNumericalPropagator(CavityPropagator):
                 / np.cos(alpha_cavity)
                 * (2 * integral_limit_in_spot_size_units)
             )
-            dz = self.min_l / (1 + 1 / beta_electron) / 0.5  # ARBITRARY - This value was determined by playing with the
-            # simulation and checking that the results are stable. the derivation is still not existent and I
-            # need to write it down.
+            if self.n_t > 1:
+                dz = self.min_l / (1 + 1 / beta_electron) / 0.5  # ARBITRARY - This value was determined by playing
+                # with the simulation and checking that the results are stable. the derivation is still not existent and
+                # I need to write it down.
+            else:  # If there is only one laser then we sample it only in one point in time and there are no
+            # oscillations so we are integrating just a gaussian, and so a very small amount of points is needed.
+                dz = self.min_l / (1 + 1 / beta_electron) / 0.5# dz = self.w_0_min / 5  # Arbitrary 5
+
             required_n_z_for_integration_over_maximal_interval = int(max_z_integration_interval / dz)
         else:
             required_n_z_for_integration_over_maximal_interval = self.n_z
