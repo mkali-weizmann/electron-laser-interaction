@@ -71,7 +71,7 @@ phi_e_100 = - prefactor * np.trapz(A ** 2 * np.sin(theta_polarization) ** 2 +
 
 phi_0_analytical = predicted_phi_0(input_wave.beta, C.power_1, y[0], C.l_1, C.w_0_min)
 phi_0_manual = E_CHARGE ** 2 / (4 * M_ELECTRON * input_wave.beta * gamma_of_beta(input_wave.beta) * C_LIGHT * H_BAR) * \
-               np.trapz((2*A)**2, x=Z, axis=0)[0, 0, 0] * 2
+               np.trapz(A**2, x=Z, axis=0)[0, 0, 0] * 2
 
 phi_manual = prefactor * np.trapz(integrand, x=Z, axis=0)[0, 0, 0]
 phi_original_function = C.phi(input_wave)[0, 0, 0]
@@ -97,7 +97,10 @@ print(f"phi:\n{phi_analytical=}\n{phi_original_function=}\n{phi_manual=}\n{phi_e
 # plt.show()
 fig, ax = plt.subplots(figsize=(15, 15))
 plt.plot(Z[:, 0, 0, 0], integrand[:, 0, 0, 0], label="integrand")
-plt.plot(Z[:, 0, 0, 0], np.abs(A[:, 0, 0, 0])**2, "--", label="A**2")
+# plt.plot(Z[:, 0, 0, 0], np.abs(A[:, 0, 0, 0])**2, "--", label="A**2")
+plt.plot(Z[:, 0, 0, 0], A[:, 0, 0, 0] ** 2 * np.sin(theta_polarization) ** 2 +
+                                   (1-input_wave.beta**2) * A[:, 0, 0, 0] ** 2 * np.cos(theta_polarization) ** 2 +
+                               grad_G[:, 0, 0, 0, 1] ** 2, label=["e_100 integrand"])
 plt.legend()
 plt.show()
 

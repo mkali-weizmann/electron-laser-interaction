@@ -244,7 +244,7 @@ def gaussian_beam(
 
     if mode == "intensity":
         if standing_wave:  # No time dependence
-            return envelope**2 * 4 * np.cos(other_phase + gouy_phase) ** 2
+            return envelope**2 * np.cos(other_phase + gouy_phase) ** 2  # * 4
         else:
             return envelope**2
 
@@ -262,9 +262,9 @@ def gaussian_beam(
             potential_factor = 1
         if standing_wave:
             if imaginary:
-                return envelope * potential_factor * 2 * np.cos(spatial_phase) * np.exp(1j * time_phase)
+                return envelope * potential_factor * np.cos(spatial_phase) * np.exp(1j * time_phase)  # * 2
             else:
-                return envelope * potential_factor * 2 * np.cos(spatial_phase) * np.cos(time_phase)
+                return envelope * potential_factor * np.cos(spatial_phase) * np.cos(time_phase)  # * 2
         else:
             if imaginary:
                 return envelope * potential_factor * np.exp(1j * (propagation_sign * spatial_phase + time_phase))
@@ -912,7 +912,9 @@ class CavityPropagator(Propagator):
         self,
         l_1: float = 1064 * 1e-9,
         l_2: Optional[float] = 532 * 1e-9,
-        power_1: float = -1,
+        power_1: float = -1,  # This is the power of the moving wave. if it is a standing wave cavity, then the
+        # Matching field will be twice as high comparing to the moving wave cavity, as derived
+        # around equation e_43 in the simulation notes.
         power_2: Optional[float] = -1,
         NA_1: float = 0.1,
         NA_2: Optional[float] = -1,
@@ -969,14 +971,24 @@ class CavityPropagator(Propagator):
 
     @property
     def E_1(self):
-        return np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
+        E_1_moving_wave = np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
+        if self.ring_cavity:
+            return E_1_moving_wave
+        else:
+            return E_1_moving_wave * 2
 
     @property
     def E_2(self):
         if self.power_2 is None:
             return None
         else:
-            return np.sqrt(np.pi * self.power_2 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_2 / self.l_2)
+            E_2_moving_wave = np.sqrt(np.pi * self.power_2 / (C_LIGHT * EPSILON_ELECTRICITY)) * (
+                2 * self.NA_2 / self.l_2
+            )
+            if self.ring_cavity:
+                return E_2_moving_wave
+            else:
+                return E_2_moving_wave * 2
 
     @property
     def NA_min(self):
@@ -991,12 +1003,6 @@ class CavityPropagator(Propagator):
             return self.NA_1
         else:
             return max(self.NA_1, self.NA_2)
-
-    @property
-    def w_0_lattice_frame(self) -> float:
-        # The width of the gaussian beam of the first laser - of the only laser if there is one laser, and of the
-        # lattice in the moving frame if there are two (the formula is from wikipedia)
-        return self.lambda_laser / (pi * np.arcsin(self.NA_lorentz_transform(self.NA_1)))
 
     @property
     def w_0_min(self) -> float:
@@ -1014,38 +1020,6 @@ class CavityPropagator(Propagator):
             return (self.l_1 - self.l_2) / (self.l_1 + self.l_2)
         else:
             return 0
-
-    @property
-    def Gamma_plus(self) -> float:
-        return np.sqrt((1 + self.beta_lattice) / (1 - self.beta_lattice))
-
-    @property
-    def Gamma_minus(self) -> float:
-        return np.sqrt((1 - self.beta_lattice) / (1 + self.beta_lattice))
-
-    @property
-    def A(self) -> float:
-        # The effective amplitude of the lattice in the moving frame. in case of a single frequency that is just the
-        # amplitude of the first laser.  # FIX E TO BE MIN_lambda(E)
-        if self.E_2 is None:
-            return self.E_1 / w_of_l(self.lambda_laser)
-        else:
-            return self.E_1 * self.Gamma_plus / w_of_l(self.lambda_laser)
-
-    @property
-    def lambda_laser(self) -> float:
-        # The effective wavelength of the lattice in the moving frame. in case of a single frequency that is just
-        # the wavelength of the first laser.
-        if self.l_2 is None:
-            return self.l_1
-        else:
-            return self.l_1 / self.Gamma_plus
-
-    @property
-    def k(self) -> float:
-        # If there is only one laser it is the k of that laser and if there are two it is the k of the lattice in the
-        # lattice's frame
-        return k_of_l(self.lambda_laser)
 
     @property
     def min_l(self):
@@ -1120,6 +1094,44 @@ class CavityAnalyticalPropagator(CavityPropagator):
             ring_cavity,
             ignore_past_files,
         )
+
+    @property
+    def A(self) -> float:
+        # The effective amplitude of the lattice in the moving frame. in case of a single frequency that is just the
+        # amplitude of the first laser.  # FIX E TO BE MIN_lambda(E)
+        if self.E_2 is None:
+            return self.E_1 / w_of_l(self.lambda_laser)
+        else:
+            return self.E_1 * self.Gamma_plus / w_of_l(self.lambda_laser)
+
+    @property
+    def w_0_lattice_frame(self) -> float:
+        # The width of the gaussian beam of the first laser - of the only laser if there is one laser, and of the
+        # lattice in the moving frame if there are two (the formula is from wikipedia)
+        return self.lambda_laser / (pi * np.arcsin(self.NA_lorentz_transform(self.NA_1)))
+
+    @property
+    def lambda_laser(self) -> float:
+        # The effective wavelength of the lattice in the moving frame. in case of a single frequency that is just
+        # the wavelength of the first laser.
+        if self.l_2 is None:
+            return self.l_1
+        else:
+            return self.l_1 / self.Gamma_plus
+
+    @property
+    def k(self) -> float:
+        # If there is only one laser it is the k of that laser and if there are two it is the k of the lattice in the
+        # lattice's frame
+        return k_of_l(self.lambda_laser)
+
+    @property
+    def Gamma_plus(self) -> float:
+        return np.sqrt((1 + self.beta_lattice) / (1 - self.beta_lattice))
+
+    @property
+    def Gamma_minus(self) -> float:
+        return np.sqrt((1 - self.beta_lattice) / (1 + self.beta_lattice))
 
     def load_or_calculate_phase_and_amplitude_mask(self, input_wave: WaveFunction):
         setup_file_path = self.setup_to_path(input_wave=input_wave)
