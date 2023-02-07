@@ -4352,18 +4352,10 @@ And for a moving wave (that does not have the
 \begin_inset Formula 
 \begin{align}
 \phi_{\text{running wave}}\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz\nonumber \\
-= & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{2m\gamma\beta c}\left({\color{red}\sin^{2}\theta\cancel{\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)}}+{\color{blue}\left(1-\beta^{2}\right)\cdot\left(\cdot\cos\theta\cancel{\cos\left(\omega t\left(z\right)\right)}\right)^{2}}+{\color{green}\left(\beta^{2}\cos^{2}\left(\theta\right)\cancel{\sin^{2}\left(\omega t\left(z\right)\right)}\right)}\right)dz\nonumber \\
+= & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{2m\gamma\beta c}\left({\color{red}\sin^{2}\theta\cancel{\cos^{2}\left(\omega t\left(z\right)-\varepsilon\pm\varphi\left(x\right)\right)}}+{\color{blue}\left(1-\beta^{2}\right)\cdot\left(\cos\theta\cancel{\cos\left(\omega t\left(z\right)\pm\varphi\left(x\right)\right)}\right)^{2}}+{\color{green}\left(\beta^{2}\cos^{2}\left(\theta\right)\cancel{\sin^{2}\left(\omega t\left(z\right)\pm\varphi\left(x\right)\right)}\right)}\right)dz\nonumber \\
 = & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{4m\gamma\beta c}\left({\color{gray}\underset{=1}{\underbrace{{\normalcolor {\color{red}\sin^{2}\left(\theta\right)}+{\color{blue}\cos^{2}\left(\theta\right)}}}}}-\cancel{{\color{blue}\beta^{2}\cos^{2}\left(\theta\right)}+{\color{green}\left(\beta^{2}\cdot\cos^{2}\left(\theta\right)\right)}}\right)dz\nonumber \\
 = & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{4m\gamma\beta c}dz\label{eq:ponderomotive_integral_final_result_moving_wave}
 \end{align}
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\phi_{\text{running wave}}=-\phi_{0}\left(x,y\right)
-\]
 
 \end_inset
 
@@ -4484,10 +4476,14 @@ Let's assume the laser propagates in the
 \end_layout
 
 \begin_layout Standard
-The original electric and magnetic fields are:
+The original electric and magnetic fields are (the factor of 
+\begin_inset Formula $\frac{1}{2}$
+\end_inset
+
+ is for later, to be aligned with Osip's paper's notation):
 \begin_inset Formula 
 \[
-\boldsymbol{E}\left(\boldsymbol{x},t\right)=\left[E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]\begin{pmatrix}0\\
+\boldsymbol{E}\left(\boldsymbol{x},t\right)=\left[\frac{1}{2}E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+\frac{1}{2}E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+\frac{1}{2}E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+\frac{1}{2}E_{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]\begin{pmatrix}0\\
 \cos\left(\theta\right)\\
 \sin\left(\theta\right)
 \end{pmatrix}
@@ -4502,11 +4498,11 @@ The
  vector depends on the direction of propagation:
 \begin_inset Formula 
 \begin{align*}
-\boldsymbol{B}\left(\boldsymbol{x},t\right) & =\frac{1}{c}{\color{gray}\overset{=\hat{\pm x}}{\overbrace{{\normalcolor \hat{k}}}}}\times{\color{gray}\overset{\boldsymbol{E}}{\overbrace{{\normalcolor \left[E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]\begin{pmatrix}0\\
+\boldsymbol{B}\left(\boldsymbol{x},t\right) & =\frac{1}{c}{\color{gray}\overset{=\hat{\pm x}}{\overbrace{{\normalcolor \hat{k}}}}}\times{\color{gray}\overset{\boldsymbol{E}}{\overbrace{{\normalcolor \left[\frac{1}{2}E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+\frac{1}{2}E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+\frac{1}{2}E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+\frac{1}{2}E_{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]\begin{pmatrix}0\\
 \cos\left(\theta\right)\\
 \sin\left(\theta\right)
 \end{pmatrix}}}}}=\\
- & =\pm\frac{1}{c}\left[E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+E_{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]\begin{pmatrix}0\\
+ & =\pm\frac{1}{c}\left[\frac{1}{2}E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+\frac{1}{2}E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+\frac{1}{2}E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+\frac{1}{2}E_{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]\begin{pmatrix}0\\
 -\sin\theta\\
 \cos\theta
 \end{pmatrix}
@@ -4652,7 +4648,7 @@ And get, after substituting for the relevant waves (before substituting
 ):
 \begin_inset Formula 
 \begin{equation}
-=\left[\Gamma_{-}E_{1}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+\Gamma_{+}E_{1}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+\Gamma_{-}E_{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+E_{2}\Gamma_{+}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]_{\left(x,t\right)=\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right),\gamma\left(t^{\prime}+\frac{\beta x^{\prime}}{c}\right)\right)}\label{eq:e_5}
+=\left[\Gamma_{-}\frac{E_{1}}{2}e^{i\left(\omega_{1}t-\frac{\omega_{1}}{c}x\right)}+\Gamma_{+}\frac{E_{1}}{2}e^{i\left(\omega_{1}t+\frac{\omega_{1}}{c}x\right)}+\Gamma_{-}\frac{E_{2}}{2}e^{i\left(\omega_{2}t-\frac{\omega_{2}}{c}x\right)}+E_{2}\frac{\Gamma_{+}}{2}e^{i\left(\omega_{2}t+\frac{\omega_{2}}{c}x\right)}\right]_{\left(x,t\right)=\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right),\gamma\left(t^{\prime}+\frac{\beta x^{\prime}}{c}\right)\right)}\label{eq:e_5}
 \end{equation}
 
 \end_inset
@@ -4715,7 +4711,7 @@ noprefix "false"
 , we get:
 \begin_inset Formula 
 \[
-E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right)=\Gamma_{-}E_{1}e^{i\Gamma_{-}\left(\omega_{1}t^{\prime}-\frac{\omega_{1}}{c}x^{\prime}\right)}+\Gamma_{+}E_{1}e^{\Gamma_{+}i\left(\omega_{1}t^{\prime}+\frac{\omega_{1}}{c}x^{\prime}\right)}+\Gamma_{-}E_{2}e^{\Gamma_{-}i\left(\omega_{2}t^{\prime}-\frac{\omega_{2}}{c}x^{\prime}\right)}+\Gamma_{+}E_{2}e^{\Gamma_{+}i\left(\omega_{2}t^{\prime}+\frac{\omega_{2}}{c}x^{\prime}\right)}
+E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right)=\Gamma_{-}\frac{E_{1}}{2}e^{i\Gamma_{-}\left(\omega_{1}t^{\prime}-\frac{\omega_{1}}{c}x^{\prime}\right)}+\Gamma_{+}\frac{E_{1}}{2}e^{\Gamma_{+}i\left(\omega_{1}t^{\prime}+\frac{\omega_{1}}{c}x^{\prime}\right)}+\Gamma_{-}\frac{E_{2}}{2}e^{\Gamma_{-}i\left(\omega_{2}t^{\prime}-\frac{\omega_{2}}{c}x^{\prime}\right)}+\Gamma_{+}\frac{E_{2}}{2}e^{\Gamma_{+}i\left(\omega_{2}t^{\prime}+\frac{\omega_{2}}{c}x^{\prime}\right)}
 \]
 
 \end_inset
@@ -4725,8 +4721,8 @@ E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right)=\Gamma_{-}E_{1}e^{i\Gamma_{
 
 \begin_inset Formula 
 \begin{align*}
-E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & =\Gamma_{-}E_{1}e^{i\Gamma_{-}\left(\omega_{1}t^{\prime}-\frac{\omega_{1}}{c}x^{\prime}\right)-\Psi_{1}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}+\Gamma_{+}E_{1}e^{\Gamma_{+}i\left(\omega_{1}t^{\prime}+\frac{\omega_{1}}{c}x^{\prime}\right)+\Psi_{1}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}\\
- & +\Gamma_{-}E_{2}e^{\Gamma_{-}i\left(\omega_{2}t^{\prime}-\frac{\omega_{2}}{c}x^{\prime}\right)-\Psi_{2}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}+\Gamma_{+}E_{2}e^{\Gamma_{+}i\left(\omega_{2}t^{\prime}+\frac{\omega_{2}}{c}x^{\prime}\right)+\Psi_{2}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}
+E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & =\Gamma_{-}\frac{E_{1}}{2}e^{i\Gamma_{-}\left(\omega_{1}t^{\prime}-\frac{\omega_{1}}{c}x^{\prime}\right)-\Psi_{1}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}+\Gamma_{+}\frac{E_{1}}{2}e^{\Gamma_{+}i\left(\omega_{1}t^{\prime}+\frac{\omega_{1}}{c}x^{\prime}\right)+\Psi_{1}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}\\
+ & +\Gamma_{-}\frac{E_{2}}{2}e^{\Gamma_{-}i\left(\omega_{2}t^{\prime}-\frac{\omega_{2}}{c}x^{\prime}\right)-\Psi_{2}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}+\Gamma_{+}\frac{E_{2}}{2}e^{\Gamma_{+}i\left(\omega_{2}t^{\prime}+\frac{\omega_{2}}{c}x^{\prime}\right)+\Psi_{2}\left(\gamma\left(x^{\prime}+\beta ct\right),y,z\right)}
 \end{align*}
 
 \end_inset
@@ -4853,12 +4849,12 @@ Under
 And get:
 \begin_inset Formula 
 \begin{equation}
-E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right)=\Gamma_{-}E_{1}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x\right)}+{\color{teal}\Gamma_{+}E_{1}}e^{i\left(\omega t^{\prime}+\frac{\omega}{c}x\right)}+{\color{teal}\Gamma_{-}E_{2}}e^{i\left(\omega t^{\prime}-\frac{\omega}{c}x\right)}+\Gamma_{+}E_{2}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x\right)}\label{eq:e_7}
+E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right)=\Gamma_{-}\frac{E_{1}}{2}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x\right)}+{\color{teal}\Gamma_{+}\frac{E_{1}}{2}}e^{i\left(\omega t^{\prime}+\frac{\omega}{c}x\right)}+{\color{teal}\Gamma_{-}\frac{E_{2}}{2}}e^{i\left(\omega t^{\prime}-\frac{\omega}{c}x\right)}+\Gamma_{+}\frac{E_{2}}{2}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x\right)}\label{eq:e_7}
 \end{equation}
 
 \end_inset
 
-Choosing equal amplitudes::
+Choosing equal amplitudes:
 \begin_inset Formula 
 \[
 {\color{teal}\Gamma_{+}E_{1}}={\color{teal}\Gamma_{-}E_{2}}{\color{lightgray}\ \backslash:\Gamma_{+}E_{2}}
@@ -4905,7 +4901,7 @@ P_{2}\propto I_{2}=I_{1}\cdot\left(\frac{\lambda_{1}}{\lambda_{2}}\right)^{2}
 Denoting 
 \begin_inset Formula 
 \begin{equation}
-\Gamma_{+}E_{1}=\Gamma_{-}E_{2}={\color{teal}E_{0}}\label{eq:E_0_def}
+\Gamma_{+}\frac{E_{1}}{2}=\Gamma_{-}\frac{E_{2}}{2}={\color{teal}\frac{E_{0}}{2}}\label{eq:E_0_def}
 \end{equation}
 
 \end_inset
@@ -4927,9 +4923,9 @@ noprefix "false"
 , we get:
 \begin_inset Formula 
 \begin{align}
-E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & =\frac{\Gamma_{-}}{\Gamma_{+}}{\color{teal}E_{0}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}+{\color{teal}E_{0}}e^{i\left(\omega t^{\prime}+\frac{\omega}{c}x^{\prime}\right)}+{\color{teal}E_{0}}e^{i\left(\omega t^{\prime}-\frac{\omega}{c}x^{\prime}\right)}+\frac{\Gamma_{+}}{\Gamma_{-}}{\color{teal}E_{0}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}\nonumber \\
- & ={\color{teal}E_{0}}\left[\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}+e^{i\omega t^{\prime}}\left[e^{i\frac{\omega}{c}x^{\prime}}+e^{-i\frac{\omega}{c}x^{\prime}}\right]+\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}\right]\nonumber \\
- & ={\color{teal}E_{0}}\left[\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}+2e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)+\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}\right]\label{eq:wave_in_moving_frame}
+E_{y}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & =\frac{\Gamma_{-}}{\Gamma_{+}}{\color{teal}\frac{E_{0}}{2}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}+{\color{teal}\frac{E_{0}}{2}}e^{i\left(\omega t^{\prime}+\frac{\omega}{c}x^{\prime}\right)}+{\color{teal}\frac{E_{0}}{2}}e^{i\left(\omega t^{\prime}-\frac{\omega}{c}x^{\prime}\right)}+\frac{\Gamma_{+}}{\Gamma_{-}}{\color{teal}\frac{E_{0}}{2}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}\nonumber \\
+ & ={\color{teal}\frac{E_{0}}{2}}\left[\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}+e^{i\omega t^{\prime}}\left[e^{i\frac{\omega}{c}x^{\prime}}+e^{-i\frac{\omega}{c}x^{\prime}}\right]+\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}\right]\nonumber \\
+ & ={\color{teal}E_{0}}\left[\frac{\Gamma_{-}}{2\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}+e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)+\frac{\Gamma_{+}}{2\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}\right]\label{eq:wave_in_moving_frame}
 \end{align}
 
 \end_inset
@@ -4956,7 +4952,7 @@ noprefix "false"
  we would have here:
 \begin_inset Formula 
 \[
-E_{y,\text{gaussian beam}}={\color{teal}E_{0}}\left[\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}+\varphi_{-}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\right)}+2e^{i\omega t^{\prime}}\cos\left(\varphi\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\right)+\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\varphi_{+}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\right)}\right]
+E_{y,\text{gaussian beam}}={\color{teal}E_{0}}\left[\frac{\Gamma_{-}}{2\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}+\varphi_{-}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\right)}+e^{i\omega t^{\prime}}\cos\left(\varphi\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\right)+\frac{\Gamma_{+}}{2\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\varphi_{+}\left(\gamma\left(x^{\prime}+\beta ct^{\prime}\right)\right)\right)}\right]
 \]
 
 \end_inset
@@ -4972,7 +4968,7 @@ Calculate the resulted intensity of the field
 And the intensity:
 \begin_inset Formula 
 \begin{align*}
-E^{2}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & ={\color{teal}E_{0}^{2}}\left|{\color{red}\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}+{\color{green}2e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}\right|^{2}
+E^{2}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & ={\color{teal}E_{0}^{2}}\left|{\color{red}\frac{\Gamma_{-}}{2\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}+{\color{green}e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\frac{\Gamma_{+}}{2\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}\right|^{2}
 \end{align*}
 
 \end_inset
@@ -4980,9 +4976,9 @@ E^{2}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & ={\color{teal}E_{0}^{2}}\
 
 \begin_inset Formula 
 \begin{align*}
-={\color{teal}E_{0}^{2}}\cdot & \left[{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{red}\cancel{\frac{\Gamma_{-}}{\Gamma_{+}}}e^{-i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{blue}\cancel{\frac{\Gamma_{+}}{\Gamma_{-}}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}+{\color{red}\cancel{\frac{\Gamma_{-}}{\Gamma_{+}}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{blue}\cancel{\frac{\Gamma_{+}}{\Gamma_{-}}}e^{-i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}+\right.\\
-+ & {\color{red}\frac{\Gamma_{-}}{\Gamma_{+}}e^{-i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{green}2e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{red}\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{green}2e^{-i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}\\
-+ & \left.{\color{blue}\frac{\Gamma_{+}}{\Gamma_{-}}e^{-i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}{\color{green}2e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}{\color{green}2e^{-i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}\right]
+={\color{teal}E_{0}^{2}}\cdot & \left[{\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{green}\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}+{\color{red}\frac{1}{2}\cancel{\frac{\Gamma_{-}}{\Gamma_{+}}}e^{-i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{blue}\frac{1}{2}\cancel{\frac{\Gamma_{+}}{\Gamma_{-}}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}+{\color{red}\frac{1}{2}\cancel{\frac{\Gamma_{-}}{\Gamma_{+}}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{blue}\frac{1}{2}\cancel{\frac{\Gamma_{+}}{\Gamma_{-}}}e^{-i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}+\right.\\
++ & {\color{red}\frac{\Gamma_{-}}{2\Gamma_{+}}e^{-i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{green}e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{red}\frac{\Gamma_{-}}{2\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)}}{\color{green}e^{-i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}\\
++ & \left.{\color{blue}\frac{\Gamma_{+}}{2\Gamma_{-}}e^{-i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}{\color{green}e^{i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\frac{\Gamma_{+}}{2\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}\right)}}{\color{green}e^{-i\omega t^{\prime}}\cos\left(\frac{\omega}{c}x^{\prime}\right)}\right]
 \end{align*}
 
 \end_inset
@@ -4990,9 +4986,9 @@ E^{2}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & ={\color{teal}E_{0}^{2}}\
 
 \begin_inset Formula 
 \begin{align*}
-={\color{teal}E_{0}^{2}} & \left[{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+e^{i\left({\color{red}-\omega_{-}t^{\prime}+\frac{\omega_{-}}{c}x^{\prime}}+{\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}\right)}+e^{-i\left({\color{red}-\omega_{-}t^{\prime}+\frac{\omega_{-}}{c}x^{\prime}}+{\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}\right)}+\right.\\
-+2 & \frac{\Gamma_{-}}{\Gamma_{+}}\left(e^{-i\left({\color{red}\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}+e^{i\left({\color{red}\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}\right)\cos\left(\frac{\omega}{c}x^{\prime}\right)\\
-+ & \left.2\frac{\Gamma_{+}}{\Gamma_{-}}\left(e^{-i\left({\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}+e^{i\left({\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}\right)\cos\left(\frac{\omega}{c}x^{\prime}\right)\right]
+={\color{teal}E_{0}^{2}} & \left[{\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{green}\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}+\frac{1}{4}e^{i\left({\color{red}-\omega_{-}t^{\prime}+\frac{\omega_{-}}{c}x^{\prime}}+{\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}\right)}+\frac{1}{4}e^{-i\left({\color{red}-\omega_{-}t^{\prime}+\frac{\omega_{-}}{c}x^{\prime}}+{\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}\right)}+\right.\\
++ & \frac{\Gamma_{-}}{\Gamma_{+}}\left(e^{-i\left({\color{red}\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}+e^{i\left({\color{red}\omega_{-}t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}\right)\cos\left(\frac{\omega}{c}x^{\prime}\right)\\
++ & \left.\frac{\Gamma_{+}}{\Gamma_{-}}\left(e^{-i\left({\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}+e^{i\left({\color{blue}\omega_{+}t^{\prime}+\frac{\omega_{+}}{c}x^{\prime}}-{\color{green}\omega t^{\prime}}\right)}\right)\cos\left(\frac{\omega}{c}x^{\prime}\right)\right]
 \end{align*}
 
 \end_inset
@@ -5000,8 +4996,8 @@ E^{2}\left(\boldsymbol{x}^{\prime},t^{\prime}\right) & ={\color{teal}E_{0}^{2}}\
 
 \begin_inset Formula 
 \begin{align*}
-={\color{teal}E_{0}^{2}} & \left[{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{gray}\underset{\text{Averages over time to }0}{\underbrace{{\normalcolor 2\cos\left(\left(\omega_{+}-\omega_{-}\right)t^{\prime}+\frac{\omega_{-}+\omega_{+}}{c}x^{\prime}\right)}}}}\right.\\
- & \left.{\color{gray}\underset{\text{Averages over time to }0}{\underbrace{{\normalcolor +4\cos\left(\frac{\omega}{c}x^{\prime}\right)\left(\frac{\Gamma_{-}}{\Gamma_{+}}\cos\left(\left(\omega_{-}-\omega\right)t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)+\frac{\Gamma_{+}}{\Gamma_{-}}\cos\left(\frac{\omega}{c}x^{\prime}\right)\cos\left(\left(\omega_{+}-\omega\right)t^{\prime}+\frac{\omega_{-}}{c}x^{\prime}\right)\right)}}}}\right]
+={\color{teal}E_{0}^{2}} & \left[{\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{green}\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}+{\color{gray}\underset{\text{Averages over time to }0}{\underbrace{{\normalcolor \cos\left(\left(\omega_{+}-\omega_{-}\right)t^{\prime}+\frac{\omega_{-}+\omega_{+}}{c}x^{\prime}\right)}}}}\right.\\
+ & \left.{\color{gray}\underset{\text{Averages over time to }0}{\underbrace{{\normalcolor +2\cos\left(\frac{\omega}{c}x^{\prime}\right)\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\cos\left(\left(\omega_{-}-\omega\right)t^{\prime}-\frac{\omega_{-}}{c}x^{\prime}\right)+\frac{\Gamma_{+}}{2\Gamma_{-}}\cos\left(\frac{\omega}{c}x^{\prime}\right)\cos\left(\left(\omega_{+}-\omega\right)t^{\prime}+\frac{\omega_{-}}{c}x^{\prime}\right)\right)}}}}\right]
 \end{align*}
 
 \end_inset
@@ -5017,7 +5013,7 @@ And the ponderomotive potential over one period (by definition we have
 ):
 \begin_inset Formula 
 \begin{equation}
-\left\langle I\right\rangle ={\color{teal}E_{0}^{2}}\left({\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}\right)=\tag{e\_10}\label{eq:e_10}
+\left\langle I\right\rangle ={\color{teal}E_{0}^{2}}\left({\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{green}\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}\right)=\tag{e\_10}\label{eq:e_10}
 \end{equation}
 
 \end_inset
@@ -5029,7 +5025,7 @@ Recalling the definition of
 :
 \begin_inset Formula 
 \[
-\left\langle I\right\rangle ={\color{teal}E_{0}^{2}}\left({\color{red}\frac{\left(1-\beta\right)^{2}}{\left(1+\beta\right)^{2}}}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{\left(1-\beta\right)^{2}}}+{\color{green}2}+{\color{green}2\cos\left(2kx^{\prime}\right)}\right)
+\left\langle I\right\rangle ={\color{teal}E_{0}^{2}}\left({\color{red}\frac{\left(1-\beta\right)^{2}}{4\left(1+\beta\right)^{2}}}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{4\left(1-\beta\right)^{2}}}+{\color{green}\frac{1}{2}}+{\color{green}\frac{1}{2}\cos\left(2kx^{\prime}\right)}\right)
 \]
 
 \end_inset
@@ -5039,11 +5035,11 @@ Recalling the definition of
 
 \begin_layout Standard
 And So we see that the intensity is a sum of constant terms (
-\begin_inset Formula ${\color{red}\frac{\left(1-\beta\right)^{2}}{\left(1+\beta\right)^{2}}}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{\left(1-\beta\right)^{2}}}+{\color{green}2}$
+\begin_inset Formula ${\color{red}\frac{\left(1-\beta\right)^{2}}{4\left(1+\beta\right)^{2}}}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{4\left(1-\beta\right)^{2}}}+\frac{1}{2}$
 \end_inset
 
 ) and an oscillating term (
-\begin_inset Formula ${\color{green}2\cos\left(2kx^{\prime}\right)}$
+\begin_inset Formula ${\color{green}\frac{1}{2}\cos\left(2kx^{\prime}\right)}$
 \end_inset
 
 ).
@@ -5069,7 +5065,7 @@ Is it a reasonable assumption at all? I mean, in the waist where it is the
 
 \begin_inset Formula 
 \begin{equation}
-\left\langle I\right\rangle \left(x^{\prime},y^{\prime},z^{\prime}\right)={\color{teal}E_{0}^{2}\left(\gamma x^{\prime}+\gamma\beta ct,y^{\prime},z^{\prime}\right)}\left({\color{red}\frac{\left(1-\beta\right)^{2}}{\left(1+\beta\right)^{2}}}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{\left(1-\beta\right)^{2}}}+{\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime},t^{\prime}\right)\right)}\right)\label{eq:moving_intensity}
+\left\langle I\right\rangle \left(x^{\prime},y^{\prime},z^{\prime}\right)={\color{teal}E_{0}^{2}\left(\gamma x^{\prime}+\gamma\beta ct,y^{\prime},z^{\prime}\right)}\left({\color{red}\frac{\left(1-\beta\right)^{2}}{4\left(1+\beta\right)^{2}}}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{4\left(1-\beta\right)^{2}}}+{\color{green}1}+{\color{green}1\cos\left(2\varphi\left(x^{\prime},t^{\prime}\right)\right)}\right)\label{eq:moving_intensity}
 \end{equation}
 
 \end_inset
@@ -5105,7 +5101,7 @@ noprefix "false"
 
 \begin_layout Standard
 \begin_inset Note Note
-status collapsed
+status open
 
 \begin_layout Plain Layout
 Adding the gaussian envelope 
@@ -5130,7 +5126,7 @@ literal "false"
 ):
 \begin_inset Formula 
 \[
-V_{\text{ponderomotive}}=\left\langle I\right\rangle =\frac{e^{2}A_{0}^{2}}{4m\gamma}\frac{1}{2}\left({\color{red}\frac{\left(1-\beta\right)^{2}}{\left(1+\beta\right)^{2}}}+{\color{green}4\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{\left(1-\beta\right)^{2}}}\right)
+V_{\text{ponderomotive}}=\left\langle I\right\rangle =\frac{e^{2}A_{0}^{2}}{4m\gamma}\frac{1}{2}\left({\color{red}\frac{\left(1-\beta\right)^{2}}{4\left(1+\beta\right)^{2}}}+{\color{green}\cos^{2}\left(\frac{\omega}{c}x^{\prime}\right)}+{\color{blue}\frac{\left(1+\beta\right)^{2}}{4\left(1-\beta\right)^{2}}}\right)
 \]
 
 \end_inset
@@ -5608,7 +5604,7 @@ E_{\text{laser,lattic'es frame}}\left(x^{\prime},y^{\prime},z^{\prime},t^{\prime
 
 \begin_inset Formula 
 \[
-={\color{teal}E_{0,\text{envelope}}\left(\gamma x^{\prime}+\gamma\beta ct^{\prime},y^{\prime},z^{\prime}\right)}\cdot\left[{\color{red}\frac{\Gamma_{-}}{\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\varphi_{-}\left(x^{\prime}\right)\right)}}+{\color{green}2e^{i\omega t^{\prime}}\cos\left(\varphi\left(x^{\prime}\right)\right)}+{\color{blue}\frac{\Gamma_{+}}{\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\varphi_{+}\left(x^{\prime}\right)\right)}}\right]\tag{{\color{blue}\ref{eq:wave_in_moving_frame}}}
+={\color{teal}E_{0,\text{envelope}}\left(\gamma x^{\prime}+\gamma\beta ct^{\prime},y^{\prime},z^{\prime}\right)}\cdot\left[{\color{red}\frac{\Gamma_{-}}{2\Gamma_{+}}e^{i\left(\omega_{-}t^{\prime}-\varphi_{-}\left(x^{\prime}\right)\right)}}+{\color{green}e^{i\omega t^{\prime}}\cos\left(\varphi\left(x^{\prime}\right)\right)}+{\color{blue}\frac{\Gamma_{+}}{2\Gamma_{-}}e^{i\left(\omega_{+}t^{\prime}+\varphi_{+}\left(x^{\prime}\right)\right)}}\right]\tag{{\color{blue}\ref{eq:wave_in_moving_frame}}}
 \]
 
 \end_inset
@@ -5646,7 +5642,7 @@ red
 :
 \begin_inset Formula 
 \[
-E_{\text{laser,lattic'es frame, ring cavity}}\left(x^{\prime},y^{\prime},z^{\prime},t^{\prime}\right)={\color{teal}E_{0,\text{envelope}}\left(\gamma x^{\prime}+\gamma\beta ct^{\prime},y^{\prime},z^{\prime}\right)}\cdot2e^{i\omega t}\cos\left(\varphi\left(x^{\prime}\right)\right)
+E_{\text{laser,lattic'es frame, ring cavity}}\left(x^{\prime},y^{\prime},z^{\prime},t^{\prime}\right)={\color{teal}E_{0,\text{envelope}}\left(\gamma x^{\prime}+\gamma\beta ct^{\prime},y^{\prime},z^{\prime}\right)}\cdot e^{i\omega t}\cos\left(\varphi\left(x^{\prime}\right)\right)
 \]
 
 \end_inset
@@ -5672,7 +5668,7 @@ noprefix "false"
 :
 \begin_inset Formula 
 \[
-\left\langle I_{\text{laser, lattic'es frame}}\right\rangle \left(x^{\prime},y^{\prime},z^{\prime}\right)={\color{teal}E_{0}^{2}\left(\gamma x^{\prime}+\gamma\beta ct,y^{\prime},z^{\prime}\right)}\left({\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)\tag{{\color{blue}\eqref{eq:moving_intensity}}}
+\left\langle I_{\text{laser, lattic'es frame}}\right\rangle \left(x^{\prime},y^{\prime},z^{\prime}\right)={\color{teal}E_{0}^{2}\left(\gamma x^{\prime}+\gamma\beta ct,y^{\prime},z^{\prime}\right)}\left({\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}+{\color{green}\frac{1}{2}}+{\color{green}\frac{1}{2}\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)\tag{{\color{blue}\eqref{eq:moving_intensity}}}
 \]
 
 \end_inset
@@ -5684,7 +5680,7 @@ noprefix "false"
 And for a ring cavity:
 \begin_inset Formula 
 \[
-\left\langle I\right\rangle _{\text{laser, lattic'es frame, ring cavity}}={\color{teal}E_{0}^{2}\left(\gamma x^{\prime}+\gamma\beta ct,y^{\prime},z^{\prime}\right)}\cdot\left({\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)
+\left\langle I\right\rangle _{\text{laser, lattic'es frame, ring cavity}}={\color{teal}E_{0}^{2}\left(\gamma x^{\prime}+\gamma\beta ct,y^{\prime},z^{\prime}\right)}\cdot\left({\color{green}\frac{1}{2}}+{\color{green}\frac{1}{2}\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)
 \]
 
 \end_inset
@@ -5797,8 +5793,8 @@ noprefix "false"
  we get:
 \begin_inset Formula 
 \begin{align}
-\left\langle I\right\rangle \left(x^{\prime}=\frac{x_{0}}{\gamma\cos\alpha},y^{\prime},z^{\prime},t^{\prime}=0\right) & ={\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\cancel{\gamma}\frac{x_{0}}{\cancel{\gamma}\cos\alpha}+\cancel{\gamma\beta c\cdot0}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\cancel{\gamma}\frac{x_{0}}{\cancel{\gamma}\cos\alpha}+\cancel{\gamma\beta c\cdot0}\right)}}}\left({\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)\label{eq:e_36}\\
- & ={\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}}\left({\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)\nonumber 
+\left\langle I\right\rangle \left(x^{\prime}=\frac{x_{0}}{\gamma\cos\alpha},y^{\prime},z^{\prime},t^{\prime}=0\right) & ={\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\cancel{\gamma}\frac{x_{0}}{\cancel{\gamma}\cos\alpha}+\cancel{\gamma\beta c\cdot0}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\cancel{\gamma}\frac{x_{0}}{\cancel{\gamma}\cos\alpha}+\cancel{\gamma\beta c\cdot0}\right)}}}\left({\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}+{\color{green}\frac{1}{2}}+{\color{green}\frac{1}{2}\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)\label{eq:e_36}\\
+ & ={\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}}\left({\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}+{\color{green}\frac{1}{2}}+{\color{green}\frac{1}{2}\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)\nonumber 
 \end{align}
 
 \end_inset
@@ -5818,7 +5814,7 @@ red
  terms:
 \begin_inset Formula 
 \[
-\left\langle I_{\text{ring cavity}}\right\rangle \left(x^{\prime}=\frac{x_{0}}{\gamma\cos\alpha},y^{\prime},z^{\prime},t^{\prime}=0\right)={\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}}\left({\color{green}2}+{\color{green}2\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)
+\left\langle I_{\text{ring cavity}}\right\rangle \left(x^{\prime}=\frac{x_{0}}{\gamma\cos\alpha},y^{\prime},z^{\prime},t^{\prime}=0\right)={\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}}\left({\color{green}\frac{1}{2}}+{\color{green}\frac{1}{2}\cos\left(2\varphi\left(x^{\prime}\right)\right)}\right)
 \]
 
 \end_inset
@@ -5985,7 +5981,7 @@ red
 \begin{align}
 \phi_{0}\left(x^{\prime}=\frac{x_{0}}{\cos\alpha},y^{\prime}=y_{0}\right) & =\frac{e^{2}}{4mc\beta_{e}^{\prime}\gamma_{e}^{\prime}\hbar}\cdot\intop A_{0}^{2}\left(y,z\right)dz\nonumber \\
  & =\frac{e^{2}}{4mc\beta_{e}^{\prime}\gamma_{e}^{\prime}\hbar}\cdot\intop{\color{teal}E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}\cdot e^{-\frac{2\left(y^{2}+z^{2}\right)}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}}dz\nonumber \\
- & \stackrel{{\color{blue}\eqref{eq:gaussian_beam_potential_total_phase}}}{=}\frac{e^{2}}{\hbar4mc\beta_{e}^{\prime}\gamma_{e}^{\prime}\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{w_{0}^{2}E_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}e^{-\frac{2y_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}\label{eq:phi_0_first_time}
+ & \stackrel{{\color{blue}\eqref{eq:phi_0_analytical_expression}}}{=}\frac{e^{2}}{\hbar4mc\beta_{e}^{\prime}\gamma_{e}^{\prime}\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{w_{0}^{2}E_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}e^{-\frac{2y_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}\label{eq:phi_0_first_time}
 \end{align}
 
 \end_inset
@@ -6009,11 +6005,11 @@ noprefix "false"
 
 \color inherit
  we know that the 
-\begin_inset Formula ${\color{green}2+2\cos\left(2kx^{\prime}\right)}$
+\begin_inset Formula ${\color{green}\frac{1}{2}+\frac{1}{2}\cos\left(2kx^{\prime}\right)}$
 \end_inset
 
  term will end up as 
-\begin_inset Formula ${\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}$
+\begin_inset Formula ${\color{green}\frac{1}{2}\left(1+\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)\right)}$
 \end_inset
 
  but from equation
@@ -6031,14 +6027,14 @@ noprefix "false"
 
 \color inherit
  the two constant terms will just stay 
-\begin_inset Formula ${\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}$
+\begin_inset Formula ${\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}$
 \end_inset
 
 :
 \begin_inset Formula 
 \begin{align*}
 \phi\left(x_{0},y_{0}\right) & ={\color{gray}\overset{\text{Do not appear in a ring cavity}}{\overbrace{{\normalcolor \phi_{{\color{red}\text{red term}}}\left(x_{0},y_{0}\right)+\phi_{{\color{blue}\text{blue term}}}\left(x_{0},y_{0}\right)}}}}+\phi_{{\color{green}\text{green term}}}\left(x_{0},y_{0}\right)\\
- & =\phi_{0}\left(x_{0},y_{0}\right)\cdot\left[{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}\right]
+ & =\phi_{0}\left(x_{0},y_{0}\right)\cdot\left[{\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}+{\color{green}\frac{1}{2}\left(1+\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)\right)}\right]
 \end{align*}
 
 \end_inset
@@ -6182,7 +6178,7 @@ noprefix "false"
 y^{\prime}\\
 \gamma x^{\prime}\sin\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
 \gamma\beta x^{\prime}+\gamma ct^{\prime}
-\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\theta},y_{0}\right)\left({\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}}}}}\right)}
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\theta},y_{0}\right)\left({\color{green}\frac{1}{2}+\frac{1}{2}\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}}}}}\right)}
 \]
 
 \end_inset
@@ -6218,12 +6214,12 @@ And so after transforming back to the lab's frame the phase will be:
 y^{\prime}\\
 \gamma x^{\prime}\sin\alpha+z^{\prime}\cos\alpha+\gamma\beta ct^{\prime}\sin\alpha\\
 \gamma\beta x^{\prime}+\gamma ct^{\prime}
-\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left({\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}\right)}}}}}} & \xrightarrow[\text{Lorentz transform and rotation}]{}\\
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left({\color{green}\frac{1}{2}+\frac{1}{2}\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2kx^{\prime}\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}+{\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}\right)}}}}}} & \xrightarrow[\text{Lorentz transform and rotation}]{}\\
 {\color{gray}\underset{\text{Lab's frame}}{\underbrace{{\normalcolor \psi_{x_{0},y_{0}}\begin{pmatrix}x\\
 y\\
 z\\
 t
-\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left({\color{green}2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2k\left(\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\right)\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}}+{\color{red}\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}\right)}}}}}
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left({\color{green}\frac{1}{2}+\frac{1}{2}\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2k\left(\gamma\left(x\cos\alpha+z\sin\alpha\right)-\gamma\beta ct\right)\right)}+{\color{blue}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}}+{\color{red}\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}\right)}}}}}
 \end{align*}
 
 \end_inset
@@ -6243,7 +6239,7 @@ Approximating again the wave function to be non-zero only at around
 y\\
 z\\
 t
-\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+2\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor \left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}\right)}\label{eq:analytical cavity effect - total modulation}
+\end{pmatrix}\cdot e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\frac{1}{2}+\frac{1}{2}\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor \left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}}}}\right)}\label{eq:analytical cavity effect - total modulation}
 \end{equation}
 
 \end_inset
@@ -6251,7 +6247,7 @@ t
 And the middle band will be:
 \begin_inset Formula 
 \[
-e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+\text{Const}\right)}={\color{gray}\underset{\text{No t dependance}}{\underbrace{{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}\right)}}}}}\cdot{\color{teal}e^{i\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2\sin\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{2\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)\right)}}=
+e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\frac{1}{2}\rho\left(\theta,\beta_{e}^{\prime}\right)\cos\left(2\gamma k_{l}\left[\left(x_{0}\cos\alpha+z\sin\alpha\right)-\beta ct\right]\right)+\text{Const}\right)}={\color{gray}\underset{\text{No t dependance}}{\underbrace{{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\frac{1}{2}+\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}\right)}}}}}\cdot{\color{teal}e^{i\frac{1}{2}\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\sin\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{2\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)\right)}}=
 \]
 
 \end_inset
@@ -6259,7 +6255,7 @@ e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\cos\left(2\gamma k
 Using the identity:
 \begin_inset Formula 
 \[
-e^{i\left[{\color{brown}A_{0}}+{\color{teal}A\sin\left(\omega t\right)}\right]}={\color{brown}e^{iA_{0}}}\cdot{\color{teal}\sum_{q}J_{q}\left(A\right)e^{iq\omega t}}
+e^{i\left[{\color{brown}C_{0}}+{\color{teal}C\sin\left(\omega t\right)}\right]}={\color{brown}e^{iC_{0}}}\cdot{\color{teal}\sum_{q}J_{q}\left(C\right)e^{iq\omega t}}
 \]
 
 \end_inset
@@ -6267,7 +6263,7 @@ e^{i\left[{\color{brown}A_{0}}+{\color{teal}A\sin\left(\omega t\right)}\right]}=
 We get:
 \begin_inset Formula 
 \[
-={\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}\sum_{q=-\infty}^{\infty}J_{q}\left(2\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)e^{iq\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{4\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)}}\Rightarrow
+={\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\frac{1}{2}+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}\sum_{q=-\infty}^{\infty}J_{q}\left(\frac{1}{2}\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)e^{iq\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{4\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)}}\Rightarrow
 \]
 
 \end_inset
@@ -6287,7 +6283,7 @@ t
 y\\
 z\\
 t
-\end{pmatrix}\cdot{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}J_{0}\left(2\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_35}\label{eq:e_35}
+\end{pmatrix}\cdot{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(\frac{1}{2}+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{2\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{2\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}J_{0}\left(\frac{1}{2}\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_35}\label{eq:e_35}
 \end{equation}
 
 \end_inset
@@ -6307,7 +6303,7 @@ t
 y\\
 z\\
 t
-\end{pmatrix}\cdot{\color{brown}e^{i2\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)}}\cdot{\color{teal}J_{0}\left(2\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_36}\label{eq:e_38}
+\end{pmatrix}\cdot{\color{brown}e^{i\frac{1}{2}\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)}}\cdot{\color{teal}J_{0}\left(\frac{1}{2}\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_36}\label{eq:e_38}
 \end{equation}
 
 \end_inset
@@ -6319,7 +6315,7 @@ t
 for 
 \begin_inset Formula 
 \begin{equation}
-\phi_{0}\left(x^{\prime}=\frac{x_{0}}{\cos\alpha},y^{\prime}=y_{0}\right)=\frac{e^{2}}{\hbar4mc\beta_{e}\gamma_{e}}\sqrt{\frac{\pi}{2}}\frac{E_{0}^{2}w_{0}^{2}}{w\left(\frac{x_{0}}{\cos\alpha}\right)}e^{-\frac{2y_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}\tag{e\_11}\label{eq:e_11}
+\phi_{0}\left(x^{\prime}=\frac{x_{0}}{\cos\alpha},y^{\prime}=y_{0}\right)=\frac{e^{2}}{\hbar4mc\beta_{e}\gamma_{e}\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{E_{0}^{2}w_{0}^{2}}{w\left(\frac{x_{0}}{\cos\alpha}\right)}e^{-\frac{2y_{0}^{2}}{w^{2}\left(\frac{x_{0}}{\cos\alpha}\right)}}\tag{{\color{blue}\eqref{eq:phi_0_analytical_expression}}}\label{eq:e_11}
 \end{equation}
 
 \end_inset
@@ -6397,7 +6393,7 @@ literal "false"
 ):
 \begin_inset Formula 
 \begin{equation}
-\boxed{\phi_{0}\left(x,y\right)=\frac{e^{2}}{\hbar4mc\beta\gamma\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{E_{0}^{2}w_{0}^{2}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}}\tag{e\_1}\label{eq:gaussian_beam_potential_total_phase}
+\boxed{\phi_{0}\left(x,y\right)=\frac{e^{2}}{\hbar4mc\beta\gamma\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{E_{0}^{2}w_{0}^{2}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}}\tag{e\_1}\label{eq:phi_0_analytical_expression}
 \end{equation}
 
 \end_inset
@@ -8991,6 +8987,22 @@ noprefix "false"
  & =\frac{4{\color{purple}e^{2}}\lambda^{2}}{\sqrt{2}{\color{purple}4}\pi^{{\color{purple}2}}\sqrt{\pi}m\gamma\beta{\color{purple}c}c^{3}{\color{purple}\hbar}{\color{purple}\varepsilon_{0}}w_{0}}Pe^{-\frac{2y^{2}}{w_{0}^{2}}}\\
  & =\frac{\sqrt{8}\lambda^{2}{\color{purple}\alpha}}{\sqrt{\pi^{3}}m\gamma\beta c^{3}w_{0}}Pe^{-\frac{2y^{2}}{w_{0}^{2}}}
 \end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\phi_{0}\left(x,y\right)=\frac{{\color{green}e^{2}}}{{\color{green}\hbar4mc\beta\gamma}}{\color{gray}\underset{A^{2}}{\underbrace{{\normalcolor {\color{green}\frac{E_{0}^{2}}{\omega^{2}}}}}}}{\color{green}\sqrt{\frac{\pi}{2}}}\frac{w_{0}^{2}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{{\color{green}e^{2}}}{{\color{green}4}{\color{green}m}{\color{green}\gamma\beta c}{\color{green}\hbar}}\cdot\frac{{\color{green}w_{0}^{2}}}{{\color{green}w^{\cancel{2}}\left(x\right)}}{\color{green}A^{2}}{\color{green}e^{-\frac{2y^{2}}{w_{0}^{2}}}}\sqrt{\frac{\cancel{w^{2}\left(x\right)}{\color{green}\pi}}{{\color{green}2}}}
+\]
 
 \end_inset
 
