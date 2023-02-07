@@ -7,7 +7,8 @@ N_POINTS = 64  # Resolution of image
 pixel_size = 1e-10
 
 input_coordinate_system = CoordinateSystem(dxdydz=(pixel_size, pixel_size), n_points=(N_POINTS, N_POINTS))
-first_wave = WaveFunction(psi=np.ones((N_POINTS, N_POINTS)), coordinates=input_coordinate_system, E0=Joules_of_keV(300))
+first_wave = WaveFunction(psi=np.ones((N_POINTS, N_POINTS)), coordinates=input_coordinate_system,
+                          E_0=Joules_of_keV(300))
 
 dummy_sample = SamplePropagator(
     dummy_potential=f"letters_{N_POINTS}",
