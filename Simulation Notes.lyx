@@ -3703,13 +3703,74 @@ And in total after passing through the whole potential (taking
 ) we get:
 \begin_inset Formula 
 \begin{align}
- & \boxed{\phi\left(t_{0}\right)=-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\left(\boldsymbol{A}\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)-\nabla G\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)-\partial_{z}G\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)\right)^{2}}\right)dz}\tag{e\_3}\label{eq:e_3}\\
- & T\left(z,t_{0}\right)=t_{0}+\frac{1}{\beta c}z\nonumber 
+\phi\left(t_{0}\right) & =-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\left(\boldsymbol{A}\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)-\nabla G\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)-\partial_{z}G\left(\boldsymbol{x},T\left(z,t_{0}\right)\right)\right)^{2}}\right)dz\tag{e\_3}\label{eq:e_3}\\
+ & =-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left[{\color{green}\left(A_{x}-\partial_{x}G\right)^{2}}+{\color{green}\left(A_{y}-\partial_{y}G\right)^{2}}+\left({\color{green}1}-{\color{blue}\beta^{2}}\right)\left(A_{z}-\partial_{z}G\right)^{2}\right]dz\\
+\\
+T\left(z,t_{0}\right) & =t_{0}+\frac{1}{\beta c}z\nonumber 
 \end{align}
 
 \end_inset
 
 
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+For a wave that propagates mostly in the 
+\begin_inset Formula $x$
+\end_inset
+
+ direction, we can denote it's field as:
+\begin_inset Formula 
+\[
+\boldsymbol{A}\left(x,y,z,t\right)=A_{0}\left(x,y,z,t\right)\cdot\begin{pmatrix}0\\
+\sin\theta\\
+\cos\theta
+\end{pmatrix}
+\]
+
+\end_inset
+
+And if we denote:
+\begin_inset Formula 
+\begin{align*}
+G_{0}\left(x,y,z,t\right) & =\intop_{-\infty}^{z}A_{0}\left(x,y,Z,t-\frac{z-Z}{\beta c}\right)dZ
+\end{align*}
+
+\end_inset
+
+The we can write:
+\begin_inset Formula 
+\[
+G=G_{0}\cos\theta
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+And get:
+\begin_inset Formula 
+\begin{align*}
+\phi\left(t_{0}\right) & =-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left[{\color{green}\left(\partial_{x}\cos\theta G_{0}\right)^{2}}+{\color{green}\left(A_{0}\sin\theta-\partial_{y}G_{0}\cos\theta\right)^{2}}+\left({\color{green}1}-{\color{blue}\beta^{2}}\right)\left(A_{0}\cos\theta-\partial_{z}G_{0}\cos\theta\right)^{2}\right]dz\\
+ & =-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left[\cos^{2}\theta\left(\partial_{x}G_{0}\right)^{2}+A_{0}^{2}\sin^{2}\theta-2\sin\theta\cos\theta A_{0}\cdot\partial_{y}G_{0}+\cos^{2}\theta\left(\partial_{y}G_{0}\right)^{2}+\cos^{2}\theta\left({\color{green}1}-{\color{blue}\beta^{2}}\right)\left(A_{0}^{2}+2A_{0}\partial_{z}G_{0}+\left(\partial_{z}G_{0}\right)^{2}\right)\right]dz\\
+ & =-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left[\cos^{2}\theta\left[\left(\partial_{x}G_{0}\right)^{2}+\left(\partial_{y}G_{0}\right)^{2}+\left(\partial_{z}G_{0}\right)^{2}\right]+A_{0}^{2}\left(\cos^{2}\left(\theta\right)\left(1-\beta^{2}\right)+\sin^{2}\left(\theta\right)\right)-2\sin\theta\cos\theta A_{0}\cdot\partial_{y}G_{0}+2\cos^{2}\theta\left(1-\beta^{2}\right)A_{0}G_{0}-\cos^{2}\theta\beta^{2}\left(\partial_{z}G_{0}\right)\right]dz\\
+ & =-\frac{1}{\hbar}\intop_{-\infty}^{\infty}\frac{e^{2}}{2m\gamma\beta c}\left[\cos^{2}\theta\left(\nabla G_{0}\right)^{2}+A_{0}^{2}\left(1-\cos^{2}\theta\beta^{2}\right)-2\sin\theta\cos\theta A_{0}\cdot\partial_{y}G_{0}+2\cos^{2}\theta\left(1-\beta^{2}\right)A_{0}G_{0}-\cos^{2}\theta\beta^{2}G_{0}^{2}\right]dz
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset Note Note
 status collapsed
 
@@ -3754,7 +3815,7 @@ And for the special case of
 :
 \begin_inset Formula 
 \begin{align}
-\phi\left(t\right) & =-\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\cancel{A_{x}^{2}}+\cancel{2A_{x}\partial_{x}G}+\left(\partial_{x}G\right)^{2}+A_{y}^{2}+A_{z}^{2}}-{\color{blue}\beta^{2}A_{z}^{2}+\cancel{2A_{z}\partial_{z}G}-\cancel{\left(\partial_{z}G\right)^{2}}}\right)dz\nonumber \\
+\phi\left(t\right) & =-\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{green}\cancel{A_{x}^{2}}+\cancel{2A_{x}\partial_{x}G}+\left(\partial_{x}G\right)^{2}+A_{y}^{2}+A_{z}^{2}}-{\color{blue}\beta^{2}A_{z}^{2}+\cancel{\beta^{2}2A_{z}\partial_{z}G}-\cancel{\beta^{2}\left(\partial_{z}G\right)^{2}}}\right)dz\nonumber \\
  & =-\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left(A_{y}^{2}+\left(1-{\color{blue}\beta^{2}}\right)A_{z}^{2}+\left(\partial_{x}G\right)^{2}\right)dz\nonumber \\
  & =-\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left(A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)+\left(1-{\color{blue}\beta^{2}}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)+\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}\right)dz\label{eq:e_18}
 \end{align}
@@ -4150,7 +4211,7 @@ noprefix "false"
  we get:
 \begin_inset Formula 
 \begin{align*}
-\phi\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz
+\phi\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{gray}\underset{y}{\underbrace{{\normalcolor {\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}}}}}+{\color{gray}\underset{z}{\underbrace{{\normalcolor {\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}}}}}+{\color{gray}\underset{x}{\underbrace{{\normalcolor {\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}}}}}\right)dz
 \end{align*}
 
 \end_inset
@@ -4179,20 +4240,20 @@ noprefix "false"
 \color inherit
  we get:
 \begin_inset Formula 
-\begin{align*}
-\phi\left(x,y\right)=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z} & \left[{\color{gray}\overset{A_{y}}{\overbrace{{\normalcolor {\color{red}\left(A_{\text{envelope}}^{2}\left(x,y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}}}}}\right.\\
- & +{\color{gray}\overset{A_{z}}{\overbrace{{\normalcolor {\color{blue}\left(1-\beta^{2}\right)\cdot A_{\text{envelope}}^{2}\left(x,y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\theta\cos^{2}\left(\omega t\left(z\right)\right)}}}}}\\
- & +{\color{gray}\underset{A_{x}}{\underbrace{{\normalcolor \left.{\color{green}\beta^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)\sin^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\left(\theta\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]}}}}dz
-\end{align*}
+\begin{align}
+\phi\left(x,y\right)=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z} & \left[{\color{gray}\overset{y}{\overbrace{{\normalcolor {\color{red}\left(A_{\text{envelope}}^{2}\left(x,y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}}}}}\right.\nonumber \\
+ & +{\color{gray}\overset{z}{\overbrace{{\normalcolor {\color{blue}\left(1-\beta^{2}\right)\cdot A_{\text{envelope}}^{2}\left(x,y,z\right)\cos^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\theta\cos^{2}\left(\omega t\left(z\right)\right)}}}}}\nonumber \\
+ & +{\color{gray}\underset{x}{\underbrace{{\normalcolor \left.{\color{green}\beta^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)\sin^{2}\left(\varphi\left(x\right)\right)\cdot\cos^{2}\left(\theta\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]}}}}dz\label{eq:e_100}
+\end{align}
 
 \end_inset
 
 
 \begin_inset Formula 
-\begin{align*}
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z} & A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}\right.\\
- & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]\right]dz
-\end{align*}
+\begin{align}
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z} & A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)\right)}\right.\nonumber \\
+ & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)\cos^{2}\left(\omega t\left(z\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)\sin^{2}\left(\omega t\left(z\right)\right)}\right]\right]dz\label{eq:e_101}
+\end{align}
 
 \end_inset
 
@@ -4200,12 +4261,16 @@ The integragtion over
 \begin_inset Formula $\cos^{2}\left(\omega t\left(z\right)\right),\sin^{2}\left(\omega t\left(z\right)\right),\cos^{2}\left(\omega t\left(z\right)-\varepsilon\right)$
 \end_inset
 
- will just add a half factor and we get:
+ will just add a 
+\color brown
+half
+\color inherit
+ factor and we get:
 \begin_inset Formula 
-\begin{align*}
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z} & \frac{1}{2}A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\right)}\right.\\
- & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)}\right]\right]dz
-\end{align*}
+\begin{align}
+=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z} & {\color{brown}\frac{1}{2}}A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\cdot\sin^{2}\left(\theta\right)\right)}\right.\nonumber \\
+ & +\cos^{2}\left(\theta\right)\left[\left({\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}\right)+\beta^{2}\left[-{\color{blue}\cos^{2}\left(\varphi\left(x\right)\right)}+{\color{green}\sin^{2}\left(\varphi\left(x\right)\right)}\right]\right]dz\label{eq:e_102}
+\end{align}
 
 \end_inset
 
@@ -4223,24 +4288,24 @@ The red and the first blue parts are simply
 
 ):
 \begin_inset Formula 
-\[
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z}\frac{1}{2}A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]dz
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z}\frac{1}{2}A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\frac{1}{2}+\frac{1}{2}\cos\left(2\varphi\left(x\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]dz
-\]
+\begin{equation}
+=-\frac{e^{2}}{{\color{brown}4}m\gamma\beta c\hbar}\intop_{z}A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\left(\cos^{2}\left(\varphi\left(x\right)\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]dz\label{eq:e_103}
+\end{equation}
 
 \end_inset
 
 
 \begin_inset Formula 
 \begin{equation}
-=-\frac{e^{2}}{2m\gamma\beta c\hbar}\intop_{z}\frac{1}{2}A_{\text{envelope}}^{2}\left(x,y,z\right){\color{red}\frac{1}{2}}\left[{\color{red}1}+\left({\color{red}1}-2\cos^{2}\left(\theta\right)\beta^{2}\right)\cos\left(2\varphi\left(x\right)\right)\right]dz\label{eq:ponderomotive_integral_final_result_standing_wave}
+=-\frac{e^{2}}{{\color{brown}4}m\gamma\beta c\hbar}\intop_{z}A_{\text{envelope}}^{2}\left(x,y,z\right)\left[{\color{red}\frac{1}{2}+\frac{1}{2}\cos\left(2\varphi\left(x\right)\right)}-\cos^{2}\left(\theta\right)\beta^{2}\cos\left(2\varphi\left(x\right)\right)\right]dz\label{eq:e_104}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+=-\frac{e^{2}}{4m\gamma\beta c\hbar}\intop_{z}A_{\text{envelope}}^{2}\left(x,y,z\right){\color{red}\frac{1}{2}}\left[{\color{red}1}+\left({\color{red}1}-2\cos^{2}\left(\theta\right)\beta^{2}\right)\cos\left(2\varphi\left(x\right)\right)\right]dz\label{eq:ponderomotive_integral_final_result_standing_wave}
 \end{equation}
 
 \end_inset
@@ -6202,7 +6267,7 @@ e^{i\left[{\color{brown}A_{0}}+{\color{teal}A\sin\left(\omega t\right)}\right]}=
 We get:
 \begin_inset Formula 
 \[
-={\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}\sum_{q=-\infty}^{\infty}J_{q}\left(\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)e^{iq\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{4\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)}}\Rightarrow
+={\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}\sum_{q=-\infty}^{\infty}J_{q}\left(2\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)e^{iq\left(2\gamma k_{l}\beta c\left(-t+\frac{\pi}{4\gamma k_{l}\beta c}\right)+2\gamma k_{l}\left(x_{0}\cos\alpha+z\sin\alpha\right)\right)}}\Rightarrow
 \]
 
 \end_inset
@@ -6222,7 +6287,7 @@ t
 y\\
 z\\
 t
-\end{pmatrix}\cdot{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}J_{0}\left(\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_35}\label{eq:e_35}
+\end{pmatrix}\cdot{\color{brown}e^{i\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\left(2+{\color{gray}\underset{\text{Not in ring cavity}}{\underbrace{{\normalcolor {\color{brown}\left(\frac{\Gamma_{+}}{\Gamma_{-}}\right)^{2}+\left(\frac{\Gamma_{-}}{\Gamma_{+}}\right)^{2}}}}}}\right)}}\cdot{\color{teal}J_{0}\left(2\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_35}\label{eq:e_35}
 \end{equation}
 
 \end_inset
@@ -6242,7 +6307,7 @@ t
 y\\
 z\\
 t
-\end{pmatrix}\cdot{\color{brown}e^{i2\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)}}\cdot{\color{teal}J_{0}\left(\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_36}\label{eq:e_38}
+\end{pmatrix}\cdot{\color{brown}e^{i2\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)}}\cdot{\color{teal}J_{0}\left(2\rho\left(\theta,\beta_{e}^{\prime}\right)\phi_{0}\left(\frac{x_{0}}{\cos\alpha},y_{0}\right)\right)}\tag{e\_36}\label{eq:e_38}
 \end{equation}
 
 \end_inset
@@ -6994,6 +7059,27 @@ And so the integral becomes:
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+{\color{gray}\tilde{A}_{z}\left(x\cos\alpha-Z\sin\alpha,y,x\sin\alpha+Z\cos\alpha,\frac{Z-z}{\beta c}+t\right)} & {\color{gray}=\frac{w_{0}}{w\left(x\cos\alpha-Z\sin\alpha\right)}e^{\frac{-z^{2}}{w^{2}\left(x\cos\alpha-Z\sin\alpha\right)}}\cos\left(\frac{Z-z}{\beta c}+t\right)}\\
+ & {\color{gray}=\frac{w_{0}}{w\left(x\cos\alpha-Z\sin\alpha\right)}e^{\frac{-z^{2}}{w^{2}\left(x\cos\alpha-Z\sin\alpha\right)}}\cos\left(\frac{Z}{\beta c}+\left(t-\frac{z}{\beta c}\right)\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
 Which is more comfortable in my eyes then integration over 
 \begin_inset Formula $t$
 \end_inset
@@ -7158,7 +7244,7 @@ blue
 term in the integral of the phase:
 \begin_inset Formula 
 \[
-\intop_{-\infty}^{\infty}\left(A_{z}\left(z,t\left(z\right)\right)-{\color{blue}\nabla G\left(z,t\left(z\right)\right)}\right)^{2}\ldots dz
+\phi=\intop_{-\infty}^{\infty}\left(A\left(z,t\left(z\right)\right)-{\color{blue}\nabla G\left(z,t\left(z\right)\right)}\right)^{2}\ldots dz
 \]
 
 \end_inset
@@ -8689,10 +8775,10 @@ E=E_{0}\cdot\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}+z^{2}}{w^{2}\left(x\rig
 \end_layout
 
 \begin_layout Standard
-Then the intensity has the form:
+Then the field squared has the form:
 \begin_inset Formula 
 \[
-I=E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(x\right)}e^{-2\frac{y^{2}+z^{2}}{w^{2}\left(x\right)}}=E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(x\right)}e^{-\frac{y^{2}+z^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}
+\left|E\right|^{2}=E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(x\right)}e^{-2\frac{y^{2}+z^{2}}{w^{2}\left(x\right)}}=E_{0}^{2}\cdot\frac{w_{0}^{2}}{w^{2}\left(x\right)}e^{-\frac{y^{2}+z^{2}}{2\left(\frac{w\left(x\right)}{2}\right)^{2}}}
 \]
 
 \end_inset
@@ -8719,7 +8805,7 @@ literal "false"
 )
 \begin_inset Formula 
 \[
-I\left(0,y,z\right)=\frac{c\varepsilon_{0}}{2}\cdot\left|E\right|^{2}=\frac{c\varepsilon_{0}}{2}E_{0}^{2}\cancel{\frac{w_{0}^{2}}{w_{0}^{2}}}e^{-\frac{y^{2}+z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}=\frac{c\varepsilon_{0}}{2}E_{0}^{2}e^{-\frac{y^{2}+z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}={\color{green}\left(\sqrt{2\pi}\cdot\frac{w_{0}}{\sqrt{2}}\right)^{2}}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\frac{1}{{\color{green}\sqrt{2\pi}\cdot\frac{w_{0}}{\sqrt{2}}}}e^{-\frac{y^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}\cdot\frac{1}{{\color{green}\sqrt{2\pi}\cdot\frac{w_{0}}{\sqrt{2}}}}e^{-\frac{z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}=
+I\left(0,y,z\right)=\frac{c\varepsilon_{0}}{2}\cdot\left|E\right|^{2}=\frac{c\varepsilon_{0}}{2}E_{0}^{2}\cancel{\frac{w_{0}^{2}}{w_{0}^{2}}}e^{-\frac{y^{2}+z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}=\frac{c\varepsilon_{0}}{2}E_{0}^{2}e^{-\frac{y^{2}+z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}={\color{green}\left(\sqrt{2\pi}\cdot\frac{w_{0}}{2}\right)^{2}}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\frac{1}{{\color{green}\sqrt{2\pi}\cdot\frac{w_{0}}{2}}}e^{-\frac{y^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}\cdot\frac{1}{{\color{green}\sqrt{2\pi}\cdot\frac{w_{0}}{2}}}e^{-\frac{z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}=
 \]
 
 \end_inset
@@ -8730,39 +8816,8 @@ Integrating over
 
  we get:
 \begin_inset Formula 
-\begin{align*}
-P & =\intop_{y,z}I\left(0,y,z\right)dydz\\
-= & \intop_{y,z}\frac{c\varepsilon_{0}}{2}E_{0}^{2}e^{-\frac{y^{2}+z^{2}}{\frac{1}{2}w_{0}^{2}}}dydz\\
-= & \intop_{\theta}\intop_{r}\frac{c\varepsilon_{0}}{2}E_{0}^{2}e^{-\frac{r^{2}}{\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}}}drrd\theta\\
-= & 2\pi\frac{c\varepsilon_{0}}{2}E_{0}^{2}\intop_{\tilde{r}}re^{-\left(\frac{r}{\left(\frac{w_{0}}{\sqrt{2}}\right)}\right)^{2}}dr\\
-\stackrel{r\rightarrow\tilde{r}=\frac{r}{\left(\frac{w_{0}}{\sqrt{2}}\right)}}{=} & 2\pi\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\intop_{\tilde{r}}\tilde{r}e^{-\tilde{r}^{2}}d\tilde{r}\\
-\stackrel{\tilde{r}^{2}\rightarrow s,ds=\frac{1}{2}\tilde{r}d\tilde{r}}{=} & 2\pi\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\intop_{s}\frac{1}{2}e^{-s}ds\\
-= & 2\pi\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\left.\frac{1}{2}e^{-s}\right|_{\infty}^{0}\\
- & =2\pi\frac{w_{0}^{2}}{4}\frac{c\varepsilon_{0}}{2}E_{0}^{2}
-\end{align*}
-
-\end_inset
-
-
-\begin_inset Formula 
 \[
-=
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}
-\]
-
-\end_inset
-
-Or also:
-\begin_inset Formula 
-\[
-P=\intop_{y,z}I\left(0,y,z\right)dydz=\intop_{{\color{brown}y},{\color{teal}z}}\left(\sqrt{2\pi}\cdot\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}{\color{brown}\frac{1}{\sqrt{2\pi}\cdot\frac{w_{0}}{2}}e^{-\frac{y^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}}\cdot{\color{teal}\frac{1}{\sqrt{2\pi}\cdot\frac{w_{0}}{2}}e^{-\frac{z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}}{\color{brown}dy}{\color{teal}dz}=
+P=\intop_{y,z}I\left(0,y,z\right)dydz=\intop_{{\color{brown}y},{\color{teal}z}}\left(\sqrt{2\pi}\cdot\frac{w_{0}}{2}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}{\color{brown}\frac{1}{\sqrt{2\pi}\cdot\frac{w_{0}}{2}}e^{-\frac{y^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}}\cdot{\color{teal}\frac{1}{\sqrt{2\pi}\cdot\frac{w_{0}}{2}}e^{-\frac{z^{2}}{2\left(\frac{w_{0}}{2}\right)^{2}}}}{\color{brown}dy}{\color{teal}dz}=
 \]
 
 \end_inset
@@ -8785,9 +8840,61 @@ P=\intop_{y,z}I\left(0,y,z\right)dydz=\intop_{{\color{brown}y},{\color{teal}z}}\
 
 
 \begin_inset Formula 
+\begin{equation}
+P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}\iff\frac{4}{\pi c\varepsilon_{0}w_{0}^{2}}P=E_{0}^{2}\label{eq:e_44}
+\end{equation}
+
+\end_inset
+
+If, alternatively, we have a standing wave of the form:
+\begin_inset Formula 
+\[
+E=E_{0}\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}+z^{2}}{w_{0}^{2}}}\cos\left(\varphi\left(x,y,z\right)\right)=\frac{1}{2}E_{0}\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}+z^{2}}{w_{0}^{2}}}e^{i\varphi\left(x,y,z\right)}+\frac{1}{2}E_{0}\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}+z^{2}}{w_{0}^{2}}}e^{-i\varphi\left(x,y,z\right)}
+\]
+
+\end_inset
+
+Then the power of each one of the moving wave will be:
+\begin_inset Formula 
+\begin{equation}
+P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}\left(\frac{E_{0}}{2}\right)^{2}=\frac{1}{4}\cdot\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}\iff4\cdot\frac{4}{\pi c\varepsilon_{0}w_{0}^{2}}\cdot P=E_{0}^{2}\label{eq:e_45}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Or Also:
+\begin_inset Formula 
+\begin{align*}
+P & =\intop_{y,z}I\left(0,y,z\right)dydz\\
+= & \intop_{y,z}\frac{c\varepsilon_{0}}{2}E_{0}^{2}e^{-\frac{y^{2}+z^{2}}{\frac{1}{2}w_{0}^{2}}}dydz\\
+=\frac{c\varepsilon_{0}}{2}E_{0}^{2} & \intop_{\theta}\intop_{r}e^{-\frac{r^{2}}{\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}}}drrd\theta\\
+= & 2\pi\frac{c\varepsilon_{0}}{2}E_{0}^{2}\intop_{\tilde{r}}re^{-\left(\frac{r}{\left(\frac{w_{0}}{\sqrt{2}}\right)}\right)^{2}}dr\\
+\stackrel{r\rightarrow\tilde{r}=\frac{r}{\left(\frac{w_{0}}{\sqrt{2}}\right)}}{=} & 2\pi\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\intop_{\tilde{r}}\tilde{r}e^{-\tilde{r}^{2}}d\tilde{r}\\
+\stackrel{\tilde{r}^{2}\rightarrow s,ds=\frac{1}{2}\tilde{r}d\tilde{r}}{=} & 2\pi\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\intop_{s}\frac{1}{2}e^{-s}ds\\
+= & 2\pi\left(\frac{w_{0}}{\sqrt{2}}\right)^{2}\frac{c\varepsilon_{0}}{2}E_{0}^{2}\left.\frac{1}{2}e^{-s}\right|_{\infty}^{0}\\
+ & =2\pi\frac{w_{0}^{2}}{4}\frac{c\varepsilon_{0}}{2}E_{0}^{2}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
 \[
 P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}
 \]
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -8798,12 +8905,20 @@ Using
 , we can also write:
 \begin_inset Formula 
 \[
-P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}=P=\frac{\pi c\varepsilon_{0}}{4}\left(\frac{\lambda}{\pi\cdot\kaliNA}\right)^{2}E_{0}^{2}=\frac{c\varepsilon_{0}\lambda^{2}}{4\pi\cdot\kaliNA^{2}}E_{0}^{2}
+P=\frac{\pi c\varepsilon_{0}{\color{purple}w_{0}^{2}}}{4}E_{0}^{2}=\frac{\pi c\varepsilon_{0}}{4}{\color{purple}\left(\frac{\lambda}{\pi\cdot\kaliNA}\right)^{2}}E_{0}^{2}=\frac{c\varepsilon_{0}\lambda^{2}}{4\pi\cdot\kaliNA^{2}}E_{0}^{2}
 \]
 
 \end_inset
 
 Or alternatively:
+\begin_inset Formula 
+\[
+\frac{P\cdot4\pi\cdot\kaliNA^{2}}{c\varepsilon_{0}\lambda^{2}}=E_{0}^{2}{\color{lightgray}\ \backslash\sqrt{}}
+\]
+
+\end_inset
+
+
 \begin_inset Formula 
 \begin{equation}
 \boxed{E_{0}=\frac{2\kaliNA}{\lambda}\sqrt{\frac{\pi P}{c\varepsilon_{0}}}}\tag{e\_43}\label{eq:e_43}
@@ -8811,11 +8926,75 @@ Or alternatively:
 
 \end_inset
 
+And if there is a standing wave then then we replace 
+\begin_inset Formula $P$
+\end_inset
+
+ by 
+\begin_inset Formula $4P$
+\end_inset
+
+ as we did in 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_45"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+:
+\begin_inset Formula 
+\[
+E_{0,\text{standing}}=\frac{4\kaliNA}{\lambda}\sqrt{\frac{\pi P}{c\varepsilon_{0}}}
+\]
+
+\end_inset
+
 
 \end_layout
 
 \begin_layout Standard
-And the two dimen
+Calculating 
+\begin_inset Formula $\phi_{0}$
+\end_inset
+
+ (from 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:phi_0_first_time"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\phi_{0}\left(0,y\right)=\frac{e^{2}}{4m\gamma\beta c\hbar}\intop_{z}A_{\text{envelope}}^{2}\left(0,y,z\right)dz & =\frac{e^{2}}{4m\gamma\beta c\hbar}\intop_{z}A_{0}^{2}\cdot e^{-2\frac{y^{2}+z^{2}}{w_{0}^{2}}}dz\\
+ & =\frac{e^{2}}{4m\gamma\beta c\hbar}\frac{{\color{blue}E_{0}^{2}}}{{\color{green}\omega^{2}}}e^{-\frac{2y^{2}}{w_{0}^{2}}}{\color{brown}\intop_{z}\cdot e^{-\frac{2z^{2}}{w_{0}^{2}}}dz}\\
+ & \stackrel{{\color{blue}\eqref{eq:e_45}}}{=}\frac{e^{2}}{\cancel{4}m\gamma\beta c\hbar}\frac{{\color{blue}4\cdot\frac{\cancel{4}}{\pi c\varepsilon_{0}w_{0}^{2}}P}}{{\color{green}\left(c\cdot\frac{2\pi}{\lambda}\right)^{2}}}e^{-\frac{2y^{2}}{w_{0}^{2}}}{\color{brown}\sqrt{\frac{\pi}{\nicefrac{2}{w_{0}^{2}}}}}\\
+ & =\frac{e^{2}{\color{green}\lambda^{2}}{\color{brown}\sqrt{\pi}\cancel{w_{0}}}}{{\color{brown}\sqrt{2}}{\color{green}4}\pi^{{\color{green}3}}m\gamma\beta c^{{\color{green}4}}\hbar}{\color{blue}\frac{4}{\varepsilon_{0}w_{0}^{\cancel{2}}}P}e^{-\frac{2y^{2}}{w_{0}^{2}}}\\
+ & =\frac{4{\color{purple}e^{2}}\lambda^{2}}{\sqrt{2}{\color{purple}4}\pi^{{\color{purple}2}}\sqrt{\pi}m\gamma\beta{\color{purple}c}c^{3}{\color{purple}\hbar}{\color{purple}\varepsilon_{0}}w_{0}}Pe^{-\frac{2y^{2}}{w_{0}^{2}}}\\
+ & =\frac{\sqrt{8}\lambda^{2}{\color{purple}\alpha}}{\sqrt{\pi^{3}}m\gamma\beta c^{3}w_{0}}Pe^{-\frac{2y^{2}}{w_{0}^{2}}}
+\end{align*}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
