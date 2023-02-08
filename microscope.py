@@ -15,8 +15,8 @@ M_ELECTRON = 9.1093837e-31
 C_LIGHT = 299792458
 H_BAR = 1.054571817e-34
 E_CHARGE = 1.602176634e-19
-FINE_STRUCTURE_CONST = 7.299e-3
 EPSILON_ELECTRICITY = 8.8541878128e-12
+FINE_STRUCTURE_CONST = E_CHARGE**2 / (4 * np.pi * EPSILON_ELECTRICITY * H_BAR * C_LIGHT)
 np.seterr(all="raise")
 
 
@@ -971,7 +971,9 @@ class CavityPropagator(Propagator):
 
     @property
     def E_1(self):
-        E_1_moving_wave = np.sqrt(self.power_1 * 4 / (pi*C_LIGHT*EPSILON_ELECTRICITY*self.w_0_min**2))  # np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
+        E_1_moving_wave = np.sqrt(
+            self.power_1 * 4 / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_min**2)
+        )  # np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
         if self.ring_cavity:
             return E_1_moving_wave
         else:
@@ -1108,7 +1110,7 @@ class CavityAnalyticalPropagator(CavityPropagator):
     def w_0_lattice_frame(self) -> float:
         # The width of the gaussian beam of the first laser - of the only laser if there is one laser, and of the
         # lattice in the moving frame if there are two (the formula is from wikipedia)
-        return self.lambda_laser / (pi * np.arcsin(self.NA_lorentz_transform(self.NA_1)))
+        return self.lambda_laser / (pi * self.NA_lorentz_transform(self.NA_1))
 
     @property
     def lambda_laser(self) -> float:
@@ -1146,7 +1148,7 @@ class CavityAnalyticalPropagator(CavityPropagator):
 
     def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results: bool = False):
         phi_0 = self.phi_0(input_wave)
-        constant_phase_shift = self.constant_phase_shift(phi_0)
+        constant_phase_shift = self.constant_phase_shift(phi_0=phi_0, input_wave=input_wave)
         if self.E_2 is not None:  # For the case of a double laser:
             attenuation_factor = self.attenuation_factor(input_wave, phi_0)
         else:
@@ -1166,16 +1168,20 @@ class CavityAnalyticalPropagator(CavityPropagator):
             phi_0 = self.phi_0(input_wave)
         if self.E_2 is not None:  # For the case of a double laser, explanation in equation eq:e_32 in my readme file
             if self.ring_cavity:
-                return phi_0 * 1/2
+                return phi_0 * 1 / 2
             else:
                 return phi_0 * (
-                    1/2 + 1/4*(self.Gamma_plus / self.Gamma_minus) ** 2 + 1/4*(self.Gamma_minus / self.Gamma_plus) ** 2
+                    1 / 2
+                    + 1 / 4 * (self.Gamma_plus / self.Gamma_minus) ** 2
+                    + 1 / 4 * (self.Gamma_minus / self.Gamma_plus) ** 2
                 )
         else:
             x_R = x_R_gaussian(self.w_0_lattice_frame, self.lambda_laser)
             x_lattice = input_wave.coordinates.X_grid / np.cos(self.beta_electron2alpha_cavity(input_wave.beta))
             gouy_phase = gouy_phase_gaussian(x_lattice, x_R, self.w_0_lattice_frame)
-            cosine_squared = (1 / 2) * (1 + self.rho(input_wave.beta) * np.cos(4 * np.pi * x_lattice / self.lambda_laser + gouy_phase))
+            cosine_squared = (1 / 2) * (
+                1 + self.rho(input_wave.beta) * np.cos(4 * np.pi * x_lattice / self.lambda_laser + gouy_phase)
+            )
             return phi_0 * cosine_squared
 
     def phi_0(self, input_wave: WaveFunction) -> np.ndarray:
@@ -1188,25 +1194,25 @@ class CavityAnalyticalPropagator(CavityPropagator):
         w_x = w_x_gaussian(w_0=self.w_0_lattice_frame, x=x_lattice, x_R=x_R)
         # The next two lines are based on equation e_1 in my readme file
         beta_electron_in_lattice_frame = self.beta_electron_in_lattice_frame(input_wave.beta)
-        constant_coefficients = (E_CHARGE**2 * self.w_0_lattice_frame**2 * np.sqrt(pi) * self.A**2) / (  # (self.power_1 * 4 * 4 / (np.pi * C_LIGHT * EPSILON_ELECTRICITY * w_x**2 * w_of_l(self.l_1)**2))
-            4
-            * H_BAR
-            * np.sqrt(2)
-            * M_ELECTRON
-            * C_LIGHT
-            * beta_electron_in_lattice_frame
-            * gamma_of_beta(beta_electron_in_lattice_frame)
+        constant_coefficients = (
+            self.w_0_lattice_frame**2
+            * FINE_STRUCTURE_CONST
+            * np.sqrt(pi)
+            * (self.power_1 * 4 * 4 / (C_LIGHT * w_x**2 * w_of_l(self.l_1) ** 2))
+        ) / (  # self.A**2  * (self.power_1 * 4 * 4 / (np.pi * C_LIGHT * EPSILON_ELECTRICITY * w_x**2 * w_of_l(self.l_1)**2))
+            np.sqrt(2) * M_ELECTRON * beta_electron_in_lattice_frame * gamma_of_beta(beta_electron_in_lattice_frame)
         )
         spatial_envelope = (
             safe_exponent(-2 * input_wave.coordinates.Y_grid**2 / w_x**2) / w_x
         )  # Shouldn't there be here a w_0 term?
         # No! it is in the previous term.
-        return constant_coefficients * spatial_envelope
+        phi_0 = constant_coefficients * spatial_envelope
+        return phi_0
 
     def attenuation_factor(self, input_wave: WaveFunction, phi_0: Optional[np.ndarray] = None):
         if phi_0 is None:
             phi_0 = self.phi_0(input_wave)
-        return jv(0, (1/2) * phi_0 * self.rho(input_wave.beta))
+        return jv(0, (1 / 2) * phi_0 * self.rho(input_wave.beta))
 
     def rho(self, beta_electron: float):
         return 1 - 2 * beta_electron**2 * np.cos(self.theta_polarization) ** 2
