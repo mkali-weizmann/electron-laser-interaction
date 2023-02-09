@@ -358,6 +358,7 @@ def divide_calculation_to_batches(
 
 def find_power_for_phase(
     starting_power: float = 1e3,
+    E_0: float = Joules_of_keV(300),
     desired_phase: float = pi / 2,
     cavity_type: str = "numerical",
     print_progress=True,
@@ -366,7 +367,7 @@ def find_power_for_phase(
     **kwargs,
 ):
     input_coordinate_system = CoordinateSystem(lengths=(0, 0), n_points=(1, 1))
-    input_wave = WaveFunction(psi=np.ones((1, 1)), coordinates=input_coordinate_system, E_0=Joules_of_keV(300))
+    input_wave = WaveFunction(psi=np.ones((1, 1)), coordinates=input_coordinate_system, E_0=E_0)
     # Based on equation e_41 from the simulation notes:
     if mode == "analytical":
         x_1 = starting_power
@@ -375,7 +376,7 @@ def find_power_for_phase(
         elif cavity_type == "analytical":
             C_1 = CavityAnalyticalPropagator(power_1=x_1, **kwargs)
         else:
-            raise ValueError(f"Unknown cavity type {cavity_type}")
+            raise ValueError(f"Unknown cavity type {cavity_type}. must be either 'numerical' or 'analytical'")
         mask_1 = C_1.phase_and_amplitude_mask(input_wave=input_wave)
         y_1 = np.angle(mask_1[0, 0])
         y_2_supposed = -desired_phase
@@ -667,7 +668,8 @@ class Microscope:
         expected_electrons_per_pixel = output_wave_intensity * (
             self.n_electrons_per_square_angstrom * output_wave.psi.size
         )
-        if np.max(expected_electrons_per_pixel) > 1000000000:
+        if np.max(expected_electrons_per_pixel) > 1000000000:  # ARBITRARY - this prevents overflow of the poisson
+            # distribution
             output_wave_intensity_shot_noise = expected_electrons_per_pixel
         else:
             output_wave_intensity_shot_noise = np.random.poisson(
@@ -973,7 +975,8 @@ class CavityPropagator(Propagator):
     def E_1(self):
         E_1_moving_wave = np.sqrt(
             self.power_1 * 4 / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_min**2)
-        )  # np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
+        )  # can also be written as:
+            # np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
         if self.ring_cavity:
             return E_1_moving_wave
         else:
@@ -1065,23 +1068,31 @@ class CavityAnalyticalPropagator(CavityPropagator):
         ring_cavity: bool = True,
         starting_P_in_auto_P_search: float = 1e3,
         ignore_past_files: bool = False,
+        input_wave_energy_for_power_finding=None,
     ):
 
         if power_1 == -1:
-            power_1 = find_power_for_phase(
-                starting_power=starting_P_in_auto_P_search,
-                cavity_type="analytical",
-                print_progress=True,
-                l_1=l_1,
-                l_2=l_2,
-                power_2=power_2,
-                NA_1=NA_1,
-                NA_2=NA_2,
-                theta_polarization=theta_polarization,
-                alpha_cavity=alpha_cavity,
-                alpha_cavity_deviation=alpha_cavity_deviation,
-                ring_cavity=ring_cavity,
-            )
+            if input_wave_energy_for_power_finding is None:
+                raise ValueError(
+                    "if you want the power to be determined automatically, you must specify the energy"
+                    "of the incoming electrons with  the input_wave_energy_for_power_finding argument."
+                )
+            else:
+                power_1 = find_power_for_phase(
+                    starting_power=starting_P_in_auto_P_search,
+                    E_0=input_wave_energy_for_power_finding,
+                    cavity_type="analytical",
+                    print_progress=True,
+                    l_1=l_1,
+                    l_2=l_2,
+                    power_2=power_2,
+                    NA_1=NA_1,
+                    NA_2=NA_2,
+                    theta_polarization=theta_polarization,
+                    alpha_cavity=alpha_cavity,
+                    alpha_cavity_deviation=alpha_cavity_deviation,
+                    ring_cavity=ring_cavity,
+                )
 
         super().__init__(
             l_1,
@@ -1195,13 +1206,19 @@ class CavityAnalyticalPropagator(CavityPropagator):
         # The next two lines are based on equation e_1 in my readme file
         beta_electron_in_lattice_frame = self.beta_electron_in_lattice_frame(input_wave.beta)
         constant_coefficients = (
-            self.w_0_lattice_frame**2
+            self.power_1
+            * self.lambda_laser**2
             * FINE_STRUCTURE_CONST
-            * np.sqrt(pi)
-            * (self.power_1 * 4 * 4 / (C_LIGHT * w_x**2 * w_of_l(self.l_1) ** 2))
-        ) / (  # self.A**2  * (self.power_1 * 4 * 4 / (np.pi * C_LIGHT * EPSILON_ELECTRICITY * w_x**2 * w_of_l(self.l_1)**2))
-            np.sqrt(2) * M_ELECTRON * beta_electron_in_lattice_frame * gamma_of_beta(beta_electron_in_lattice_frame)
+            * np.sqrt(8 / np.pi**3)
+            / (
+                beta_electron_in_lattice_frame
+                * gamma_of_beta(beta_electron_in_lattice_frame)
+                * M_ELECTRON
+                * C_LIGHT**3
+            )
         )
+        if self.ring_cavity:
+            constant_coefficients /= 4
         spatial_envelope = (
             safe_exponent(-2 * input_wave.coordinates.Y_grid**2 / w_x**2) / w_x
         )  # Shouldn't there be here a w_0 term?
@@ -1266,27 +1283,36 @@ class CavityNumericalPropagator(CavityPropagator):
         n_z: Optional[int] = None,
         starting_P_in_auto_P_search: float = 1e3,
         debug_mode: bool = False,
-        batches_calculation_numel_maximal: int = 1e5  # This determines how many x,y,t points are calculated in each
+        batches_calculation_numel_maximal: int = 1e5,
+        # This determines how many x,y,t points are calculated in each
         # batch
+        input_wave_energy_for_power_finding=None,
     ):
 
         if power_1 == -1:
-            power_1 = find_power_for_phase(
-                starting_power=starting_P_in_auto_P_search,
-                cavity_type="numerical",
-                print_progress=True,
-                l_1=l_1,
-                l_2=l_2,
-                power_2=power_2,
-                NA_1=NA_1,
-                NA_2=NA_2,
-                theta_polarization=theta_polarization,
-                alpha_cavity=alpha_cavity,
-                alpha_cavity_deviation=alpha_cavity_deviation,
-                ring_cavity=ring_cavity,
-                n_t=n_t,
-                ignore_past_files=ignore_past_files,
-            )
+            if input_wave_energy_for_power_finding is None:
+                raise ValueError(
+                    "if you want the power to be determined automatically, you must specify the energy"
+                    "of the incoming electrons with  the input_wave_energy_for_power_finding argument."
+                )
+            else:
+                power_1 = find_power_for_phase(
+                    starting_power=starting_P_in_auto_P_search,
+                    E_0=input_wave_energy_for_power_finding,
+                    cavity_type="numerical",
+                    print_progress=True,
+                    l_1=l_1,
+                    l_2=l_2,
+                    power_2=power_2,
+                    NA_1=NA_1,
+                    NA_2=NA_2,
+                    theta_polarization=theta_polarization,
+                    alpha_cavity=alpha_cavity,
+                    alpha_cavity_deviation=alpha_cavity_deviation,
+                    ring_cavity=ring_cavity,
+                    n_t=n_t,
+                    ignore_past_files=ignore_past_files,
+                )
         super().__init__(
             l_1,
             l_2,
@@ -1505,8 +1531,8 @@ class CavityNumericalPropagator(CavityPropagator):
         prefactor = (
             -1 / H_BAR * E_CHARGE**2 / (2 * M_ELECTRON * gamma_of_beta(beta_electron) * beta_electron * C_LIGHT)
         )
-        phi_values = prefactor * np.trapz(phi_integrand, x=Z, axis=0)
-        return phi_values
+        phi = prefactor * np.trapz(phi_integrand, x=Z, axis=0)
+        return phi
 
     def phi_integrand(
         self,

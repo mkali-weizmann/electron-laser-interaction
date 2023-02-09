@@ -4961,7 +4961,7 @@ E_{y,\text{gaussian beam}}={\color{teal}E_{0}}\left[\frac{\Gamma_{-}}{2\Gamma_{+
 \end_layout
 
 \begin_layout Subsection
-Calculate the resulted intensity of the field
+Calculate the resulted intensity of the field in the moving frame
 \end_layout
 
 \begin_layout Standard
@@ -6393,7 +6393,7 @@ literal "false"
 ):
 \begin_inset Formula 
 \begin{equation}
-\boxed{\phi_{0}\left(x,y\right)=\frac{e^{2}}{\hbar4mc\beta\gamma\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{E_{0}^{2}w_{0}^{2}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}}\tag{e\_1}\label{eq:phi_0_analytical_expression}
+\boxed{\phi_{0}\left(x,y\right)=\frac{e^{2}}{\hbar4mc\beta\gamma\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{E_{0}^{2}w_{0}^{2}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}}\label{eq:phi_0_analytical_expression}
 \end{equation}
 
 \end_inset
@@ -6415,6 +6415,43 @@ Using the relation
 \end_inset
 
 Which is more like Kirkland's notation.
+\end_layout
+
+\begin_layout Standard
+Using equation the expression of 
+\begin_inset Formula $E_{0}$
+\end_inset
+
+ as a function of the circulating power 
+\begin_inset Formula $P$
+\end_inset
+
+ (the power of one of the moving waves) 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_45"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we can transform it to Osip's paper's form:
+\begin_inset Formula 
+\begin{align}
+\phi_{0}\left(x,y\right) & =\frac{e^{2}}{\hbar4mc\beta\gamma\omega^{2}}\sqrt{\frac{\pi}{2}}\frac{{\color{red}E_{0}^{2}}w_{0}^{2}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}\nonumber \\
+ & =\frac{{\color{purple}e^{2}}}{{\color{purple}\hbar}{\color{purple}4}mc\beta\gamma{\color{green}\omega^{2}}}\sqrt{\frac{\pi}{2}}\frac{{\color{red}4\cdot\frac{4}{{\color{purple}\pi c\varepsilon_{0}}\cancel{w_{0}^{2}}}\cdot P}\cancel{w_{0}^{2}}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}\nonumber \\
+ & =\frac{{\color{purple}\alpha}{\color{green}\lambda^{2}}}{mc\beta\gamma{\color{green}c^{2}\left(\cancel{2}\pi\right)^{2}}}\sqrt{8\pi}\frac{\cancel{4}\cdot P}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}\nonumber \\
+\phi_{0}\left(x,y\right) & ={\color{gray}\underset{^{\text{Constant factor}}}{\underbrace{{\normalcolor \frac{\alpha\lambda^{2}P}{m\beta\gamma c^{3}}\sqrt{\frac{8}{\pi^{3}}}}}}}{\color{gray}\underset{^{\text{Function of }x,y}}{\underbrace{{\normalcolor \frac{e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}}{w\left(x\right)}}}}}\tag{e\_1}\label{eq:phi_0_Osip's_version}
+\end{align}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -8852,9 +8889,11 @@ E=E_{0}\frac{w_{0}}{w\left(x\right)}e^{-\frac{y^{2}+z^{2}}{w_{0}^{2}}}\cos\left(
 
 Then the power of each one of the moving wave will be:
 \begin_inset Formula 
-\begin{equation}
-P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}\left(\frac{E_{0}}{2}\right)^{2}=\frac{1}{4}\cdot\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}\iff4\cdot\frac{4}{\pi c\varepsilon_{0}w_{0}^{2}}\cdot P=E_{0}^{2}\label{eq:e_45}
-\end{equation}
+\begin{alignat}{1}
+P & =\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}\left(\frac{E_{0}}{2}\right)^{2}\nonumber \\
+ & =\frac{1}{4}\cdot\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}{\color{lightgray}\ \backslash\cdot\frac{4\cdot4}{\pi c\varepsilon_{0}w_{0}^{2}}}\\
+4\cdot\frac{4}{\pi c\varepsilon_{0}w_{0}^{2}}\cdot P & =E_{0}^{2}\label{eq:e_45}
+\end{alignat}
 
 \end_inset
 
@@ -8948,60 +8987,6 @@ noprefix "false"
 \begin_inset Formula 
 \[
 E_{0,\text{standing}}=\frac{4\kaliNA}{\lambda}\sqrt{\frac{\pi P}{c\varepsilon_{0}}}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Calculating 
-\begin_inset Formula $\phi_{0}$
-\end_inset
-
- (from 
-\color blue
-
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:phi_0_first_time"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-
-\color inherit
-)
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{align*}
-\phi_{0}\left(0,y\right)=\frac{e^{2}}{4m\gamma\beta c\hbar}\intop_{z}A_{\text{envelope}}^{2}\left(0,y,z\right)dz & =\frac{e^{2}}{4m\gamma\beta c\hbar}\intop_{z}A_{0}^{2}\cdot e^{-2\frac{y^{2}+z^{2}}{w_{0}^{2}}}dz\\
- & =\frac{e^{2}}{4m\gamma\beta c\hbar}\frac{{\color{blue}E_{0}^{2}}}{{\color{green}\omega^{2}}}e^{-\frac{2y^{2}}{w_{0}^{2}}}{\color{brown}\intop_{z}\cdot e^{-\frac{2z^{2}}{w_{0}^{2}}}dz}\\
- & \stackrel{{\color{blue}\eqref{eq:e_45}}}{=}\frac{e^{2}}{\cancel{4}m\gamma\beta c\hbar}\frac{{\color{blue}4\cdot\frac{\cancel{4}}{\pi c\varepsilon_{0}w_{0}^{2}}P}}{{\color{green}\left(c\cdot\frac{2\pi}{\lambda}\right)^{2}}}e^{-\frac{2y^{2}}{w_{0}^{2}}}{\color{brown}\sqrt{\frac{\pi}{\nicefrac{2}{w_{0}^{2}}}}}\\
- & =\frac{e^{2}{\color{green}\lambda^{2}}{\color{brown}\sqrt{\pi}\cancel{w_{0}}}}{{\color{brown}\sqrt{2}}{\color{green}4}\pi^{{\color{green}3}}m\gamma\beta c^{{\color{green}4}}\hbar}{\color{blue}\frac{4}{\varepsilon_{0}w_{0}^{\cancel{2}}}P}e^{-\frac{2y^{2}}{w_{0}^{2}}}\\
- & =\frac{4{\color{purple}e^{2}}\lambda^{2}}{\sqrt{2}{\color{purple}4}\pi^{{\color{purple}2}}\sqrt{\pi}m\gamma\beta{\color{purple}c}c^{3}{\color{purple}\hbar}{\color{purple}\varepsilon_{0}}w_{0}}Pe^{-\frac{2y^{2}}{w_{0}^{2}}}\\
- & =\frac{\sqrt{8}\lambda^{2}{\color{purple}\alpha}}{\sqrt{\pi^{3}}m\gamma\beta c^{3}w_{0}}Pe^{-\frac{2y^{2}}{w_{0}^{2}}}
-\end{align*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\phi_{0}\left(x,y\right)=\frac{{\color{green}e^{2}}}{{\color{green}\hbar4mc\beta\gamma}}{\color{gray}\underset{A^{2}}{\underbrace{{\normalcolor {\color{green}\frac{E_{0}^{2}}{\omega^{2}}}}}}}{\color{green}\sqrt{\frac{\pi}{2}}}\frac{w_{0}^{2}}{w\left(x\right)}e^{-\frac{2y^{2}}{w^{2}\left(x\right)}}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\frac{{\color{green}e^{2}}}{{\color{green}4}{\color{green}m}{\color{green}\gamma\beta c}{\color{green}\hbar}}\cdot\frac{{\color{green}w_{0}^{2}}}{{\color{green}w^{\cancel{2}}\left(x\right)}}{\color{green}A^{2}}{\color{green}e^{-\frac{2y^{2}}{w_{0}^{2}}}}\sqrt{\frac{\cancel{w^{2}\left(x\right)}{\color{green}\pi}}{{\color{green}2}}}
 \]
 
 \end_inset
