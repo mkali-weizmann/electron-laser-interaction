@@ -974,7 +974,7 @@ class CavityPropagator(Propagator):
     @property
     def E_1(self):
         E_1_moving_wave = np.sqrt(
-            self.power_1 * 4 / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_min**2)
+            self.power_1 * 4 / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_1**2)
         )  # can also be written as:
             # np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
         if self.ring_cavity:
@@ -987,8 +987,8 @@ class CavityPropagator(Propagator):
         if self.power_2 is None:
             return None
         else:
-            E_2_moving_wave = np.sqrt(np.pi * self.power_2 / (C_LIGHT * EPSILON_ELECTRICITY)) * (
-                2 * self.NA_2 / self.l_2
+            E_2_moving_wave = np.sqrt(
+            self.power_2 * 4 / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_2**2)
             )
             if self.ring_cavity:
                 return E_2_moving_wave
@@ -1010,14 +1010,19 @@ class CavityPropagator(Propagator):
             return max(self.NA_1, self.NA_2)
 
     @property
+    def w_0_1(self):
+        return self.l_1 / (pi * self.NA_1)
+
+    @property
+    def w_0_2(self):
+        return self.l_2 / (pi * self.NA_2)
+
+    @property
     def w_0_min(self) -> float:
         if self.E_2 is None:
-            return self.l_1 / (pi * self.NA_1)
+            return self.w_0_1
         else:
-            return min(
-                self.l_1 / (pi * self.NA_1),
-                self.l_2 / (pi * self.NA_2),
-            )
+            return min(self.w_0_1, self.w_0_2)
 
     @property  # The velocity at which the standing wave is propagating
     def beta_lattice(self) -> float:
@@ -1594,9 +1599,9 @@ class CavityNumericalPropagator(CavityPropagator):
         Z, X, Y, T = np.meshgrid(z, x, y, t, indexing="ij")
 
         Z *= w_x_gaussian(
-            w_0=w0_of_NA(self.NA_max, self.min_l),
+            w_0=w0_of_NA(self.NA_max, self.max_l),
             x=X / np.cos(alpha_cavity),
-            l_laser=self.min_l,
+            l_laser=self.max_l,
         ) / np.cos(
             alpha_cavity
         )  # This scales the z axis to the size of the beam spot_size at each x. x is divided by
@@ -1749,7 +1754,7 @@ class CavityNumericalPropagator(CavityPropagator):
                     l_laser=self.max_l,
                 )
                 / np.cos(alpha_cavity)
-                * (2 * integral_limit_in_spot_size_units)
+                * (3 * integral_limit_in_spot_size_units)
             )
             if self.n_t > 1:
                 dz = self.min_l / (1 + 1 / beta_electron) / 4  # ARBITRARY - This value was determined by playing
