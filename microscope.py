@@ -1528,7 +1528,7 @@ class CavityNumericalPropagator(CavityPropagator):
         x, y, t = x_y_t
         phi_integrand, Z = self.phi_integrand(x, y, t, beta_electron, save_to_file)
         prefactor = (
-            -1 / H_BAR * E_CHARGE**2 / (2 * M_ELECTRON * gamma_of_beta(beta_electron) * beta_electron * C_LIGHT)
+            - E_CHARGE**2 / (2 * M_ELECTRON * gamma_of_beta(beta_electron) * beta_electron * C_LIGHT * H_BAR)
         )
         phi = prefactor * np.trapz(phi_integrand, x=Z, axis=0)
         return phi
@@ -1591,7 +1591,6 @@ class CavityNumericalPropagator(CavityPropagator):
 
         # Z axis is first because numpy integrates best over the first axis.
         Z, X, Y, T = np.meshgrid(z, x, y, t, indexing="ij")
-
         Z *= w_x_gaussian(
             w_0=w0_of_NA(self.NA_max, self.max_l),
             x=X / np.cos(alpha_cavity),
@@ -1600,7 +1599,7 @@ class CavityNumericalPropagator(CavityPropagator):
             alpha_cavity
         )  # This scales the z axis to the size of the beam spot_size at each x. x is divided by
         # cos_alpha because the beam is tilted, and so does the spot size itself.
-        Z -= X * np.tan(alpha_cavity)  # This make the Z coordinates centered around
+        Z += X * np.tan(alpha_cavity)  # This make the Z coordinates centered around
         # the cavity axis - which depend on the angle of the cavity and the x coordinate.
         T += Z / (C_LIGHT * beta_electron)  # This makes T be the time of the electron that passed through z=0 at
         # time t and then got to Z after/before: Z/(beta * c) time. (that is, t=t(z))
@@ -1623,8 +1622,8 @@ class CavityNumericalPropagator(CavityPropagator):
         alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
 
         # The derivation of those rotated coordinates is in eq:e_25 in the readme file.
-        X_tilde = X * np.cos(alpha_cavity) - Z * np.sin(alpha_cavity)
-        Z_tilde = X * np.sin(alpha_cavity) + Z * np.cos(alpha_cavity)
+        X_tilde = X * np.cos(alpha_cavity) + Z * np.sin(alpha_cavity)
+        Z_tilde = - X * np.sin(alpha_cavity) + Z * np.cos(alpha_cavity)
 
         if self.ring_cavity:
             standing_wave = False
@@ -1707,9 +1706,9 @@ class CavityNumericalPropagator(CavityPropagator):
         return grad_G
 
     @staticmethod
-    def G_gauge(A_shifted: np.ndarray, Z: np.ndarray) -> np.ndarray:
+    def G_gauge(A_z: np.ndarray, Z: np.ndarray) -> np.ndarray:
         # Assumes the first axis is Z axis (This way the integration is the fastest)
-        G_gauge_values = integrate.cumtrapz(A_shifted, x=Z, axis=0, initial=0)
+        G_gauge_values = integrate.cumtrapz(A_z, x=Z, axis=0, initial=0)
         return G_gauge_values  # integral over z
 
     def setup_to_path(self, input_wave: WaveFunction) -> str:
@@ -1786,7 +1785,7 @@ class CavityNumericalPropagator(CavityPropagator):
         alpha_cavity = self.beta_electron2alpha_cavity(beta_electron=beta_electron)
 
         if component_index.lower() == "x":
-            return -A * np.cos(self.theta_polarization) * np.sin(alpha_cavity)
+            return - A * np.cos(self.theta_polarization) * np.sin(alpha_cavity)
         elif component_index.lower() == "y":
             return A * np.sin(self.theta_polarization)
         elif component_index.lower() == "z":
