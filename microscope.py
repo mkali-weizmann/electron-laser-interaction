@@ -1191,14 +1191,8 @@ class CavityAnalyticalPropagator(CavityPropagator):
                     + 1 / 4 * (self.Gamma_plus / self.Gamma_minus) ** 2
                     + 1 / 4 * (self.Gamma_minus / self.Gamma_plus) ** 2
                 )
-        else:
-            x_R = x_R_gaussian(self.w_0_lattice_frame, self.lambda_laser)
-            x_lattice = input_wave.coordinates.X_grid / np.cos(self.beta_electron2alpha_cavity(input_wave.beta))
-            gouy_phase = gouy_phase_gaussian(x_lattice, x_R, self.w_0_lattice_frame)
-            cosine_squared = (1 / 2) * (
-                1 + self.rho(input_wave.beta) * np.cos(4 * np.pi * x_lattice / self.lambda_laser + gouy_phase)
-            )
-            return phi_0 * cosine_squared
+        else:  # from equation e_50 in the simulation notes file
+            return phi_0
 
     def phi_0(self, input_wave: WaveFunction) -> np.ndarray:
         # Gives the phase acquired by a narrow electron beam centered around (x, y) by passing in the cavity_2f.
@@ -1634,7 +1628,8 @@ class CavityNumericalPropagator(CavityPropagator):
 
         if self.ring_cavity:
             standing_wave = False
-            forward_propagation_l_1 = self.l_1 < self.l_2  # if l_1 is the shorter wavelength then it propagates forward
+            forward_propagation_l_1 = self.E_2 is None or self.l_1 < self.l_2  # if l_1 is the shorter wavelength
+            # then it propagates forward
         else:
             standing_wave = True
             forward_propagation_l_1 = None
