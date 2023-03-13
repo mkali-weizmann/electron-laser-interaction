@@ -238,9 +238,9 @@ def gaussian_beam(
     envelope = E * (w_0 / w_x) * safe_exponent(-(y**2 + z**2) / w_x**2)  # The clipping
     # is to prevent underflow errors.
     if forward_propagation is True:
-        propagation_sign = 1
-    else:
         propagation_sign = -1
+    else:
+        propagation_sign = 1
 
     if mode == "intensity":
         if standing_wave:  # No time dependence
@@ -1278,7 +1278,7 @@ class CavityNumericalPropagator(CavityPropagator):
         ring_cavity: bool = True,
         ignore_past_files: bool = False,
         print_progress: bool = True,
-        n_t: int = 3,
+        t: Optional[np.ndarray] = None,
         n_z: Optional[int] = None,
         starting_P_in_auto_P_search: float = 1e3,
         debug_mode: bool = False,
@@ -1286,6 +1286,7 @@ class CavityNumericalPropagator(CavityPropagator):
         # This determines how many x,y,t points are calculated in each
         # batch
         input_wave_energy_for_power_finding=None,
+        l_1_propagation_direction_override=None
     ):
 
         if power_1 == -1:
@@ -1309,7 +1310,7 @@ class CavityNumericalPropagator(CavityPropagator):
                     alpha_cavity=alpha_cavity,
                     alpha_cavity_deviation=alpha_cavity_deviation,
                     ring_cavity=ring_cavity,
-                    n_t=n_t,
+                    t=t,
                     ignore_past_files=ignore_past_files,
                 )
         super().__init__(
@@ -1327,13 +1328,18 @@ class CavityNumericalPropagator(CavityPropagator):
         )
 
         if power_2 is None:
-            self.n_t = 1
+            self.t = np.array([0], dtype=np.float64)
         else:
-            self.n_t = n_t
+            if t is None:
+                delta_w = np.abs(w_of_l(self.l_1) - w_of_l(self.l_2))
+                self.t = np.array([0, pi / (2 * delta_w), pi / delta_w], dtype=np.float64)
+            else:
+                self.t = t.astype(np.float64)
         self.print_progress = print_progress
         self.debug_mode = debug_mode
         self.n_z = n_z
         self.batches_calculation_numel_maximal = batches_calculation_numel_maximal
+        self.single_laser_propagation_direction_override = l_1_propagation_direction_override
 
     def load_or_calculate_phase_and_amplitude_mask(self, input_wave: WaveFunction):
         setup_file_path = self.setup_to_path(input_wave=input_wave)
@@ -1372,7 +1378,7 @@ class CavityNumericalPropagator(CavityPropagator):
 
                     # If the two frequencies don't have the same ratio to the original ones or the original calculation
                     # was done using a Fourier Transform then we can't use it:
-                    if np.abs((power_1_ratio - power_2_ratio) / power_1_ratio) > 1e-2 or self.n_t != 3:
+                    if np.abs((power_1_ratio - power_2_ratio) / power_1_ratio) > 1e-2 or len(self.t) != 3:
                         phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
 
                     # If the original setup had different amplitudes but the same setup then we can use the same phase
@@ -1437,10 +1443,10 @@ class CavityNumericalPropagator(CavityPropagator):
             total_phi[second_half_first_idx:, min_y_idx:second_half_first_idx, :] = np.flip(
                 reduced_phi[1:-1, :, :], axis=0
             )
-            total_phi[:second_half_first_idx, second_half_first_idx : len(x) - min_y_idx, :] = np.flip(
+            total_phi[:second_half_first_idx, second_half_first_idx: len(x) - min_y_idx, :] = np.flip(
                 reduced_phi[:, 1:-1, :], axis=1
             )
-            total_phi[second_half_first_idx:, second_half_first_idx : len(x) - min_y_idx, :] = np.flip(
+            total_phi[second_half_first_idx:, second_half_first_idx: len(x) - min_y_idx, :] = np.flip(
                 reduced_phi[1:-1, 1:-1, :], axis=(0, 1)
             )
             phase_and_amplitude_mask = self.phase_and_amplitude_mask_quadrant(input_wave, save_results, total_phi)
@@ -1459,7 +1465,7 @@ class CavityNumericalPropagator(CavityPropagator):
             if save_results:
                 np.save(self.setup_to_path(input_wave=input_wave), phi[:, :, 0])
         else:
-            if self.n_t == 3:
+            if len(self.t) == 3:
                 # This assumes that if there are exactly 3 time steps, then they are [0, pi/(2delta_w), pi/delta_w]:
                 # The derivation is in equation eq:27 in my readme file.
                 phi_const = 1 / 2 * (phi[:, :, 0] + phi[:, :, 2])
@@ -1496,20 +1502,12 @@ class CavityNumericalPropagator(CavityPropagator):
         return phase_and_amplitude_mask
 
     def phi(self, input_wave: WaveFunction):
-        if self.E_2 is not None:
-            delta_w = np.abs(w_of_l(self.l_1) - w_of_l(self.l_2))
-            if self.n_t == 3:
-                t = np.array([0, pi / (2 * delta_w), pi / delta_w])
-            else:
-                t = np.linspace(0, 20 * pi / delta_w, self.n_t)  # ARBITRARY total_t_needed
-        else:
-            t = np.array([0], dtype=np.float64)
         phi_values = divide_calculation_to_batches(
             self.phi_single_batch,
             list_of_axes=[
                 input_wave.coordinates.x_axis,
                 input_wave.coordinates.y_axis,
-                t,
+                self.t,
             ],
             numel_maximal=int(self.batches_calculation_numel_maximal),  # ARBITRARY - reflects the memory size
             # limit of the computer
@@ -1627,7 +1625,10 @@ class CavityNumericalPropagator(CavityPropagator):
 
         if self.ring_cavity:
             standing_wave = False
-            forward_propagation_l_1 = self.E_2 is None or self.l_1 < self.l_2  # if l_1 is the shorter wavelength
+            if self.single_laser_propagation_direction_override is not None:
+                forward_propagation_l_1 = self.single_laser_propagation_direction_override
+            else:
+                forward_propagation_l_1 = self.E_2 is None or self.l_1 < self.l_2  # if l_1 is the shorter wavelength
             # then it propagates forward
         else:
             standing_wave = True
@@ -1727,7 +1728,7 @@ class CavityNumericalPropagator(CavityPropagator):
             f"P1{self.power_1:.5g}_P2{power_2_str}_NA1{self.NA_1 * 100:.4g}_NA2{N_2_str}_"
             f"alpha{self.beta_electron2alpha_cavity(input_wave.beta) / 2 * np.pi * 360:.0f}_"
             f"theta{self.theta_polarization * 100:.4g}_E{input_wave.E_0:.2g}_Ring{self.ring_cavity}_"
-            f"Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nt{self.n_t}_"
+            f"Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nt{len(self.t)}_"
             f"Nz_{self.n_z}_DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}.npy"
         )
         return path
@@ -1750,7 +1751,7 @@ class CavityNumericalPropagator(CavityPropagator):
                 / np.cos(alpha_cavity)
                 * (3 * integral_limit_in_spot_size_units)
             )
-            if self.n_t > 1:
+            if len(self.t) > 1:
                 dz = self.min_l / (1 + 1 / beta_electron) / 4  # ARBITRARY - This value was determined by playing
                 # with the simulation and checking that the results are stable. the derivation is still not existent and
                 # I need to write it down.

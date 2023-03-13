@@ -223,7 +223,7 @@ End
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "C:/Users/michaeka/OneDrive - weizmann.ac.il/Templates/MacrosEnglish.lyx"
+filename "Simulation Notes.lyx"
 
 \end_inset
 
@@ -3430,7 +3430,7 @@ First, let us rewrite the the integral of
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\nicefrac{G}{\beta c}=\intop_{-\infty}^{t}A_{z}\left(z-\beta c\left(t-T\right),T\right)dT
+\nicefrac{G}{\beta c}=\intop_{-\infty}^{t}A_{z}\left({\color{green}z-\beta c\left(t-T\right)},{\color{red}T}\right)dT
 \]
 
 \end_inset
@@ -3438,8 +3438,8 @@ First, let us rewrite the the integral of
 Define:
 \begin_inset Formula 
 \begin{align}
-Z & =z-\beta c\left(t-T\right) & \frac{1}{\beta c}dZ & =dT & T=t & \iff Z=z\label{eq:e_24}\\
-T & =\frac{Z-z}{\beta c}+t\nonumber 
+Z & ={\color{green}z-\beta c\left(t-T\right)} & \frac{1}{\beta c}dZ & =dT & T=t & \iff Z=z\label{eq:e_24}\\
+T & ={\color{red}\frac{Z-z}{\beta c}+t}\nonumber 
 \end{align}
 
 \end_inset
@@ -3447,7 +3447,7 @@ T & =\frac{Z-z}{\beta c}+t\nonumber
 
 \begin_inset Formula 
 \[
-\nicefrac{G}{\beta c}=\intop_{-\infty}^{t}A_{z}\left(z-\beta c\left(t-T\right),T\right)dT=\frac{1}{\beta c}\intop_{-\infty}^{z}A_{z}\left(Z,\frac{Z-z}{\beta c}+t\right)dZ
+G=\beta c\intop_{-\infty}^{t}A_{z}\left(z-\beta c\left(t-T\right),T\right)dT=\intop_{-\infty}^{z}A_{z}\left(Z,{\color{red}\frac{Z-z}{\beta c}+t}\right)dZ
 \]
 
 \end_inset
@@ -4354,7 +4354,7 @@ And for a moving wave (that does not have the
 \phi_{\text{running wave}}\left(x,y\right)\stackrel{\left({\color{blue}\eqref{eq:e_18}}\right)}{=} & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}}{2m\gamma\beta c}\left({\color{red}A_{y}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{blue}\left(1-\beta^{2}\right)A_{z}^{2}\left(\boldsymbol{x},t\left(z\right)\right)}+{\color{green}\left(\partial_{x}G\left(\boldsymbol{x},t\left(z\right)\right)\right)^{2}}\right)dz\nonumber \\
 = & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{2m\gamma\beta c}\left({\color{red}\sin^{2}\theta\cancel{\cos^{2}\left(\omega t\left(z\right)-\varepsilon\pm\varphi\left(x\right)\right)}}+{\color{blue}\left(1-\beta^{2}\right)\cdot\left(\cos\theta\cancel{\cos\left(\omega t\left(z\right)\pm\varphi\left(x\right)\right)}\right)^{2}}+{\color{green}\left(\beta^{2}\cos^{2}\left(\theta\right)\cancel{\sin^{2}\left(\omega t\left(z\right)\pm\varphi\left(x\right)\right)}\right)}\right)dz\nonumber \\
 = & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{4m\gamma\beta c}\left({\color{gray}\underset{=1}{\underbrace{{\normalcolor {\color{red}\sin^{2}\left(\theta\right)}+{\color{blue}\cos^{2}\left(\theta\right)}}}}}-\cancel{{\color{blue}\beta^{2}\cos^{2}\left(\theta\right)}+{\color{green}\left(\beta^{2}\cdot\cos^{2}\left(\theta\right)\right)}}\right)dz\nonumber \\
-= & -\frac{1}{\hbar}\intop_{z}\frac{e^{2}A_{\text{envelope}}^{2}\left(x,y,z\right)}{4m\gamma\beta c}dz\label{eq:ponderomotive_integral_final_result_moving_wave}
+= & -{\color{gray}\underset{\phi_{0}}{\underbrace{{\normalcolor \frac{e^{2}}{4\hbar m\gamma\beta c}\intop_{z}A_{\text{envelope}}^{2}\left(x,y,z\right)dz}}}}\tag{e\_50}\label{eq:ponderomotive_integral_final_result_moving_wave}
 \end{align}
 
 \end_inset
@@ -6994,7 +6994,7 @@ Assume a gaussian beam's electromagnetic potential that is aligned with
 \end_inset
 
  axis is 
-\begin_inset Formula $\tilde{A}\left(x,y,z,t\right)$
+\begin_inset Formula $\tilde{A}\left(\tilde{x},\tilde{y},\tilde{z},t\right)$
 \end_inset
 
 .
@@ -7020,10 +7020,10 @@ If
  direction) then the potential in the lab's frame will be:
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{A}\left(x,y,z,t\right)=\begin{pmatrix}\tilde{A}_{x}\cos\alpha+\tilde{A}_{z}\sin\alpha\\
+\boldsymbol{A}\left(x,y,z,t\right)=\begin{pmatrix}\cancel{\tilde{A}_{x}\cos\alpha}-\tilde{A}_{z}\sin\alpha\\
 A_{y}\\
--\tilde{A}_{x}\sin\alpha+\tilde{A}_{z}\cos\alpha
-\end{pmatrix}\left(x\cos\alpha-z\sin\alpha,y,x\sin\alpha+z\cos\alpha\right)\tag{e\_37}\label{eq:e_37}
+\cancel{\tilde{A}_{x}\sin\alpha}+\tilde{A}_{z}\cos\alpha
+\end{pmatrix}\left({\color{gray}\underset{\tilde{x}}{\underbrace{{\normalcolor x\cos\alpha+z\sin\alpha}}}},y,{\color{gray}\underset{\tilde{z}}{\underbrace{{\normalcolor -x\sin\alpha+z\cos\alpha}}}}\right)\tag{e\_37}\label{eq:e_37}
 \end{equation}
 
 \end_inset
@@ -7036,10 +7036,16 @@ Therefore the integrand to calculate
 \begin_inset Formula $G$
 \end_inset
 
- will be:
+ will be: 
+\series bold
+\color red
+Reset the signs in the derivation
+\series default
+\color inherit
+
 \begin_inset Formula 
 \[
-\text{Integrand}\left(x,y,z,t,T\right)=A_{z}\left(x,y,z-\beta c\left(t-T\right),T\right)=\left[-\tilde{A}_{x}\sin\alpha+A_{z}\cos\alpha\right]{\color{gray}\underset{\text{This is the argument of the function A, not a multiplication factor}}{\underbrace{{\normalcolor \left(x\cos\alpha-\left(z-\beta c\left(t-T\right)\right)\sin\alpha,y,x\sin\alpha+\left(z-\beta c\left(t-T\right)\right)\cos\alpha,T\right)}}}}
+\text{Integrand}\left(x,y,z,t,T\right)=A_{z}\left(x,y,z-\beta c\left(t-T\right),T\right)=A_{z}\cos\alpha{\color{gray}\underset{\text{This is the argument of the function A, not a multiplication factor}}{\underbrace{{\normalcolor \left(x\cos\alpha-\left(z-\beta c\left(t-T\right)\right)\sin\alpha,y,x\sin\alpha+\left(z-\beta c\left(t-T\right)\right)\cos\alpha,T\right)}}}}
 \]
 
 \end_inset
@@ -7228,7 +7234,11 @@ dz<\lambda_{\text{eff}}<\frac{\lambda}{1+\frac{1}{\beta}}\tag{e\_40}\label{eq:e_
 
 \end_inset
 
-in practice, playing with it, I found that 
+in practice, playing with it, I found 
+\color blue
+that
+\color inherit
+ 
 \begin_inset Formula $dz=\frac{\lambda}{3\left(1+\frac{1}{\beta}\right)}$
 \end_inset
 
