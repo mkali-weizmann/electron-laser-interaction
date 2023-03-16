@@ -7,7 +7,7 @@ N_POINTS = 64  # Resolution of image
 pixel_size = 1e-10
 
 input_coordinate_system = CoordinateSystem(dxdydz=(pixel_size, pixel_size), n_points=(N_POINTS, N_POINTS))
-first_wave = WaveFunction(psi=np.ones((N_POINTS, N_POINTS)), coordinates=input_coordinate_system,
+input_wave = WaveFunction(psi=np.ones((N_POINTS, N_POINTS)), coordinates=input_coordinate_system,
                           E_0=Joules_of_keV(300))
 
 dummy_sample = SamplePropagator(
@@ -20,9 +20,9 @@ dummy_sample = SamplePropagator(
 first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
 second_lens = LensPropagator(focal_length=3.3e-3, fft_shift=False)
 
-cavity_2f_analytical = CavityAnalyticalPropagator(l_1=l_1, l_2=l_2, NA_1=NA_1, ring_cavity=False)
+# cavity_2f_analytical = CavityAnalyticalPropagator(l_1=l_1, l_2=l_2, NA_1=NA_1, ring_cavity=True, input_wave_energy_for_power_finding=input_wave.E_0)
 
-cavity_2f_numerical = CavityNumericalPropagator(l_1=l_1, l_2=l_2, NA_1=NA_1, ring_cavity=False)
+cavity_2f_numerical = CavityNumericalPropagator(l_1=l_1, l_2=l_2, NA_1=NA_1, ring_cavity=True, input_wave_energy_for_power_finding=input_wave.E_0)
 
 aberration_propagator = AberrationsPropagator(
     Cs=1e-8, defocus=10e-9, astigmatism_parameter=0, astigmatism_orientation=0
@@ -35,7 +35,7 @@ M = Microscope(
 )
 
 
-pic = M.take_a_picture(first_wave)
+pic = M.take_a_picture(input_wave)
 
 plt.imshow(pic.values, extent=pic.coordinates.limits)
 plt.colorbar()
