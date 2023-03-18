@@ -15,15 +15,15 @@ first_lens = LensPropagator(focal_length=3.3e-3, fft_shift=True)
 fourier_plane_wave = first_lens.propagate(input_wave)
 
 columns = ['NA_1', 'polarization_pies', 'ring_cavity', 'E_0', 'second_laser', 'alpha_cavity_deviation_degrees', 'n_electrons', 'resolution', 'pixel_size', 'focal_length_mm', 'Cs_mm', 'defocus_nm', 'n_z', 'power_1']
-list_of_combinations = [[0.05, 1/2,      True,          300,    True,          0,                               20,             256,          2e-10,        3.3,            0.3,     0,          None,  -1],
-                        [0.1,  1/2,      True,          300,    True,          0,                               20,             256,          2e-10,        3.3,            0.3,     0,          None,  -1],
-                        [0.2,  1/2,      True,          300,    True,          0,                               20,             256,          2e-10,        3.3,            0.3,     0,          None,  -1],
-                        [0.05, 0,        True,          300,    True,          0,                               20,             256,          2e-10,        3.3,            0.3,     0,          None,  -1],
-                        [0.05, 1/2,      False,         300,    True,          0,                               20,             256,          2e-10,        3.3,            0.3,     0,          None,  -1],
-                        [0.05, 1/2,      True,          100,    True,          0,                               20,             256,          2e-10,        3.3,            0.3,     0,          None,  -1],
-                        [0.05, 1/2,      True,          300,    False,         0,                               20,             256,          2e-10,        3.3,            0.3,     0,          None,  -1],
-                        [0.05, 1/2,      True,          300,    True,          3,                               20,             256,          2e-10,        3.3,            0.3,     0,          None,  -1],
-                        [0.05, 1/2,      True,          300,    True,          0,                               20,             256,          2e-10,        3.3,            0.3,     0,          None,  0]
+list_of_combinations = [[0.05, 1/2,      True,          300,    True,          0,                               20,             256,          2e-10,        3.3,               0.3,     0,           None,   -1],
+                        [0.1,  1/2,      True,          300,    True,          0,                               20,             256,          2e-10,        3.3,               0.3,     0,           None,   -1],
+                        [0.2,  1/2,      True,          300,    True,          0,                               20,             256,          2e-10,        3.3,               0.3,     0,           None,   -1],
+                        [0.05, 0,        True,          300,    True,          0,                               20,             256,          2e-10,        3.3,               0.3,     0,           None,   -1],
+                        [0.05, 1/2,      False,         300,    True,          0,                               20,             256,          2e-10,        3.3,               0.3,     0,           None,   -1],
+                        [0.05, 1/2,      True,          100,    True,          0,                               20,             256,          2e-10,        3.3,               0.3,     0,           None,   -1],
+                        [0.05, 1/2,      True,          300,    False,         0,                               20,             256,          2e-10,        3.3,               0.3,     0,           None,   -1],
+                        [0.05, 1/2,      True,          300,    True,          3,                               20,             256,          2e-10,        3.3,               0.3,     0,           None,   -1],
+                        [0.05, 1/2,      True,          300,    True,          0,                               20,             256,          2e-10,        3.3,               0.3,     0,           None,   0]
                         ]
 df = pd.DataFrame(list_of_combinations, columns=columns)
 
