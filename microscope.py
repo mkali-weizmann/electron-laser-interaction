@@ -281,6 +281,12 @@ def gaussian_beam(
         return total_phase + time_phase
 
 
+def lower_image_resolution(image: np.ndarray, subsample_rate) -> np.ndarray:
+    reshaped_image = image.reshape(image.shape[0] // subsample_rate, subsample_rate, image.shape[1] // subsample_rate, subsample_rate)
+    subsampled_image = reshaped_image.sum(axis=(1, 3))
+    return subsampled_image
+
+
 def ASPW_propagation(U_z0: np.ndarray, dxdydz: tuple[float, ...], k: float) -> np.ndarray:
     dx, dy, dz = dxdydz
     U_fft = np.fft.fftn(U_z0)
@@ -652,17 +658,18 @@ class Microscope:
         self.print_progress = print_progress
         self.n_electrons_per_square_angstrom = n_electrons_per_square_angstrom
 
-    def take_a_picture(self, input_wave: WaveFunction) -> SpatialFunction:
+    def take_a_picture(self, input_wave: WaveFunction, add_shot_noise=True) -> SpatialFunction:
         output_wave = self.propagate(input_wave)
-        image = self.expose_camera(output_wave)
+        image = self.expose_camera(output_wave, add_shot_noise=add_shot_noise)
         return image
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         self.propagation_steps = []
         input_wave_psi_normalized = input_wave.psi / np.sqrt(np.sum(np.abs(input_wave.psi) ** 2))
         input_wave_psi_normalized *= np.sqrt(
-            self.n_electrons_per_square_angstrom * 1e20 * input_wave.coordinates.dx * input_wave.coordinates.dy
-        )
+                self.n_electrons_per_square_angstrom * 1e20 * input_wave.coordinates.lengths[0] *
+                input_wave.coordinates.lengths[1]
+            )
         input_wave = WaveFunction(input_wave.E_0, input_wave_psi_normalized, input_wave.coordinates)  # Normalized
         for propagator in self.propagators:
             if self.print_progress:
@@ -672,7 +679,7 @@ class Microscope:
             input_wave = output_wave
         return input_wave
 
-    def expose_camera(self, output_wave: Optional[WaveFunction] = None) -> SpatialFunction:
+    def expose_camera(self, output_wave: Optional[WaveFunction] = None, add_shot_noise=True) -> SpatialFunction:
         if len(self.propagation_steps) == 0:
             raise ValueError("You must propagate the wave first")
 
@@ -680,15 +687,15 @@ class Microscope:
             output_wave = self.propagation_steps[-1].output_wave
 
         output_wave_intensity = np.abs(output_wave.psi) ** 2
-        expected_electrons_per_pixel = output_wave_intensity * (
-            self.n_electrons_per_square_angstrom * output_wave.psi.size
-        )
-        if np.max(expected_electrons_per_pixel) > 1000000000:  # ARBITRARY - this prevents overflow of the poisson
-            # distribution
-            output_wave_intensity_shot_noise = expected_electrons_per_pixel
+        # expected_electrons_per_pixel = output_wave_intensity * (
+        #     self.n_electrons_per_square_angstrom * output_wave.psi.size
+        # )
+        if np.max(output_wave_intensity) > 100000000 or add_shot_noise is False:  # ARBITRARY - this prevents overflow
+            # of the poisson distribution
+            output_wave_intensity_shot_noise = output_wave_intensity
         else:
             output_wave_intensity_shot_noise = np.random.poisson(
-                expected_electrons_per_pixel
+                output_wave_intensity
             )  # This actually assumes an
         # independent shot noise for each pixel, which is not true, but it's a good approximation for many pixels.
         return SpatialFunction(
@@ -1265,7 +1272,7 @@ class CavityAnalyticalPropagator(CavityPropagator):
             N_2_str = f"{self.NA_2 * 100:.4g}"
             l_2_str = f"{self.l_2 * 1e9:.4g}"
         path = (
-            f"Data Arrays\\Phase Masks\\2f_a_l1{self.l_1 * 1e9:.4g}_l2{l_2_str}_"
+            f"d\\p\\2f_a_l1{self.l_1 * 1e9:.4g}_l2{l_2_str}_"
             f"P1{self.power_1:.3g}_E2{power_2_str}_NA1{self.NA_1 * 100:.4g}_NA2{N_2_str}_"
             f"alpha{self.beta_electron2alpha_cavity(input_wave.beta) / 2 * np.pi * 360:.0f}_"
             f"theta{self.theta_polarization * 100:.4g}_E{input_wave.E_0:.2g}_Ring{self.ring_cavity}_"
@@ -1351,6 +1358,9 @@ class CavityNumericalPropagator(CavityPropagator):
         self.debug_mode = debug_mode
         if n_z is None:
             if np.abs(theta_polarization - np.pi/2) < 1e-10:
+                # The gauge function, which is calculated at each point as an integral of the field, requries
+                # many points of integration for an accurate result. When the polarization is horizontal (theta=np.pi/2)
+                # the gauge function is zero, and the calculation can be much faster.
                 self.n_z = 200
             else:
                 self.n_z = 1800
@@ -1370,7 +1380,7 @@ class CavityNumericalPropagator(CavityPropagator):
         else:
             power_1_pattern = "P1(.*?)_"
             power_2_pattern = "P2(.*?)_"
-            phase_masks_path = "Data Arrays\\Phase Masks\\"
+            phase_masks_path = "d\\p\\"
             general_file_name = setup_file_path[len(phase_masks_path):].replace(".", r"\.").replace("+", r"\+")
             general_file_name = re.sub(power_1_pattern, power_1_pattern, general_file_name)
             general_file_name = re.sub(power_2_pattern, power_2_pattern, general_file_name)
@@ -1750,7 +1760,7 @@ class CavityNumericalPropagator(CavityPropagator):
             N_2_str = f"{self.NA_2 * 100:.4g}"
             l_2_str = f"{self.l_2 * 1e9:.4g}"
         path = (
-            f"Data Arrays\\Phase Masks\\2f_n_l1{self.l_1 * 1e9:.4g}_l2{l_2_str}_"
+            f"d\\p\\2f_n_l1{self.l_1 * 1e9:.4g}_l2{l_2_str}_"
             f"P1{self.power_1:.5g}_P2{power_2_str}_NA1{self.NA_1 * 100:.4g}_NA2{N_2_str}_"
             f"alpha{self.beta_electron2alpha_cavity(input_wave.beta) / 2 * np.pi * 360:.0f}_"
             f"theta{self.theta_polarization * 100:.4g}_E{input_wave.E_0:.2g}_Ring{self.ring_cavity}_"

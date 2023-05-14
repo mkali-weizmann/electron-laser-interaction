@@ -540,7 +540,7 @@ def plot_results(results, plot_features=default_plot_features):
 
 #%% constants and derivative parameters
 const = {
-    "alpha": 0.0072973525693,  # fine structure constant
+    "alpha_cavity": 0.0072973525693,  # fine structure constant
     "c": 299792458,  # speed of light [m/s]
     "hbar": 6.62607004e-34 / (2 * np.pi),  # reduced planck's constant [kg*m^2/s]
     "e_mass": 0.511e6,  # electron mass [eV/c^2]
@@ -1069,7 +1069,7 @@ def get_eta0_from_power(laser, e_energy, const):
     # max phase shift (note: this is computed in SI units)
     eta0 = (
         np.sqrt(2 / np.pi**3)
-        * const["alpha"]
+        * const["alpha_cavity"]
         * laser["power"]
         * scope["wlen"]
         * 1e-10
@@ -1095,7 +1095,7 @@ def get_eta0_from_laser_power(laser, e_energy, const):
     # max phase shift (note: this is computed in SI units)
     eta0 = (
         np.sqrt(2 / np.pi**3)
-        * const["alpha"]
+        * const["alpha_cavity"]
         * laser["power"]
         * scope["wlen"]
         * 1e-10
@@ -1119,7 +1119,7 @@ def get_laser_power_from_eta0(laser, e_energy, const, return_power=False, eta0=N
         np.deg2rad(eta0_deg)
         * const["hbar"]
         * const["c"] ** 2
-        / (np.sqrt(2 / np.pi**3) * const["alpha"] * scope["wlen"] * 1e-10 * laser["wlen"] * 1e-10 * laser["NA"])
+        / (np.sqrt(2 / np.pi**3) * const["alpha_cavity"] * scope["wlen"] * 1e-10 * laser["wlen"] * 1e-10 * laser["NA"])
     )
 
     if return_power:
