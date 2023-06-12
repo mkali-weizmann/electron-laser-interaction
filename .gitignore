@@ -157,3 +157,5 @@ cython_debug/
 /Figures/examples/
 
 *.mrc
+/slides/files/Microscope/
+/slides/presentation_assets/
