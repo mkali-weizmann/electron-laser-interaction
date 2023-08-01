@@ -159,3 +159,5 @@ cython_debug/
 *.mrc
 /slides/files/Microscope/
 /slides/presentation_assets/
+/media/
+/slides/media/

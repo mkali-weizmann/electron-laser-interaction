@@ -893,8 +893,8 @@ class Microscope(Slide, MovingCameraScene):  # , ZoomedScene
                  z_index=line_complex_amplitude.z_index + 1)))
         self.next_slide()
         self.start_loop()
-        self.play(TRACKER_TIME.animate.increment_value(Dt_e),
-                  TRACKER_TIME_LASER.animate.increment_value(Dt_l), run_time=2, rate_func=linear)
+        self.play(TRACKER_TIME.animate.increment_value(6),
+                  TRACKER_TIME_LASER.animate.increment_value(2), run_time=4, rate_func=linear)
         self.end_loop()
         self.updated_object_animation(self.mobjects, FadeOut)
         self.play(self.camera.frame.animate.scale(1 / ZOOM_RATIO).move_to(ORIGIN))

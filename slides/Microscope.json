@@ -1,7 +1,7 @@
 {
   "slides": [
     {
-      "type": "loop",
+      "type": "slide",
       "start_animation": 0,
       "end_animation": 1,
       "number": 1,
@@ -24,111 +24,356 @@
     {
       "type": "slide",
       "start_animation": 3,
-      "end_animation": 4,
+      "end_animation": 5,
       "number": 4,
       "terminated": false
     },
     {
-      "type": "slide",
-      "start_animation": 4,
-      "end_animation": 5,
-      "number": 5,
-      "terminated": false
-    },
-    {
-      "type": "slide",
+      "type": "loop",
       "start_animation": 5,
       "end_animation": 6,
-      "number": 6,
+      "number": 5,
       "terminated": false
     },
     {
       "type": "slide",
       "start_animation": 6,
       "end_animation": 7,
-      "number": 7,
+      "number": 6,
       "terminated": false
     },
     {
       "type": "slide",
       "start_animation": 7,
       "end_animation": 8,
+      "number": 7,
+      "terminated": false
+    },
+    {
+      "type": "loop",
+      "start_animation": 8,
+      "end_animation": 9,
       "number": 8,
       "terminated": false
     },
     {
       "type": "slide",
-      "start_animation": 8,
-      "end_animation": 11,
-      "number": 9,
-      "terminated": false
-    },
-    {
-      "type": "slide",
-      "start_animation": 11,
+      "start_animation": 9,
       "end_animation": 12,
-      "number": 10,
+      "number": 9,
       "terminated": false
     },
     {
       "type": "slide",
       "start_animation": 12,
       "end_animation": 13,
-      "number": 11,
+      "number": 10,
       "terminated": false
     },
     {
       "type": "slide",
       "start_animation": 13,
-      "end_animation": 14,
+      "end_animation": 15,
+      "number": 11,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 15,
+      "end_animation": 18,
       "number": 12,
       "terminated": false
     },
     {
       "type": "slide",
-      "start_animation": 14,
-      "end_animation": 16,
+      "start_animation": 18,
+      "end_animation": 20,
       "number": 13,
       "terminated": false
     },
     {
-      "type": "slide",
-      "start_animation": 16,
-      "end_animation": 17,
+      "type": "loop",
+      "start_animation": 20,
+      "end_animation": 21,
       "number": 14,
       "terminated": false
     },
     {
-      "type": "last",
-      "start_animation": 17,
-      "end_animation": 18,
+      "type": "slide",
+      "start_animation": 21,
+      "end_animation": 23,
       "number": 15,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 23,
+      "end_animation": 24,
+      "number": 16,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 24,
+      "end_animation": 25,
+      "number": 17,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 25,
+      "end_animation": 26,
+      "number": 18,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 26,
+      "end_animation": 28,
+      "number": 19,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 28,
+      "end_animation": 30,
+      "number": 20,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 30,
+      "end_animation": 32,
+      "number": 21,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 32,
+      "end_animation": 34,
+      "number": 22,
+      "terminated": false
+    },
+    {
+      "type": "loop",
+      "start_animation": 34,
+      "end_animation": 35,
+      "number": 23,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 35,
+      "end_animation": 36,
+      "number": 24,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 36,
+      "end_animation": 38,
+      "number": 25,
+      "terminated": false
+    },
+    {
+      "type": "loop",
+      "start_animation": 38,
+      "end_animation": 39,
+      "number": 26,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 39,
+      "end_animation": 42,
+      "number": 27,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 42,
+      "end_animation": 43,
+      "number": 28,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 43,
+      "end_animation": 44,
+      "number": 29,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 44,
+      "end_animation": 46,
+      "number": 30,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 46,
+      "end_animation": 47,
+      "number": 31,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 47,
+      "end_animation": 49,
+      "number": 32,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 49,
+      "end_animation": 51,
+      "number": 33,
+      "terminated": false
+    },
+    {
+      "type": "loop",
+      "start_animation": 51,
+      "end_animation": 52,
+      "number": 34,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 52,
+      "end_animation": 53,
+      "number": 35,
+      "terminated": false
+    },
+    {
+      "type": "loop",
+      "start_animation": 53,
+      "end_animation": 54,
+      "number": 36,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 54,
+      "end_animation": 56,
+      "number": 37,
+      "terminated": false
+    },
+    {
+      "type": "loop",
+      "start_animation": 56,
+      "end_animation": 57,
+      "number": 38,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 57,
+      "end_animation": 61,
+      "number": 39,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 61,
+      "end_animation": 63,
+      "number": 40,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 63,
+      "end_animation": 64,
+      "number": 41,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 64,
+      "end_animation": 66,
+      "number": 42,
+      "terminated": false
+    },
+    {
+      "type": "last",
+      "start_animation": 66,
+      "end_animation": 67,
+      "number": 43,
       "terminated": false
     }
   ],
   "files": [
-    "slides\\files\\Microscope\\4266129954_2341319086_2030443106.mp4",
-    "slides\\files\\Microscope\\1442284246_935673146_3050617019.mp4",
-    "slides\\files\\Microscope\\1442284246_4203670387_601882308.mp4",
-    "slides\\files\\Microscope\\1442284246_3354457801_2434324438.mp4",
-    "slides\\files\\Microscope\\1442284246_2589876577_100680876.mp4",
-    "slides\\files\\Microscope\\1442284246_1980497917_3287204420.mp4",
-    "slides\\files\\Microscope\\1442284246_2923457683_162912382.mp4",
-    "slides\\files\\Microscope\\1442284246_1236962527_4013671446.mp4",
-    "slides\\files\\Microscope\\1442284246_2894967971_2489847233.mp4",
-    "slides\\files\\Microscope\\1442284246_1469877697_2519946256.mp4",
-    "slides\\files\\Microscope\\1442284246_4082385588_688145153.mp4",
-    "slides\\files\\Microscope\\1442284246_3902437207_1533656280.mp4",
-    "slides\\files\\Microscope\\1442284246_2827258286_2777233501.mp4",
-    "slides\\files\\Microscope\\1442284246_517972029_1551255440.mp4",
-    "slides\\files\\Microscope\\1442284246_2989555962_4085610110.mp4",
-    "slides\\files\\Microscope\\1442284246_130513807_3143206579.mp4",
-    "slides\\files\\Microscope\\1442284246_3233848360_1471066477.mp4",
-    "slides\\files\\Microscope\\1442284246_1646004929_2706346340.mp4"
+    "slides\\files\\Microscope\\3923076979_1076466279_631829896.mp4",
+    "slides\\files\\Microscope\\3923076979_783111594_4174018169.mp4",
+    "slides\\files\\Microscope\\3737038414_3599590092_270969669.mp4",
+    "slides\\files\\Microscope\\3737038414_3180391120_2868918625.mp4",
+    "slides\\files\\Microscope\\3737038414_2561632940_4174018169.mp4",
+    "slides\\files\\Microscope\\3737038414_225998382_1760214949.mp4",
+    "slides\\files\\Microscope\\3737038414_918632538_1088383281.mp4",
+    "slides\\files\\Microscope\\3737038414_666509875_2919098751.mp4",
+    "slides\\files\\Microscope\\3737038414_1680764653_3389712024.mp4",
+    "slides\\files\\Microscope\\3737038414_716041073_1383332294.mp4",
+    "slides\\files\\Microscope\\3737038414_2932488521_2520693397.mp4",
+    "slides\\files\\Microscope\\3737038414_3025965743_1644827768.mp4",
+    "slides\\files\\Microscope\\3737038414_2907108067_4030703183.mp4",
+    "slides\\files\\Microscope\\3737038414_2615894320_482548948.mp4",
+    "slides\\files\\Microscope\\3737038414_3576490622_540375065.mp4",
+    "slides\\files\\Microscope\\3737038414_3490667428_750389087.mp4",
+    "slides\\files\\Microscope\\3737038414_3437909621_3767744004.mp4",
+    "slides\\files\\Microscope\\3737038414_2340210877_1224422577.mp4",
+    "slides\\files\\Microscope\\3737038414_918632538_529226649.mp4",
+    "slides\\files\\Microscope\\3737038414_4067155545_1106348835.mp4",
+    "slides\\files\\Microscope\\3737038414_1166289838_2285395305.mp4",
+    "slides\\files\\Microscope\\3737038414_3240918425_1315897722.mp4",
+    "slides\\files\\Microscope\\3737038414_3520009837_2951496902.mp4",
+    "slides\\files\\Microscope\\3737038414_3271693786_2364479116.mp4",
+    "slides\\files\\Microscope\\3737038414_2725531446_1702347811.mp4",
+    "slides\\files\\Microscope\\3737038414_262975374_3962379138.mp4",
+    "slides\\files\\Microscope\\3737038414_1642122466_3125349586.mp4",
+    "slides\\files\\Microscope\\3737038414_2743775366_1001944402.mp4",
+    "slides\\files\\Microscope\\3737038414_2107581867_2053694967.mp4",
+    "slides\\files\\Microscope\\3737038414_3685014097_1321185855.mp4",
+    "slides\\files\\Microscope\\3737038414_2690774158_252978751.mp4",
+    "slides\\files\\Microscope\\3737038414_1373806602_2507204400.mp4",
+    "slides\\files\\Microscope\\3737038414_1019596052_1445835254.mp4",
+    "slides\\files\\Microscope\\3737038414_1832601616_3310564712.mp4",
+    "slides\\files\\Microscope\\3737038414_3061997419_2723635031.mp4",
+    "slides\\files\\Microscope\\3737038414_405591317_625583557.mp4",
+    "slides\\files\\Microscope\\3737038414_3772187759_2427493144.mp4",
+    "slides\\files\\Microscope\\3737038414_1910640508_1931254712.mp4",
+    "slides\\files\\Microscope\\3737038414_2625686830_1485662034.mp4",
+    "slides\\files\\Microscope\\3737038414_1978304244_929836629.mp4",
+    "slides\\files\\Microscope\\3737038414_802382121_67735464.mp4",
+    "slides\\files\\Microscope\\3737038414_682132155_3782784989.mp4",
+    "slides\\files\\Microscope\\3737038414_3589453036_1332101169.mp4",
+    "slides\\files\\Microscope\\3737038414_3271693786_353774222.mp4",
+    "slides\\files\\Microscope\\3737038414_2028461905_320347221.mp4",
+    "slides\\files\\Microscope\\3737038414_2967485948_2711035127.mp4",
+    "slides\\files\\Microscope\\3737038414_3766283389_653188998.mp4",
+    "slides\\files\\Microscope\\3737038414_1148635341_171875215.mp4",
+    "slides\\files\\Microscope\\3737038414_2414735282_37144689.mp4",
+    "slides\\files\\Microscope\\3737038414_3061214090_126866864.mp4",
+    "slides\\files\\Microscope\\3737038414_3333415172_2986516077.mp4",
+    "slides\\files\\Microscope\\3737038414_2486427113_2786861645.mp4",
+    "slides\\files\\Microscope\\3218942547_1283232800_2882317625.mp4",
+    "slides\\files\\Microscope\\2224377476_1724588934_2028658876.mp4",
+    "slides\\files\\Microscope\\2224377476_1578887105_2563660946.mp4",
+    "slides\\files\\Microscope\\2224377476_3798872993_3300259066.mp4",
+    "slides\\files\\Microscope\\2224377476_3238693359_3403924487.mp4",
+    "slides\\files\\Microscope\\2224377476_3014588875_3794748161.mp4",
+    "slides\\files\\Microscope\\4005654598_1277527622_113391327.mp4",
+    "slides\\files\\Microscope\\3582530705_3322091905_113391327.mp4",
+    "slides\\files\\Microscope\\3582530705_215689500_200291874.mp4",
+    "slides\\files\\Microscope\\3582530705_350372373_3099574511.mp4",
+    "slides\\files\\Microscope\\3582530705_3932229750_3249836370.mp4",
+    "slides\\files\\Microscope\\3582530705_2110400152_2314071180.mp4",
+    "slides\\files\\Microscope\\3582530705_2542387947_2059471441.mp4",
+    "slides\\files\\Microscope\\3582530705_2959656597_223132457.mp4",
+    "slides\\files\\Microscope\\3582530705_345352296_1126713410.mp4"
   ],
   "resolution": [
-    854,
-    480
+    1920,
+    1080
   ],
   "background_color": "black"
 }

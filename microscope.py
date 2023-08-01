@@ -11,6 +11,7 @@ from scipy import integrate
 from matplotlib.widgets import Slider
 import re
 import mrcfile as mrc
+import pandas as pd
 
 M_ELECTRON = 9.1093837e-31
 C_LIGHT = 299792458
@@ -775,16 +776,16 @@ class SamplePropagator(Propagator):
             potential_2d = np.load("example_letter.npy")
             potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         elif potential_type == "letters":
-            potential_2d = np.load("Data Arrays\\Static Data\\letters_1024.npy")
+            potential_2d = np.load("d\\Static Data\\letters_1024.npy")
             potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         elif potential_type == "letters_256":
-            potential_2d = np.load("Data Arrays\\Static Data\\letters_256.npy")
+            potential_2d = np.load("d\\Static Data\\letters_256.npy")
             potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         elif potential_type == "letters_128":
-            potential_2d = np.load("Data Arrays\\Static Data\\letters_128.npy")
+            potential_2d = np.load("d\\Static Data\\letters_128.npy")
             potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         elif potential_type == "letters_64":
-            potential_2d = np.load("Data Arrays\\Static Data\\letters_64.npy")
+            potential_2d = np.load("d\\Static Data\\letters_64.npy")
             potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
         else:
             raise NotImplementedError(
@@ -1528,7 +1529,7 @@ class CavityNumericalPropagator(CavityPropagator):
                     np.save(self.setup_to_path(input_wave=input_wave), phase_and_amplitude_mask)
         if self.debug_mode:
             np.save(
-                "Data Arrays\\Debugging Arrays\\phase_amplitude_mask.npy",
+                "d\\Debugging Arrays\\phase_amplitude_mask.npy",
                 phase_and_amplitude_mask,
             )
         return phase_and_amplitude_mask
@@ -1554,7 +1555,7 @@ class CavityNumericalPropagator(CavityPropagator):
             save_to_file=self.debug_mode,
         )
         if self.debug_mode:
-            np.save("Data Arrays\\Debugging Arrays\\phi.npy", phi_values)
+            np.save("d\\Debugging Arrays\\phi.npy", phi_values)
 
         return phi_values
 
@@ -1603,7 +1604,7 @@ class CavityNumericalPropagator(CavityPropagator):
         )
 
         if save_to_file:
-            np.save("Data Arrays\\Debugging Arrays\\phi_integrand.npy", integrand)
+            np.save("d\\Debugging Arrays\\phi_integrand.npy", integrand)
 
         return (
             integrand,
@@ -1683,7 +1684,7 @@ class CavityNumericalPropagator(CavityPropagator):
             imaginary=False,
         )
         if save_to_file:
-            np.save("Data Arrays\\Debugging Arrays\\A_1.npy", A)
+            np.save("d\\Debugging Arrays\\A_1.npy", A)
         if self.E_2 is not None:
             A_2 = gaussian_beam(
                 x=X_tilde,
@@ -1700,8 +1701,8 @@ class CavityNumericalPropagator(CavityPropagator):
             )
             A += A_2
             if save_to_file:
-                np.save("Data Arrays\\Debugging Arrays\\A_2.npy", A_2)
-                np.save("Data Arrays\\Debugging Arrays\\A.npy", A)
+                np.save("d\\Debugging Arrays\\A_2.npy", A_2)
+                np.save("d\\Debugging Arrays\\A.npy", A)
         return A
 
     def grad_G(self, Z, X, Y, T, beta_electron, A_z=None, save_to_file: bool = False):
@@ -1737,8 +1738,8 @@ class CavityNumericalPropagator(CavityPropagator):
         grad_G = np.stack([(G_dZ - G) / dr, (G_dX - G) / dr, (G_dY - G) / dr], axis=-1)
 
         if save_to_file:
-            np.save("Data Arrays\\Debugging Arrays\\G.npy", G)
-            np.save("Data Arrays\\Debugging Arrays\\grad_G.npy", grad_G)
+            np.save("d\\Debugging Arrays\\G.npy", G)
+            np.save("d\\Debugging Arrays\\grad_G.npy", grad_G)
 
         return grad_G
 
@@ -1767,6 +1768,35 @@ class CavityNumericalPropagator(CavityPropagator):
             f"Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nt{len(self.t)}_"
             f"Nz_{self.n_z}_DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}.npy"
         )
+        # # Create dataframe with all the columns:
+        # dtypes = np.dtype(
+        #     [
+        #         ("method", str),
+        #         ("lambda_1", int),
+        #         ("lambda_2", float),
+        #         ("power_1", float),
+        #         ('power_2', float)
+        #         ("NA_1", float),
+        #         ("NA_2", float),
+        #         ("alpha", float),
+        #         ("theta", float),
+        #         ('E_0', float)
+        #         ("ring_cavity", bool),
+        #         ("Nx", int),
+        #         ("Ny", int),
+        #         ("Nt", int),
+        #         ('Nz', int),
+        #         ('DX', float,
+        #         ('DY', float,
+        #         ('file_path', np.str),
+        #     ]
+        # )
+        # df = pd.DataFrame(np.empty(0, dtype=dtypes))
+        # PHASER_MASKS_DF = pd.DataFrame(
+        #     columns=[
+        #     "method", "lambda_1", "lambda_2", "power_1", "power_2", "NA_1", "NA_2", "alpha", "theta", "E_0",
+        #     "ring_cavity", "Nx", "Ny", "Nt", "Nz", "DX", "DY", "file_path"], dtype=
+        # )
         return path
 
     def generate_z_vector(self, x, beta_electron):
@@ -1848,3 +1878,107 @@ class CavityNumericalPropagator(CavityPropagator):
         fig.colorbar(mask_attenuation, cax=cax, orientation="vertical")
 
         plt.show()
+
+if __name__ == "__main__":
+    NA_1 = 0.10
+    second_laser = True
+    ring_cavity = True
+    polarization_pies = 0.50
+    E_0 = 300
+    defocus_nm = 0.00
+    Cs_mm = 0.30
+    n_electrons = 20
+    power_1 = 1.1477e+05
+    focal_length_mm = 3.30
+    alpha_cavity_deviation_degrees = 0
+    resolution = 256
+    pixel_size = 2.00e-10
+    n_z = None
+
+    first_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=True)
+    if second_laser:
+        power_2 = -1
+    else:
+        power_2 = None
+    l_1 = 1064e-9
+    l_2 = 532e-9
+
+    input_wave_full = WaveFunction(E_0=Joules_of_keV(E_0), mrc_file_path=r'd\Static Data\apof.mrc')
+    input_wave = WaveFunction(E_0=input_wave_full.E_0,
+                              psi=input_wave_full.psi[150:150 + resolution, 150:150 + resolution],
+                              coordinates=CoordinateSystem(dxdydz=(pixel_size, pixel_size),
+                                                           n_points=(resolution, resolution)))
+
+    # dummy_sample = SamplePropagator(dummy_potential=f'letters_{N_POINTS}',
+    #                                 coordinates_for_dummy_potential=CoordinateSystem(axes=(input_coordinate_system.x_axis,
+    #                                                                                        input_coordinate_system.y_axis,
+    #                                                                                        np.linspace(-5e-10, 5e-10, 2)
+    #                                                                                        )))
+
+    cavity = CavityNumericalPropagator(l_1=l_1, l_2=l_2, power_1=power_1, power_2=power_2, NA_1=NA_1,
+                                       ring_cavity=ring_cavity,
+                                       alpha_cavity_deviation=alpha_cavity_deviation_degrees / 360 * 2 * np.pi,
+                                       theta_polarization=polarization_pies * np.pi,
+                                       n_z=n_z)
+    second_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=False)
+    aberration_propagator = AberrationsPropagator(Cs=Cs_mm * 1e-3, defocus=defocus_nm * 1e-9, astigmatism_parameter=0,
+                                                  astigmatism_orientation=0)
+    M = Microscope([first_lens, cavity, second_lens, aberration_propagator],
+                   n_electrons_per_square_angstrom=n_electrons)
+    pic = M.take_a_picture(input_wave)
+
+    fig, ax = plt.subplots(2, 3, figsize=(21, 14))
+    mask = cavity.load_or_calculate_phase_and_amplitude_mask(M.step_of_propagator(cavity).output_wave)
+    middle_phase_mask_value = mask[mask.shape[0] // 2, mask.shape[1] // 2]
+    attenuation_factor = np.abs(middle_phase_mask_value)
+    phase_factor = np.real(np.angle(middle_phase_mask_value))
+    #     plt.suptitle(f' phase_factor over pi{phase_factor / np.pi:.2f} {attenuation_factor=:.2f}')
+    #     plt.imshow(pic_2f_a.values, extent=pic_2f_a.coordinates.limits)
+    #     plt.colorbar()
+
+    im_intensity = ax[0, 1].imshow(np.flip(pic.values), extent=input_wave.coordinates.limits)
+    ax[0, 1].set_title(f"Image")
+    divider = make_axes_locatable(ax[0, 1])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    fig.colorbar(im_intensity, cax=cax, orientation="vertical")
+
+    output_wave = M.step_of_propagator(aberration_propagator).output_wave
+    image_fourier_plane = np.fft.fft2(output_wave.psi)
+    fft_freq_x = np.fft.fftfreq(output_wave.psi.shape[0], output_wave.coordinates.dxdydz[0])
+    fft_freq_x = np.fft.fftshift(fft_freq_x)
+    image_fourier_plane = np.clip(np.abs(image_fourier_plane), a_min=0,
+                                  a_max=np.percentile(np.abs(image_fourier_plane), 99))
+    im_fourier = ax[1, 1].imshow(np.abs(image_fourier_plane),
+                                 extent=(fft_freq_x[0], fft_freq_x[-1], fft_freq_x[0], fft_freq_x[-1]))
+    ax[1, 1].set_title(f"Image - Fourier")
+    divider = make_axes_locatable(ax[1, 1])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    fig.colorbar(im_fourier, cax=cax, orientation="vertical")
+
+    mask_phase = ax[0, 0].imshow(np.angle(input_wave.psi), extent=input_wave.coordinates.limits)
+    ax[0, 0].set_title(f"Original wave - phase")
+    divider = make_axes_locatable(ax[0, 0])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    fig.colorbar(mask_phase, cax=cax, orientation="vertical")
+
+    mask_attenuation = ax[1, 0].imshow(np.abs(input_wave.psi) ** 2, extent=input_wave.coordinates.limits)
+    ax[1, 0].set_title(f"Original image - Intensity")
+    divider = make_axes_locatable(ax[1, 0])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    fig.colorbar(mask_attenuation, cax=cax, orientation="vertical")
+
+    mask_phase = ax[0, 2].imshow(np.angle(mask), extent=M.step_of_propagator(cavity).input_wave.coordinates.limits)
+    ax[0, 2].set_title(f"mask - phase")
+    divider = make_axes_locatable(ax[0, 2])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    fig.colorbar(mask_phase, cax=cax, orientation="vertical")
+
+    mask_attenuation = ax[1, 2].imshow(np.abs(mask) ** 2,
+                                       extent=M.step_of_propagator(cavity).input_wave.coordinates.limits)
+    ax[1, 2].set_title(f"mask - intensity transfer")
+    divider = make_axes_locatable(ax[1, 2])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    fig.colorbar(mask_attenuation, cax=cax, orientation="vertical")
+
+    plt.savefig(f"Figures\\examples\\kaki.png")
+
