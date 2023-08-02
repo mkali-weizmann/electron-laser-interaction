@@ -131,10 +131,10 @@ if __name__ == "__main__":
     AX_X_LIM = 2.5
     heating_width = 0.8
     x = np.linspace(-2, 4, 100)
-    ax.plot(x, 0.5*x ** 2, label="Potential - Low Power")
-    ax.plot(x, np.exp(-x ** 2), label="Mode - Low Power")
-    ax.plot(x, 0.5*x ** 2 * (1-np.exp(-(x/heating_width)**4)), '--', label="Potential - High Power")
-    ax.plot(x, np.exp(-x ** 4), '--', label="Mode - High Power")
+    ax.plot(x, 0.5*x ** 2, '--', label="Potential - Low Power")
+    ax.plot(x, np.exp(-x ** 2), '--', label="Mode - Low Power")
+    ax.plot(x, 0.5*x ** 2 +0.1 * np.exp(-x**2), label="Potential - High Power")
+    ax.plot(x, np.exp(-x ** 4), label="Mode - High Power")
     # box = ax.get_position()
     # ax.set_position([box.x0, box.y0, box.width * 0.7, box.height])
     plt.tick_params(
