@@ -1,6 +1,8 @@
 from manim import *
 import numpy as np
 from scene import generate_wavefronts_start_to_end_gaussian
+from matplotlib import pyplot as plt
+
 
 def normalize_vector(vector):
     return vector / np.linalg.norm(vector)
@@ -91,5 +93,68 @@ class Cavity(Scene):
         self.add(left_mirror, right_mirror, upper_right_mirror, lower_left_mirror, horizontal_waves, tilted_waves, square, photon_UR, photon_LL, photon_UL, photon_LR, diagram_rectangle, triangle_up, triangle_down, triangle_left, triangle_right, secondary_square)
 
 
-C = Cavity()
-C.construct()
+
+AX_X_LIM = 2
+
+ax = Axes(
+    x_range=[-AX_X_LIM, AX_X_LIM, 0.5],
+    y_range=[0, 1.1, 0.25],
+    tips=False)
+
+# x_min must be > 0 because log is undefined at 0.
+parabolic_graph = ax.plot(lambda x: x ** 2, x_range=[-AX_X_LIM, AX_X_LIM], use_smoothing=True, color=BLUE)
+exponent_graph = ax.plot(lambda x: np.exp(-x ** 2), x_range=[-AX_X_LIM, AX_X_LIM], use_smoothing=True, color=RED)
+
+heating_width = 0.8
+
+parabolic_graph_heated = DashedVMobject(ax.plot(lambda x: x ** 2 * (1-np.exp(-(x/heating_width)**4)), x_range=[-AX_X_LIM, AX_X_LIM], use_smoothing=True, color=BLUE))
+exponent_graph_heated = DashedVMobject(ax.plot(lambda x: np.exp(-x ** 4), x_range=[-AX_X_LIM, AX_X_LIM], use_smoothing=True, color=RED))
+
+parabolic_legend = Text("Potential", color=RED).to_corner(UR).scale(0.6)
+exponent_legend = Text("Mode", color=BLUE).scale(0.6).next_to(parabolic_legend, DOWN)
+
+class Potential(Scene):
+    def construct(self):
+        self.add(ax, parabolic_graph, exponent_graph, parabolic_legend ,exponent_legend)
+
+class PotentialHeated(Scene):
+    def construct(self):
+        self.add(ax, parabolic_graph_heated, exponent_graph_heated, parabolic_legend ,exponent_legend)
+# %%
+if __name__ == "__main__":
+    from manim import *
+    import numpy as np
+    from matplotlib import pyplot as plt
+
+    # fig, ax = plt.subplots(figsize=(7, 4))
+    fig, ax = plt.subplots(figsize=(7, 4))
+    AX_X_LIM = 2.5
+    heating_width = 0.8
+    x = np.linspace(-2, 4, 100)
+    ax.plot(x, 0.5*x ** 2, label="Potential - Low Power")
+    ax.plot(x, np.exp(-x ** 2), label="Mode - Low Power")
+    ax.plot(x, 0.5*x ** 2 * (1-np.exp(-(x/heating_width)**4)), '--', label="Potential - High Power")
+    ax.plot(x, np.exp(-x ** 4), '--', label="Mode - High Power")
+    # box = ax.get_position()
+    # ax.set_position([box.x0, box.y0, box.width * 0.7, box.height])
+    plt.tick_params(
+        axis='x',  # changes apply to the x-axis
+        which='both',  # both major and minor ticks are affected
+        bottom=False,  # ticks along the bottom edge are off
+        top=False,  # ticks along the top edge are off
+        labelbottom=False)
+    plt.tick_params(
+        axis='y',  # changes apply to the x-axis
+        which='both',  # both major and minor ticks are affected
+        left=False,  # ticks along the bottom edge are off
+        right=False,  # ticks along the top edge are off
+        labelleft=False)
+
+    plt.ylim(0, 1.1)
+    # plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.legend(loc='right')
+    plt.title("Potential and Mode, Low and High Power")
+    plt.savefig("slides/media/images/potential_and_mode - assymetric.svg")
+    plt.show()
+
+
