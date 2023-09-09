@@ -431,6 +431,15 @@ End
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\kaliEBasis}{\mathcal{E}}
+{\mathcal{E}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\kaliMBasis}{\mathcal{M}}
 {\mathcal{M}}
 \end_inset

@@ -156,5 +156,3 @@ if __name__ == "__main__":
     plt.title("Potential and Mode, Low and High Power")
     plt.savefig("slides/media/images/potential_and_mode - assymetric.svg")
     plt.show()
-
-
