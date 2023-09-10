@@ -161,3 +161,14 @@ cython_debug/
 /slides/presentation_assets/
 /media/
 /slides/media/
+/berkleys files/1bz0_hemoglobin.pdb
+/berkleys files/3j9i_proteasome_ta.pdb
+/berkleys files/3rgk_myoglobin.pdb
+/berkleys files/4v6x_ribosome.cif
+/berkleys files/6rgq_proteasome_human.pdb
+/berkleys files/6z6u_apoferritin.pdb
+/berkleys files/example26.py
+/berkleys files/Simulator_Documentation.pdf
+/berkleys files/tem26.py
+/data/debugging arrays/.gitignore
+/data/phase masks/.gitignore
