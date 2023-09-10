@@ -219,10 +219,13 @@ def safe_abs_square(a: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
     return np.clip(a=np.abs(a), a_min=1e-500, a_max=None) ** 2  # ARBITRARY
 
 def signif(x, p=4):
-    x = np.asarray(x)
-    x_positive = np.where(np.isfinite(x) & (x != 0), np.abs(x), 10**(p-1))
-    mags = 10 ** (p - 1 - np.floor(np.log10(x_positive)))
-    return np.round(x * mags) / mags
+    if pd.isna(x):
+        return x
+    else:
+        x_array = np.asarray(x)
+        x_positive = np.where(np.isfinite(x_array) & (x_array != 0), np.abs(x_array), 10**(p-1))
+        mags = 10 ** (p - 1 - np.floor(np.log10(x_positive)))
+        return np.round(x_array * mags) / mags
 
 
 def gaussian_beam(
@@ -380,7 +383,7 @@ def find_power_for_phase(
     E_0: float = Joules_of_keV(300),
     desired_phase: float = pi / 2,
     cavity_type: str = "numerical",
-    print_progress=True,
+    print_progress=False,
     mode: str = "analytical",
     plot_in_numerical_option: bool = True,
     **kwargs,
@@ -391,7 +394,7 @@ def find_power_for_phase(
     if mode == "analytical":
         x_1 = starting_power
         if cavity_type == "numerical":
-            C_1 = CavityNumericalPropagator(power_1=x_1, **kwargs)
+            C_1 = CavityNumericalPropagator(power_1=x_1, print_progress=False, **kwargs)
         elif cavity_type == "analytical":
             C_1 = CavityAnalyticalPropagator(power_1=x_1, **kwargs)
         else:
@@ -402,7 +405,7 @@ def find_power_for_phase(
         x_2 = y_2_supposed * x_1 / y_1
 
         if cavity_type == "numerical":
-            C_2 = CavityNumericalPropagator(power_1=x_2, **kwargs)
+            C_2 = CavityNumericalPropagator(power_1=x_2, print_progress=False, **kwargs)
         else:
             C_2 = CavityAnalyticalPropagator(power_1=x_2, **kwargs)
 
@@ -1130,7 +1133,7 @@ class CavityAnalyticalPropagator(CavityPropagator):
                     starting_power=starting_P_in_auto_P_search,
                     E_0=input_wave_energy_for_power_finding,
                     cavity_type="analytical",
-                    print_progress=True,
+                    print_progress=False,
                     l_1=l_1,
                     l_2=l_2,
                     power_2=power_2,
@@ -1379,7 +1382,7 @@ class CavityNumericalPropagator(CavityPropagator):
                     starting_power=starting_P_in_auto_P_search,
                     E_0=input_wave_energy_for_power_finding,
                     cavity_type="numerical",
-                    print_progress=True,
+                    print_progress=False,
                     l_1=l_1,
                     l_2=l_2,
                     power_2=power_2,

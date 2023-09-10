@@ -35,7 +35,7 @@ def f(fig_1, fig_2, fig_3, NA_1=0.05, second_laser=True,
         power_2 = None
         number_of_lasers = "one laser"
 
-    input_wave_full = WaveFunction(E_0=Joules_of_keV(E_0), mrc_file_path=f"d\\Static Data\\{file_name}.mrc")
+    input_wave_full = WaveFunction(E_0=Joules_of_keV(E_0), mrc_file_path=f"data\\static data\\{file_name}.mrc")
     input_wave = WaveFunction(E_0=input_wave_full.E_0,
                               psi=input_wave_full.psi[N_0_x:N_0_x + resolution, N_0_y:N_0_y + resolution],
                               coordinates=CoordinateSystem(dxdydz=input_wave_full.coordinates.dxdydz,
@@ -109,7 +109,7 @@ def f(fig_1, fig_2, fig_3, NA_1=0.05, second_laser=True,
 
 
 start_time = time.time()
-for file_name in ["Apof_in_ice", "myoglobin"]:
+for file_name in ["apof_in_ice", "myoglobin"]:
     for shot_noise in [False, True]:
         i = 0
         fig_1 = plt.figure(figsize=(15, 10))
@@ -129,7 +129,7 @@ for file_name in ["Apof_in_ice", "myoglobin"]:
             print(time.time() - start_time)
             i += 1
 
-        if file_name == "Apof_in_ice":
+        if file_name == "apof_in_ice":
             shortened_name = "a"
         else:
             shortened_name = "m"

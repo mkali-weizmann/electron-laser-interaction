@@ -33,7 +33,7 @@ def f(NA_1=0.05, second_laser=True,
     else:
         power_2 = None
 
-    input_wave_full = WaveFunction(E_0=Joules_of_keV(E_0), mrc_file_path=f"d\\Static Data\\{file_name}.mrc")
+    input_wave_full = WaveFunction(E_0=Joules_of_keV(E_0), mrc_file_path=f"data\\static data\\{file_name}.mrc")
     input_wave = WaveFunction(E_0=input_wave_full.E_0,
                               psi=input_wave_full.psi[N_0_x:N_0_x + resolution, N_0_y:N_0_y + resolution],
                               coordinates=CoordinateSystem(dxdydz=input_wave_full.coordinates.dxdydz,
@@ -58,6 +58,7 @@ def f(NA_1=0.05, second_laser=True,
     vmin, vmax = np.percentile(pic.values, [10, 90])
     im_intensity = ax[0, 1].imshow(np.flip(pic.values), extent=input_wave.coordinates.limits, cmap='gray', vmin=vmin, vmax=vmax)
     ax[0, 1].set_title(f"Image")
+    ax[0, 1].set_title(f"(b)", loc='left')
     divider = make_axes_locatable(ax[0, 1])
     cax = divider.append_axes("right", size="5%", pad=0.05)
     fig.colorbar(im_intensity, cax=cax, orientation="vertical")
@@ -71,24 +72,28 @@ def f(NA_1=0.05, second_laser=True,
     im_fourier = ax[1, 1].imshow(np.abs(image_fourier_plane),
                                  extent=(fft_freq_x[0], fft_freq_x[-1], fft_freq_x[0], fft_freq_x[-1]), cmap='gray')
     ax[1, 1].set_title(f"Image - Fourier")
+    ax[1, 1].set_title(f"(e)", loc='left')
     divider = make_axes_locatable(ax[1, 1])
     cax = divider.append_axes("right", size="5%", pad=0.05)
     fig.colorbar(im_fourier, cax=cax, orientation="vertical")
 
     mask_phase = ax[0, 0].imshow(np.angle(input_wave.psi), extent=input_wave.coordinates.limits, cmap='gray')
     ax[0, 0].set_title(f"Original wave - phase")
+    ax[0, 0].set_title(f"(a)", loc='left')
     divider = make_axes_locatable(ax[0, 0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
     fig.colorbar(mask_phase, cax=cax, orientation="vertical")
 
     mask_attenuation = ax[1, 0].imshow(np.abs(input_wave.psi) ** 2, extent=input_wave.coordinates.limits, cmap='gray')
-    ax[1, 0].set_title(f"Original image - Intensity")
+    ax[1, 0].set_title(f"Original wave - Intensity")
+    ax[1, 0].set_title(f"(d)", loc='left')
     divider = make_axes_locatable(ax[1, 0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
     fig.colorbar(mask_attenuation, cax=cax, orientation="vertical")
 
     mask_phase = ax[0, 2].imshow(np.angle(mask), extent=M.step_of_propagator(cavity).input_wave.coordinates.limits, cmap='gray')
     ax[0, 2].set_title(f"mask - phase")
+    ax[0, 2].set_title(f"(c)", loc='left')
     divider = make_axes_locatable(ax[0, 2])
     cax = divider.append_axes("right", size="5%", pad=0.05)
     fig.colorbar(mask_phase, cax=cax, orientation="vertical")
@@ -96,6 +101,7 @@ def f(NA_1=0.05, second_laser=True,
     mask_attenuation = ax[1, 2].imshow(np.abs(mask) ** 2,
                                        extent=M.step_of_propagator(cavity).input_wave.coordinates.limits, cmap='gray')
     ax[1, 2].set_title(f"mask - intensity transfer")
+    ax[1, 2].set_title(f"(f)", loc='left')
     divider = make_axes_locatable(ax[1, 2])
     cax = divider.append_axes("right", size="5%", pad=0.05)
     fig.colorbar(mask_attenuation, cax=cax, orientation="vertical")
@@ -108,12 +114,13 @@ def f(NA_1=0.05, second_laser=True,
     plt.suptitle(f"{title_a}\n{title_b}, {title_c}")
     file_name = f"Figures\\examples\\{shorted_title_a}, {title_b_shorted}.png"
     plt.savefig(file_name)
+    plt.show()
     plt.close()
 
 
 import time
 start_time = time.time()
-for file_name in ["Apof_in_ice"]:  # ,"myoglobin"
+for file_name in ["apof_in_ice"]:  # ,"myoglobin"
     for shot_noise in [False]:
         for index, r in df.iterrows():
             settings_dict = r.to_dict()
