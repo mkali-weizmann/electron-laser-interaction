@@ -2,6 +2,21 @@ from manim import *
 import numpy as np
 from scene import generate_wavefronts_start_to_end_gaussian
 from matplotlib import pyplot as plt
+from manim_voiceover import VoiceoverScene
+from manim_voiceover.services.gtts import GTTSService
+
+class MyAwesomeScene(VoiceoverScene):
+    def construct(self):
+        self.set_speech_service(GTTSService())
+        bad_title = Circle()
+        good_title = Text("Good Title")
+        with self.voiceover(
+                text="The house is big") as tracker:  # Today we are going to talk about Transmission Electron Microscope image enhancement using second order free electron-photon interaction
+            self.play(FadeIn(bad_title, shift=DOWN))
+        # self.next_slide()
+        with self.voiceover(
+                text="The house is big") as tracker:  # This name is not very catchy. Simply speaking, we are going to see how Shooting laser on electrons make images good
+            self.play(FadeOut(bad_title, shift=DOWN), FadeIn(good_title, shift=DOWN))
 
 
 def normalize_vector(vector):
