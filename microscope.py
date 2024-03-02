@@ -11,6 +11,7 @@ import os.path
 from scipy import integrate
 from matplotlib.widgets import Slider
 import re
+from hashlib import md5
 import mrcfile as mrc
 import pandas as pd
 
@@ -217,6 +218,7 @@ def safe_exponent(a: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
 
 def safe_abs_square(a: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
     return np.clip(a=np.abs(a), a_min=1e-500, a_max=None) ** 2  # ARBITRARY
+
 
 def signif(x, p=4):
     if pd.isna(x):
@@ -445,6 +447,9 @@ def find_power_for_phase(
         if print_progress:
             print(f"For P={Es[-1]:.2e} the phase is phi_original_function={resulted_phase:.2f}")
         return Es[-1]
+
+
+
 
 
 ############################################################################################################
@@ -1308,7 +1313,7 @@ class CavityAnalyticalPropagator(CavityPropagator):
             f"DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}"
         )
 
-        hashed_str = hash(setup_str)
+        hashed_str = md5(setup_str.encode('utf-8')).hexdigest()
         path = f'data/phase masks/{hashed_str}.npy'
 
         return path
@@ -1421,24 +1426,29 @@ class CavityNumericalPropagator(CavityPropagator):
         self.print_progress = print_progress
         self.debug_mode = debug_mode
         if n_z is None:
-            if np.abs(theta_polarization - np.pi/2) < 1e-10:
+            if np.abs(theta_polarization - np.pi/2) < 1e-10 and self.alpha_cavity == 0:
                 # The gauge function, which is calculated at each point as an integral of the field, requries
-                # many points of integration for an accurate result. When the polarization is horizontal (theta=np.pi/2)
-                # the gauge function is zero, and the calculation can be much faster.
+                # many points of integration for an accurate result. When there is no A_z componend, which is the case
+                # for theta_polarization=pi/2 and no tilt of the cavity the gauge function is zero,
+                # and the calculation can be much faster.
                 self.n_z = 200
             else:
-                self.n_z = 1800
+                self.n_z = 400  # It was once 1800, changed to 400 for faster calculations. It should be determined smarterly by the wavelength and typical spatial spectrum of G
         else:
             self.n_z = n_z
 
         self.single_laser_propagation_direction_override = l_1_propagation_direction_override
 
-    def load_or_calculate_phase_and_amplitude_mask(self, input_wave: WaveFunction):
+    def load_or_calculate_phase_and_amplitude_mask(self,
+                                                   input_wave: WaveFunction,
+                                                   ignore_past_files: Optional[bool] = None):
+        if ignore_past_files is None:
+            ignore_past_files = self.ignore_past_files
 
         setup_path = self.setup_to_path(input_wave)
 
         # If it exists exactly as is:
-        if os.path.isfile(setup_path) and not self.ignore_past_files:
+        if os.path.isfile(setup_path) and not ignore_past_files:
             phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(setup_path)
 
         # For the case it exists but with a different amplitude:
@@ -1826,7 +1836,7 @@ class CavityNumericalPropagator(CavityPropagator):
             f"Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nt{len(self.t)}_"
             f"Nz_{self.n_z}_DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}"
         )
-        hashed_str = hash(setup_str)
+        hashed_str = md5(setup_str.encode('utf-8')).hexdigest()
         path = f'data/phase masks/{hashed_str}.npy'
         return path
 
@@ -1944,109 +1954,3 @@ class CavityNumericalPropagator(CavityPropagator):
         fig.colorbar(mask_attenuation, cax=cax, orientation="vertical")
 
         plt.show()
-# %%
-if __name__ == "__main__":
-    NA_1 = 0.10
-    second_laser = True
-    ring_cavity = True
-    polarization_pies = 0.50
-    E_0 = 300
-    defocus_nm = 0.00
-    Cs_mm = 0.30
-    n_electrons = 20
-    power_1 = 1.3e+05
-    focal_length_mm = 3.30
-    alpha_cavity_deviation_degrees = 0
-    resolution = 256
-    pixel_size = 2.00e-10
-    n_z = None
-
-    first_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=True)
-    if second_laser:
-        power_2 = -1
-    else:
-        power_2 = None
-    l_1 = 1064e-9
-    l_2 = 532e-9
-
-    input_wave_full = WaveFunction(E_0=Joules_of_keV(E_0), mrc_file_path=r'data\static data\apof.mrc')
-    input_wave = WaveFunction(E_0=input_wave_full.E_0,
-                              psi=input_wave_full.psi[150:150 + resolution, 150:150 + resolution],
-                              coordinates=CoordinateSystem(dxdydz=(pixel_size, pixel_size),
-                                                           n_points=(resolution, resolution)))
-
-    # dummy_sample = SamplePropagator(dummy_potential=f'letters_{N_POINTS}',
-    #                                 coordinates_for_dummy_potential=CoordinateSystem(axes=(input_coordinate_system.x_axis,
-    #                                                                                        input_coordinate_system.y_axis,
-    #                                                                                        np.linspace(-5e-10, 5e-10, 2)
-    #                                                                                        )))
-
-    cavity = CavityNumericalPropagator(l_1=l_1, l_2=l_2, power_1=power_1, power_2=power_2, NA_1=NA_1,
-                                       ring_cavity=ring_cavity,
-                                       alpha_cavity_deviation=alpha_cavity_deviation_degrees / 360 * 2 * np.pi,
-                                       theta_polarization=polarization_pies * np.pi,
-                                       n_z=n_z)
-    second_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=False)
-    aberration_propagator = AberrationsPropagator(Cs=Cs_mm * 1e-3, defocus=defocus_nm * 1e-9, astigmatism_parameter=0,
-                                                  astigmatism_orientation=0)
-    M = Microscope([first_lens, cavity, second_lens, aberration_propagator],
-                   n_electrons_per_square_angstrom=n_electrons)
-    pic = M.take_a_picture(input_wave)
-
-    fig, ax = plt.subplots(2, 3, figsize=(21, 14))
-    mask = cavity.load_or_calculate_phase_and_amplitude_mask(M.step_of_propagator(cavity).output_wave)
-    middle_phase_mask_value = mask[mask.shape[0] // 2, mask.shape[1] // 2]
-    attenuation_factor = np.abs(middle_phase_mask_value)
-    phase_factor = np.real(np.angle(middle_phase_mask_value))
-    #     plt.suptitle(f' phase_factor over pi{phase_factor / np.pi:.2f} {attenuation_factor=:.2f}')
-    #     plt.imshow(pic_2f_a.values, extent=pic_2f_a.coordinates.limits)
-    #     plt.colorbar()
-
-    im_intensity = ax[0, 1].imshow(np.flip(pic.values), extent=input_wave.coordinates.limits)
-    ax[0, 1].set_title(f"Image")
-    divider = make_axes_locatable(ax[0, 1])
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    fig.colorbar(im_intensity, cax=cax, orientation="vertical")
-
-    output_wave = M.step_of_propagator(aberration_propagator).output_wave
-    image_fourier_plane = np.fft.fft2(output_wave.psi)
-    fft_freq_x = np.fft.fftfreq(output_wave.psi.shape[0], output_wave.coordinates.dxdydz[0])
-    fft_freq_x = np.fft.fftshift(fft_freq_x)
-    image_fourier_plane = np.clip(np.abs(image_fourier_plane), a_min=0,
-                                  a_max=np.percentile(np.abs(image_fourier_plane), 99))
-    im_fourier = ax[1, 1].imshow(np.abs(image_fourier_plane),
-                                 extent=(fft_freq_x[0], fft_freq_x[-1], fft_freq_x[0], fft_freq_x[-1]))
-    ax[1, 1].set_title(f"Image - Fourier")
-    divider = make_axes_locatable(ax[1, 1])
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    fig.colorbar(im_fourier, cax=cax, orientation="vertical")
-
-    mask_phase = ax[0, 0].imshow(np.angle(input_wave.psi), extent=input_wave.coordinates.limits)
-    ax[0, 0].set_title(f"Original wave - phase")
-    divider = make_axes_locatable(ax[0, 0])
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    fig.colorbar(mask_phase, cax=cax, orientation="vertical")
-
-    mask_attenuation = ax[1, 0].imshow(np.abs(input_wave.psi) ** 2, extent=input_wave.coordinates.limits)
-    ax[1, 0].set_title(f"Original image - Intensity")
-    divider = make_axes_locatable(ax[1, 0])
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    fig.colorbar(mask_attenuation, cax=cax, orientation="vertical")
-
-    mask_phase = ax[0, 2].imshow(np.angle(mask), extent=M.step_of_propagator(cavity).input_wave.coordinates.limits)
-    ax[0, 2].set_title(f"mask - phase")
-    divider = make_axes_locatable(ax[0, 2])
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    fig.colorbar(mask_phase, cax=cax, orientation="vertical")
-
-    mask_attenuation = ax[1, 2].imshow(np.abs(mask) ** 2,
-                                       extent=M.step_of_propagator(cavity).input_wave.coordinates.limits)
-    ax[1, 2].set_title(f"mask - intensity transfer")
-    divider = make_axes_locatable(ax[1, 2])
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    fig.colorbar(mask_attenuation, cax=cax, orientation="vertical")
-    
-    plt.show()
-    
-    plt.savefig(f"Figures\\examples\\kaki.png")
-

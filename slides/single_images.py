@@ -137,10 +137,8 @@ class PotentialHeated(Scene):
         self.add(ax, parabolic_graph_heated, exponent_graph_heated, parabolic_legend ,exponent_legend)
 # %%
 if __name__ == "__main__":
-    from manim import *
     import numpy as np
     from matplotlib import pyplot as plt
-
     # fig, ax = plt.subplots(figsize=(7, 4))
     fig, ax = plt.subplots(figsize=(7, 4))
     AX_X_LIM = 2.5
@@ -169,5 +167,5 @@ if __name__ == "__main__":
     # plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.legend(loc='right')
     plt.title("Potential and Mode, Low and High Power")
-    plt.savefig("slides/media/images/potential_and_mode - assymetric.svg")
+    # plt.savefig("slides/media/images/potential_and_mode - assymetric.svg")
     plt.show()

@@ -3025,7 +3025,7 @@ Find the phase shift using the field in the electron's rest frame
 Start with the Schrodinger equation:
 \begin_inset Formula 
 \[
-\frac{d}{dt}\psi\stackrel{\text{Schrodinger Eq.}}{=}\frac{i}{\hbar}\kaliHemiltonian{\color{lightgray}\ \backslash\intop dt}
+\frac{d}{dt}\psi\stackrel{\text{Schrodinger Eq.}}{=}\frac{i}{\hbar}\kaliHemiltonian\psi{\color{lightgray}\ \backslash\intop dt}
 \]
 
 \end_inset
