@@ -3420,6 +3420,17 @@ Proof's of Osip's approximation for
 \end_layout
 
 \begin_layout Standard
+\begin_inset Formula 
+\[
+G=\beta c\intop_{-\infty}^{t}A_{z}\left(z-\beta c\left(t-T\right),T\right)dT
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 First, let us rewrite the the integral of 
 \begin_inset Formula $G$
 \end_inset
@@ -3660,6 +3671,14 @@ In the lab's frame
 \begin_inset Formula 
 \[
 \phi\left(x_{0},y_{0},z_{0},t\right)=-\frac{1}{\hbar}\intop_{-\infty}^{t}\frac{e^{2}}{2m}\left({\color{green}\left(\boldsymbol{A}\left(x_{0},y_{0},z\left(T\right),T\right)-\nabla G\right)^{2}}-{\color{blue}\beta^{2}\left(A_{z}-\partial_{z}G\right)^{2}}\right){\color{gray}\underset{dt^{\prime}}{\underbrace{{\normalcolor \left(\frac{1}{\gamma}dT\right)}}}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\phi\left(x_{0},y_{0},t\right)=-\frac{1}{\hbar}\intop_{-\infty}^{t}\frac{e^{2}}{2m}\left(\left(\boldsymbol{A}\left(x_{0},y_{0},z\left(T\right),T\right)-\nabla G\right)^{2}-\beta^{2}\left(A_{z}-\partial_{z}G\right)^{2}\right)\underset{dt^{\prime}}{\underbrace{\left(\frac{1}{\gamma}dT\right)}}
 \]
 
 \end_inset

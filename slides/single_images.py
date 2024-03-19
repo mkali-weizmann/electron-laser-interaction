@@ -4,8 +4,71 @@ from scene import generate_wavefronts_start_to_end_gaussian
 from matplotlib import pyplot as plt
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.gtts import GTTSService
+from manim_slides import Slide
+from manim import config as global_config
+config.background_color = WHITE
 
-class MyAwesomeScene(VoiceoverScene):
+class AlgebricDerivation(Slide):
+        #
+        #
+    def construct(self):
+        myTemplate = TexTemplate()
+        myTemplate.add_to_preamble(r"\leftskip=0cm")
+        SIZE = 0.4
+        myTemplate = TexTemplate()
+        myTemplate.add_to_preamble(r"\usepackage{geometry}")
+        myTemplate.add_to_preamble(r"\geometry{verbose,tmargin=2cm,bmargin=3cm,lmargin=1.5cm,rmargin=1.5cm,headheight=0cm,headsep=0cm,footskip=2cm}")
+        first_text = Tex("The elecctron phase acquired by the laser interaction is the action of a charged particle in an electromagnetic field",
+                         color=BLACK).scale(SIZE).to_corner(UL)
+        first_equation = Tex(r"$\phi\left(t\right)=\frac{1}{\hbar}\intop\left[\frac{1}{2}mv^{\prime2}-e\boldsymbol{A}^{\prime}\left(\boldsymbol{x}^{\prime}\left(t^{\prime}\right),t^{\prime}\right)\cdot\boldsymbol{v}^{\prime}\left(t^{\prime}\right)\right]dt^{\prime}$",
+                             color=BLACK).next_to(first_text, DOWN).shift(RIGHT).scale(SIZE)
+        comment = Tex("The primes are here because we start in the electron's initial reference frame, not the lab frame",
+                      tex_template=myTemplate, tex_environment="flushleft", color=BLACK).next_to(first_equation, DOWN).scale(SIZE).align_to(first_text, LEFT)
+        second_text = Tex(r"In the electron's reference frame the velocity is $\frac{e}{m}\boldsymbol{A}^{\prime}\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)$ to first order and the integral becomes:",
+                          tex_template=myTemplate, tex_environment="flushleft", color=BLACK).next_to(comment, DOWN).scale(SIZE).align_to(first_text, LEFT)
+        third_equation = Tex(r"$-\frac{1}{\hbar}\intop_{0}^{t}\frac{e^{2}}{2m}\boldsymbol{A}^{\prime2}\left(\boldsymbol{x}_{0},t^{\prime}\right)dt^{\prime}$",
+                             color=BLACK).next_to(second_text, DOWN).scale(SIZE).align_to(first_equation, LEFT)
+        third_text = Tex(r"After converting to the lab frame, the position of the electron becomes: $\left(\boldsymbol{x}_{0}^{\prime},t^{\prime}\right)\rightarrow\left(x_{0},y_{0},z_{0}+\beta cT,T\right)$",
+                         tex_template=myTemplate, color=BLACK).next_to(third_equation, DOWN).scale(SIZE).align_to(first_text, LEFT)
+        fourth_text = Tex(r"and the integral becomes:",
+                          color=BLACK).next_to(third_text, DOWN).scale(SIZE).align_to(first_text, LEFT)
+        fourth_equation = Tex(r"$\phi\left(x_{0},y_{0},t\right)=-\frac{1}{\hbar}\intop_{-\infty}^{t}\frac{e^{2}}{2m}\left(\left(\boldsymbol{A}\left(x_{0},y_{0},z\left(T\right),T\right)-\nabla G\right)^{2}-\beta^{2}\left(A_{z}-\partial_{z}G\right)^{2}\right)\underset{dt^{\prime}}{\underbrace{\left(\frac{1}{\gamma}dT\right)}}$",
+                              tex_template=myTemplate, color=BLACK).next_to(fourth_text, DOWN).scale(SIZE).align_to(first_equation, LEFT).shift(0.3 * UP)
+        fifth_text = Tex(r"Where the gauge function $G$ comes from the Lorentz Transform of the electro-magnetic potential, and is equal to:",
+                         tex_template=myTemplate, tex_environment="flushleft", color=BLACK).next_to(fourth_equation, DOWN).scale(SIZE).align_to(first_text, LEFT).shift(0.3 * UP)
+        fifth_equation = Tex(r"$G=\beta c\intop_{-\infty}^{t}A_{z}\left(z-\beta c\left(t-T\right),T\right)dT$",
+                             color=BLACK).next_to(fifth_text, DOWN).scale(SIZE).align_to(first_equation, LEFT)
+
+        shift_value = 0.2
+        self.play(FadeIn(first_text, shift=shift_value*UP))
+        self.next_slide()
+        self.play(FadeIn(first_equation, shift=shift_value*UP))
+        self.next_slide()
+        self.play(FadeIn(comment, shift=shift_value*UP))
+        self.next_slide()
+        self.play(FadeIn(second_text, shift=shift_value*UP))
+        self.next_slide()
+        self.play(FadeIn(third_equation, shift=shift_value*UP))
+        self.next_slide()
+        self.play(FadeIn(third_text, shift=shift_value*UP))
+        self.next_slide()
+        self.play(FadeIn(fourth_text, shift=shift_value*UP))
+        self.next_slide()
+        self.play(FadeIn(fourth_equation, shift=shift_value * UP))
+        self.next_slide()
+        self.play(FadeIn(fifth_text, shift=shift_value*UP))
+        self.next_slide()
+        self.play(FadeIn(fifth_equation, shift=shift_value*UP))
+        self.next_slide()
+        self.wait(1)
+
+
+
+
+
+
+
+class VoiceoverExample(VoiceoverScene):
     def construct(self):
         self.set_speech_service(GTTSService())
         bad_title = Circle()
@@ -49,8 +112,6 @@ PHOTON_END_POINT_UPPER_LEFT = DIAGRAM_SQUARE_UPPER_LEFT_CORNER + np.array([-WIDT
 PHOTON_END_POINT_LOWER_RIGHT = DIAGRAM_SQUARE_LOWER_RIGHT_CORNER + np.array([WIDTH_DIFFERENCE, -WIDTH_DIFFERENCE * np.tan(CAVITIES_TILT_ANGLE), 0])
 
 
-
-
 def photon_curve_function(start_point, end_point, amplitude=0.1, frequency=1):
     orthogonal_direction = np.cross(end_point - start_point, np.array([0, 0, 1]))
     orthogonal_direction[2] = 0
@@ -58,6 +119,7 @@ def photon_curve_function(start_point, end_point, amplitude=0.1, frequency=1):
     def curve_function(t):
         return start_point + (end_point - start_point) * t + amplitude * np.sin(2 * PI * frequency * t) * orthogonal_direction
     return curve_function
+
 
 def mirror(center, radius, outwards_normal_angle, width, color=WHITE, stroke_width=8):
     inwards_normal = - np.array([np.cos(outwards_normal_angle), np.sin(outwards_normal_angle), 0])

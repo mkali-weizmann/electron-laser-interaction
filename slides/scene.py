@@ -788,15 +788,15 @@ class Microscope(Slide, MovingCameraScene):  # , ZoomedScene
                                                                                        colors_generator=lambda
                                                                                            t: COLOR_UNPERTURBED_AMPLITUDE)
         second_lens_outgoing_waves_purterbed_1 = generate_wavefronts_start_to_end_flat(
-            start_point=POSITION_LENS_2 + 0.4 * UP,
-            end_point=POSITION_CAMERA + 0.8 * UP,
+            start_point=POSITION_LENS_2 - 0.4 * UP,
+            end_point=POSITION_CAMERA,
             wavelength=WAVELENGTH,
             width=HEIGHT_CAMERA,
             tracker=TRACKER_TIME,
             colors_generator=lambda t: COLOR_PERTURBED_AMPLITUDE)
         second_lens_outgoing_waves_purterbed_2 = generate_wavefronts_start_to_end_flat(
-            start_point=POSITION_LENS_2 - 0.4 * UP,
-            end_point=POSITION_CAMERA - 0.8 * UP,
+            start_point=POSITION_LENS_2 + 0.4 * UP,
+            end_point=POSITION_CAMERA,
             wavelength=WAVELENGTH,
             width=HEIGHT_CAMERA,
             tracker=TRACKER_TIME,
@@ -828,15 +828,16 @@ class Microscope(Slide, MovingCameraScene):  # , ZoomedScene
         #
         # ################################################################################################################
         # # Add laser:
-        laser_waves = generate_wavefronts_start_to_end_gaussian(
-            start_point=POSITION_WAIST + LENGTH_LASER_BEAM * UP,
-            end_point=POSITION_WAIST - LENGTH_LASER_BEAM * UP,
-            tracker=TRACKER_TIME_LASER,
-            wavelength=WAVELENGTH_LASER,
-            x_R=X_R_LASER,
-            w_0=W_0_LASER,
-            center=POSITION_WAIST,
-            colors_generator=lambda t: RED)
+        # laser_waves = generate_wavefronts_start_to_end_gaussian(
+        #     start_point=POSITION_WAIST + LENGTH_LASER_BEAM * UP,
+        #     end_point=POSITION_WAIST - LENGTH_LASER_BEAM * UP,
+        #     tracker=TRACKER_TIME_LASER,
+        #     wavelength=WAVELENGTH_LASER,
+        #     x_R=X_R_LASER,
+        #     w_0=W_0_LASER,
+        #     center=POSITION_WAIST,
+        #     colors_generator=lambda t: RED)
+        laser_waves = Dot(point=POSITION_WAIST, radius=0.1, color=RED, fill_opacity=0.8, stroke_opacity=1, stroke_width=4, stroke_color=RED_E)
 
         orange_rgb = color_to_rgb(COLOR_PHASE_SHIFT_AMPLITUDE)
         white_rgb = color_to_rgb(COLOR_UNPERTURBED_AMPLITUDE)
@@ -984,7 +985,49 @@ class Microscope(Slide, MovingCameraScene):  # , ZoomedScene
         self.next_slide()
         camera_scanner_group += phase_contrast_function
         self.updated_object_animation([camera_scanner_group, scanning_dot_2], FadeOut)
-        # # END INDENTATION
+
+        # asd_a = Tex(r"Mathematically:").scale(0.5)
+        # asd_b = Tex(r"$\left|\psi_{\text{unperturbed}}+i\psi_{\text{perturbance}}\right|^{2}$").scale(0.5)
+        # asd_c = Tex(r"$\xrightarrow{\text{Phase plate}}\left|i\psi_{\text{unperturbed}}+i\psi_{\text{perturbance}}\right|^{2}$").scale(0.5)
+        # asd_d = Tex(r"$=\psi_{\text{unperturbed}}^{2}+2\psi_{\text{unperturbed}}\psi_{\text{perturbance}}+\psi_{\text{perturbance}}^{2}$").scale(0.5)
+        # asd_e = Tex(r"And the shot noise $\mathcal{N}$ and signal $\mathcal{S}:$").scale(0.5)
+        # asd_f = Tex(r"$\mathcal{N}\propto\sqrt{N}\propto\sqrt{\psi^{2}}\approx\psi_{\text{unperturbed}}$").scale(0.5)
+        # asd_g = Tex(r"$\mathcal{S}\propto\psi_{\text{unperturbed}}$").scale(0.5)
+        # asd_a.next_to(title_5, 1.5*DOWN).align_to(title_5, LEFT)
+        # asd_b.next_to(asd_a, DOWN+RIGHT)
+        # asd_c.next_to(asd_b, RIGHT)
+        # asd_d.next_to(asd_c, DOWN).align_to(asd_c, LEFT)
+        # asd_e.next_to(asd_a, DOWN).align_to(asd_a, LEFT).shift(DOWN)
+        # asd_f.next_to(asd_e, DOWN).align_to(asd_e, LEFT)
+        # asd_g.next_to(asd_f, DOWN).align_to(asd_f, LEFT)
+        # self.add(asd_a, asd_b, asd_c, asd_d, asd_e, asd_f, asd_g, index_labels(asd_a),
+        #          index_labels(asd_b),
+        #          index_labels(asd_c),
+        #          index_labels(asd_d),
+        #          index_labels(asd_e),
+        #          index_labels(asd_f),
+        #          index_labels(asd_g))
+        # self.wait(3)
+        #
+        # phase_plate_mathematical_explanation = Tex(
+        #     r"Mathematically:",
+        #     r"$\left|\psi_{\text{unperturbed}}+i\psi_{\text{perturbance}}\right|^{2}$",
+        #     r"$\xrightarrow{\text{Phase plate}}\left|i\psi_{\text{unperturbed}}+i\psi_{\text{perturbance}}\right|^{2}$",
+        #     r"$=\psi_{\text{unperturbed}}^{2}+2\psi_{\text{unperturbed}}\psi_{\text{perturbance}}+\psi_{\text{perturbance}}^{2}$",
+        #     r"And the shot noise $\mathcal{N}$ and signal $\mathcal{S}:$",
+        #     r"$\mathcal{N}\propto\sqrt{N}\propto\psi_{\text{unperturbed}}$",
+        #     r"$\mathcal{S}\propto\psi_{\text{unperturbed}}$").scale(0.4)
+        # phase_plate_mathematical_explanation[0].align_to(camera_scanner_group, LEFT).align_to(camera_scanner_group, UP)
+        # phase_plate_mathematical_explanation[1].next_to(phase_plate_mathematical_explanation[0], DOWN+RIGHT)
+        # phase_plate_mathematical_explanation[2].next_to(phase_plate_mathematical_explanation[1], RIGHT)
+        # phase_plate_mathematical_explanation[3].next_to(phase_plate_mathematical_explanation[2], DOWN).align_to(phase_plate_mathematical_explanation[2], LEFT)
+        # phase_plate_mathematical_explanation[4].next_to(phase_plate_mathematical_explanation[0], DOWN).align_to(phase_plate_mathematical_explanation[0], LEFT).shift(DOWN)
+        # phase_plate_mathematical_explanation[5].next_to(phase_plate_mathematical_explanation[4], DOWN).align_to(phase_plate_mathematical_explanation[3], LEFT)
+        # phase_plate_mathematical_explanation[6].next_to(phase_plate_mathematical_explanation[5], DOWN).align_to(phase_plate_mathematical_explanation[5], LEFT)
+        # self.add(phase_plate_mathematical_explanation)
+        # self.wait(3)
+
+        # END INDENTATION
         self.updated_object_animation(left_side_group, FadeIn)
         self.next_slide()
 
