@@ -449,9 +449,6 @@ def find_power_for_phase(
         return Es[-1]
 
 
-
-
-
 ############################################################################################################
 
 
@@ -971,11 +968,13 @@ class CavityPropagator(Propagator):
         self.l_1 = l_1  # l means lambda
         self.l_2 = l_2  # l means lambda
 
-        self.power_1 = power_1  # The power is the integral over the electric field squared in the z,y plane
+        self.power_1 = power_1  # The power is the integral over the electric field squared in the z,y plane -
+        # of the running wave. For a standing wave, we set the same power but the field is twice as high for a
+        # given power.
         if power_2 == -1:
             # -1 means that the second laser is defined by the condition for equal amplitudes in the lattices' frame
             # this ratio is derived in equation "Amplitudes Ratio" in the simulation notes.
-            self.power_2 = self.power_1 * (l_1 / l_2) ** 2
+            self.power_2 = self.power_1 * l_1 / l_2
         else:
             self.power_2 = power_2
 
@@ -1018,7 +1017,7 @@ class CavityPropagator(Propagator):
     @property
     def E_1(self):
         E_1_moving_wave = np.sqrt(
-            self.power_1 * 4 / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_1**2)
+            4 * self.power_1 / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_1**2)  # Based on equation e_44
         )  # can also be written as:
         # np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
         if self.ring_cavity:

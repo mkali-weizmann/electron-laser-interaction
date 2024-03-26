@@ -8903,7 +8903,7 @@ P=\intop_{y,z}I\left(0,y,z\right)dydz=\intop_{{\color{brown}y},{\color{teal}z}}\
 
 \begin_inset Formula 
 \begin{equation}
-P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}\iff\frac{4}{\pi c\varepsilon_{0}w_{0}^{2}}P=E_{0}^{2}\label{eq:e_44}
+P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}\iff\sqrt{\frac{4}{\pi c\varepsilon_{0}w_{0}^{2}}P}=E_{0}\label{eq:e_44}
 \end{equation}
 
 \end_inset
@@ -8921,7 +8921,8 @@ Then the power of each one of the moving wave will be:
 \begin{alignat}{1}
 P & =\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}\left(\frac{E_{0}}{2}\right)^{2}\nonumber \\
  & =\frac{1}{4}\cdot\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E_{0}^{2}{\color{lightgray}\ \backslash\cdot\frac{4\cdot4}{\pi c\varepsilon_{0}w_{0}^{2}}}\\
-4\cdot\frac{4}{\pi c\varepsilon_{0}w_{0}^{2}}\cdot P & =E_{0}^{2}\label{eq:e_45}
+4\cdot\frac{4}{\pi c\varepsilon_{0}w_{0}^{2}}\cdot P & =E_{0}^{2}\label{eq:e_45}\\
+2\cdot E_{0}\left(P_{\text{circulating}}\right)=2\cdot\sqrt{\frac{4}{\pi c\varepsilon_{0}w_{0}^{2}}\cdot P} & =E_{0}
 \end{alignat}
 
 \end_inset
@@ -9016,6 +9017,156 @@ noprefix "false"
 \begin_inset Formula 
 \[
 E_{0,\text{standing}}=\frac{4\kaliNA}{\lambda}\sqrt{\frac{\pi P}{c\varepsilon_{0}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Problem
+Two frequencies resides in the same cavity (in the base mode), what will
+ be their NA's and waist size ratio?
+\end_layout
+
+\begin_layout Solution
+They will share the same Rayleigh range:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+{\color{red}\frac{\lambda_{1}}{\pi\kaliNA_{1}^{2}}}=x_{R}{\color{blue}\frac{\lambda_{2}}{\pi\kaliNA_{2}^{2}}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+{\color{red}\frac{\lambda_{1}}{\cancel{\pi}\kaliNA_{1}^{2}}}={\color{blue}\frac{\lambda_{2}}{\cancel{\pi}\kaliNA_{2}^{2}}}{\color{lightgray}\ \backslash:\lambda_{2},\cdot\kaliNA_{1}^{2},\cdot\pi}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\lambda_{1}}{\lambda_{2}}=\frac{\kaliNA_{1}^{2}}{\kaliNA_{2}^{2}}{\color{lightgray}\ \backslash\sqrt{}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sqrt{\frac{\lambda_{1}}{\lambda_{2}}}=\frac{\kaliNA_{1}}{\kaliNA_{2}}
+\]
+
+\end_inset
+
+And the waist size:
+\begin_inset Formula 
+\[
+{\color{red}\frac{\pi w_{1}^{2}}{\lambda_{1}}}=x_{R}={\color{blue}\frac{\pi w_{2}^{2}}{\lambda_{2}}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+{\color{red}\frac{\cancel{\pi}w_{1}^{2}}{\lambda_{1}}}={\color{blue}\frac{\cancel{\pi}w_{2}^{2}}{\lambda_{2}}}{\color{lightgray}\ \backslash\cdot\lambda_{1},:\pi w_{2}^{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{w_{1}^{2}}{w_{2}^{2}}=\frac{\lambda_{1}}{\lambda_{2}}{\color{lightgray}\ \backslash\sqrt{}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{w_{1}}{w_{2}}=\sqrt{\frac{\lambda_{1}}{\lambda_{2}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Problem
+Suppose we know 
+\begin_inset Formula $\frac{E_{1}}{E_{2}}=\left(\frac{\lambda_{1}}{\lambda_{2}}\right)^{-1}$
+\end_inset
+
+.
+ what will be 
+\begin_inset Formula $\frac{P_{1}}{P_{2}}$
+\end_inset
+
+?
+\end_layout
+
+\begin_layout Solution
+According to equation 
+\color blue
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e_44"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\color inherit
+ we know that:
+\begin_inset Formula 
+\[
+P=\frac{\pi c\varepsilon_{0}w_{0}^{2}}{4}E^{2}\propto w_{0}^{2}E^{2}\tag{e\_44}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{P_{1}}{P_{2}}=\frac{w_{1}^{2}}{w_{2}^{2}}\cdot\frac{E_{1}^{2}}{E_{2}^{2}}=\cancel{\frac{\lambda_{1}}{\lambda_{2}}}\cdot\left(\frac{\lambda_{1}}{\lambda_{2}}\right)^{-\cancel{2}}=\left(\frac{\lambda_{1}}{\lambda_{2}}\right)^{-1}
+\]
+
+\end_inset
+
+Or alternatively:
+\begin_inset Formula 
+\[
+\left(\frac{\lambda_{1}}{\lambda_{2}}\right)\cdot P_{1}=P_{2}
+\]
+
+\end_inset
+
+And so if for a given 
+\begin_inset Formula $P_{1}$
+\end_inset
+
+, if 
+\begin_inset Formula $\frac{\lambda_{1}}{\lambda_{2}}=\frac{1064\unit{nm}}{532\unit{nm}}=2$
+\end_inset
+
+ Then we have:
+\begin_inset Formula 
+\[
+P_{2}=2P_{1}
 \]
 
 \end_inset
