@@ -1527,7 +1527,7 @@ class CavityAnalyticalPropagator(CavityPropagator):
         phase_and_amplitude_mask = attenuation_factor * np.exp(
             -1j * constant_phase_shift
         )
-        if save_results:
+        if save_results and self.power_1 > 0:
             np.save(self.setup_to_path(input_wave), phase_and_amplitude_mask)
             self.update_phase_masks_df(input_wave)
         return phase_and_amplitude_mask
@@ -1852,7 +1852,7 @@ class CavityNumericalPropagator(CavityPropagator):
                 # setup, and if there are more, then they are equivalent, so anyway we can take the first one.
                 power_1_original = first_file.loc["power_1"]
                 power_2_original = first_file.loc["power_2"]
-                if np.isnan(power_2_original):
+                if pd.isna(power_2_original):
                     phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(
                         setup_file_path=first_file.loc["file_path"],
                         powers_ratio=self.power_1 / power_1_original,
@@ -1992,7 +1992,8 @@ class CavityNumericalPropagator(CavityPropagator):
             phase_and_amplitude_mask = phase_factor[
                 :, :, 0
             ]  # Assumes the phase is constant in time
-            if save_results:
+            if save_results and self.power_1 > 0:  # We don't want to save the trivial mask as it will not scale
+                # properly with the power (0*new_power = 0 for any mask)
                 np.save(self.setup_to_path(input_wave=input_wave), phi[:, :, 0])
                 self.update_phase_masks_df(input_wave)
         else:
@@ -2023,7 +2024,7 @@ class CavityNumericalPropagator(CavityPropagator):
                 )
                 C = C_computed_with_sin + C_computed_with_cos
                 phase_and_amplitude_mask = jv(0, C) * np.exp(1j * phi_const)
-                if save_results:
+                if save_results and self.power_1 > 0:
                     np.save(
                         self.setup_to_path(input_wave=input_wave),
                         np.stack((phi_const, C), axis=2),
