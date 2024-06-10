@@ -22,12 +22,41 @@ C_LIGHT = 299792458
 H_BAR = 1.054571817e-34
 E_CHARGE = 1.602176634e-19
 EPSILON_ELECTRICITY = 8.8541878128e-12
-FINE_STRUCTURE_CONST = E_CHARGE**2 / (4 * np.pi * EPSILON_ELECTRICITY * H_BAR * C_LIGHT)
+FINE_STRUCTURE_CONST = E_CHARGE**2 / (
+    4 * np.pi * EPSILON_ELECTRICITY * H_BAR * C_LIGHT
+)
 np.seterr(all="raise")
 try:
-    PHASE_MASKS_DF = pd.read_csv(r'data/phase masks/phase_masks.csv', index_col=False, dtype={'ring_cavity': bool})
+    PHASE_MASKS_DF = pd.read_csv(
+        r"data/phase masks/phase_masks.csv",
+        index_col=False,
+        dtype={"ring_cavity": bool},
+    )
 except FileNotFoundError:
-    PHASE_MASKS_DF = pd.DataFrame(columns=['file_path', 'n_frequencies', 'method', 'lambda_laser_1_nm', 'lambda_laser_2_nm', 'power_1', 'power_2', 'NA_1', 'NA_2', 'alpha_tilt_rads', 'theta_polarization_rads', 'E_0_electron_keV','ring_cavity', 'Nx', 'Ny', 'N_t', 'N_z', 'DX', 'DY', 'time_calculated'])
+    PHASE_MASKS_DF = pd.DataFrame(
+        columns=[
+            "file_path",
+            "n_frequencies",
+            "method",
+            "lambda_laser_1_nm",
+            "lambda_laser_2_nm",
+            "power_1",
+            "power_2",
+            "NA_1",
+            "NA_2",
+            "alpha_tilt_rads",
+            "theta_polarization_rads",
+            "E_0_electron_keV",
+            "ring_cavity",
+            "Nx",
+            "Ny",
+            "N_t",
+            "N_z",
+            "DX",
+            "DY",
+            "time_calculated",
+        ]
+    )
 
 
 def l_of_E(E: float) -> float:
@@ -185,7 +214,10 @@ def manipulate_plot(
         raise ValueError("imdata_callable must return 1 or 2 dimensional data")
 
     # axcolor = 'lightgoldenrodyellow'
-    sliders_axes = [plt.axes([0.25, 0.04 * (i + 1), 0.65, 0.03], facecolor=(0.97, 0.97, 0.97)) for i in range(N_params)]
+    sliders_axes = [
+        plt.axes([0.25, 0.04 * (i + 1), 0.65, 0.03], facecolor=(0.97, 0.97, 0.97))
+        for i in range(N_params)
+    ]
     sliders = [
         Slider(
             ax=sliders_axes[i],
@@ -227,20 +259,25 @@ def signif(x, p=4):
         return x
     else:
         x_array = np.asarray(x)
-        x_positive = np.where(np.isfinite(x_array) & (x_array != 0), np.abs(x_array), 10**(p-1))
+        x_positive = np.where(
+            np.isfinite(x_array) & (x_array != 0), np.abs(x_array), 10 ** (p - 1)
+        )
         mags = 10 ** (p - 1 - np.floor(np.log10(x_positive)))
         return np.round(x_array * mags) / mags
 
+
 @njit(parallel=True)
-def gaussian_beam_numba(x: np.ndarray,
-                        y: np.ndarray,
-                        z: np.ndarray,
-                        E: float,
-                        lambda_laser: float,
-                        NA: float,
-                        t: np.ndarray,
-                        forward_propagation: bool,
-                        standing_wave: bool) -> np.ndarray:
+def gaussian_beam_numba(
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    E: float,
+    lambda_laser: float,
+    NA: float,
+    t: np.ndarray,
+    forward_propagation: bool,
+    standing_wave: bool,
+) -> np.ndarray:
     w_0 = lambda_laser / (np.pi * NA)
     x_R = pi * w_0**2 / lambda_laser
     w_x = w_0 * np.sqrt(1 + (x / x_R) ** 2)
@@ -258,24 +295,35 @@ def gaussian_beam_numba(x: np.ndarray,
     time_phase = C_LIGHT * k * t
     spatial_phase = other_phase - gouy_phase
 
-    envelope = E * (w_0 / w_x) * np.exp(
-        np.clip(a=-(y ** 2 + z ** 2) / w_x ** 2, a_min=-200, a_max=None))
+    envelope = (
+        E
+        * (w_0 / w_x)
+        * np.exp(np.clip(a=-(y**2 + z**2) / w_x**2, a_min=-200, a_max=None))
+    )
     if standing_wave:
-        return envelope * potential_factor * np.cos(spatial_phase) * np.cos(time_phase)  # * 2
+        return (
+            envelope * potential_factor * np.cos(spatial_phase) * np.cos(time_phase)
+        )  # * 2
     else:
-        return envelope * potential_factor * np.cos(propagation_sign * spatial_phase + time_phase)
+        return (
+            envelope
+            * potential_factor
+            * np.cos(propagation_sign * spatial_phase + time_phase)
+        )
 
 
 @njit(parallel=True)
-def gaussian_beam_numba_looped(x: np.ndarray,
-                        y: np.ndarray,
-                        z: np.ndarray,
-                        E: float,
-                        lambda_laser: float,
-                        NA: float,
-                        t: np.ndarray,
-                        forward_propagation: bool,
-                        standing_wave: bool) -> np.ndarray:
+def gaussian_beam_numba_looped(
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    E: float,
+    lambda_laser: float,
+    NA: float,
+    t: np.ndarray,
+    forward_propagation: bool,
+    standing_wave: bool,
+) -> np.ndarray:
     result_array = np.zeros_like(x)
     w_0 = lambda_laser / (np.pi * NA)
     x_R = pi * w_0**2 / lambda_laser
@@ -294,13 +342,28 @@ def gaussian_beam_numba_looped(x: np.ndarray,
     for i in prange(result_array.shape[0]):
         time_phase = C_LIGHT * k * t[i, ...]
         spatial_phase = other_phase[i, ...] - gouy_phase[i, ...]
-        envelope = E * (w_0 / w_x[i, ...]) * np.exp(
-            np.clip(a=-(y[i, ...] ** 2 + z[i, ...] ** 2) / w_x[i, ...] ** 2, a_min=-200, a_max=None))  # The clipping
+        envelope = (
+            E
+            * (w_0 / w_x[i, ...])
+            * np.exp(
+                np.clip(
+                    a=-(y[i, ...] ** 2 + z[i, ...] ** 2) / w_x[i, ...] ** 2,
+                    a_min=-200,
+                    a_max=None,
+                )
+            )
+        )  # The clipping
         # is to prevent underflow errors.
         if standing_wave:
-            result_array[i, ...] = potential_factor * envelope * np.cos(spatial_phase) * np.cos(time_phase)
+            result_array[i, ...] = (
+                potential_factor * envelope * np.cos(spatial_phase) * np.cos(time_phase)
+            )
         else:
-            result_array[i, ...] = potential_factor * envelope * np.cos(propagation_sign * spatial_phase + time_phase)
+            result_array[i, ...] = (
+                potential_factor
+                * envelope
+                * np.cos(propagation_sign * spatial_phase + time_phase)
+            )
 
     return result_array
 
@@ -328,7 +391,9 @@ def gaussian_beam(
     R_x_inverse = R_x_inverse_gaussian(x, x_R)
     k = k_of_l(lambda_laser)
     other_phase = k * x + k * (z**2 + y**2) / 2 * R_x_inverse
-    envelope = E * (w_0 / w_x) * safe_exponent(-(y**2 + z**2) / w_x**2)  # The clipping
+    envelope = (
+        E * (w_0 / w_x) * safe_exponent(-(y**2 + z**2) / w_x**2)
+    )  # The clipping
     # is to prevent underflow errors.
     if forward_propagation is True:
         propagation_sign = -1
@@ -349,20 +414,40 @@ def gaussian_beam(
 
         spatial_phase = other_phase - gouy_phase
 
-        if mode == "potential":  # The ratio between E and A in Gibbs gauge is E=w*A or A=E/w
+        if (
+            mode == "potential"
+        ):  # The ratio between E and A in Gibbs gauge is E=w*A or A=E/w
             potential_factor = 1 / (C_LIGHT * k)  # potential_factor = 1/omega
         else:
             potential_factor = 1
         if standing_wave:
             if complex:
-                return envelope * potential_factor * np.cos(spatial_phase) * np.exp(1j * time_phase)  # * 2
+                return (
+                    envelope
+                    * potential_factor
+                    * np.cos(spatial_phase)
+                    * np.exp(1j * time_phase)
+                )  # * 2
             else:
-                return envelope * potential_factor * np.cos(spatial_phase) * np.cos(time_phase)  # * 2
+                return (
+                    envelope
+                    * potential_factor
+                    * np.cos(spatial_phase)
+                    * np.cos(time_phase)
+                )  # * 2
         else:
             if complex:
-                return envelope * potential_factor * np.exp(1j * (propagation_sign * spatial_phase + time_phase))
+                return (
+                    envelope
+                    * potential_factor
+                    * np.exp(1j * (propagation_sign * spatial_phase + time_phase))
+                )
             else:
-                return envelope * potential_factor * np.cos(propagation_sign * spatial_phase + time_phase)
+                return (
+                    envelope
+                    * potential_factor
+                    * np.cos(propagation_sign * spatial_phase + time_phase)
+                )
 
     elif mode == "phase":
         total_phase = propagation_sign * (other_phase - gouy_phase)
@@ -374,12 +459,19 @@ def gaussian_beam(
 
 
 def lower_image_resolution(image: np.ndarray, subsample_rate) -> np.ndarray:
-    reshaped_image = image.reshape(image.shape[0] // subsample_rate, subsample_rate, image.shape[1] // subsample_rate, subsample_rate)
+    reshaped_image = image.reshape(
+        image.shape[0] // subsample_rate,
+        subsample_rate,
+        image.shape[1] // subsample_rate,
+        subsample_rate,
+    )
     subsampled_image = reshaped_image.sum(axis=(1, 3))
     return subsampled_image
 
 
-def ASPW_propagation(U_z0: np.ndarray, dxdydz: tuple[float, ...], k: float) -> np.ndarray:
+def ASPW_propagation(
+    U_z0: np.ndarray, dxdydz: tuple[float, ...], k: float
+) -> np.ndarray:
     dx, dy, dz = dxdydz
     U_fft = np.fft.fftn(U_z0)
     k_x = np.fft.fftfreq(U_z0.shape[0], d=dx) * 2 * pi
@@ -399,7 +491,9 @@ def propagate_through_potential_slice(
     # dk = V2k(V0) - V2k(V0, averaged_potential)
     # psi_output = incoming_wave * np.exp(-1j * dk * dz)
     # KIRKLAND'S VERSION: (TWO VERSION AGREE!)
-    sigma = gamma_of_beta(beta_of_E(E0)) * M_ELECTRON * E_CHARGE / (H_BAR**2 * k_of_E(E0))
+    sigma = (
+        gamma_of_beta(beta_of_E(E0)) * M_ELECTRON * E_CHARGE / (H_BAR**2 * k_of_E(E0))
+    )
     psi_output = incoming_wave * np.exp(1j * sigma * dz * averaged_potential)
     return psi_output
 
@@ -439,7 +533,9 @@ def divide_calculation_to_batches(
     else:
         for i in range(dimensions_sizes[-1]):
             if print_progress:
-                print(f"Calculating layer {i + 1} out of {len(list_of_axes[-1])} in axis {len(list_of_axes) - 1}")
+                print(
+                    f"Calculating layer {i + 1} out of {len(list_of_axes[-1])} in axis {len(list_of_axes) - 1}"
+                )
 
             def f_s_contracted(l, **kwargs):
                 return f_s(l + [list_of_axes[-1][i]], **kwargs)[..., 0]
@@ -466,7 +562,9 @@ def find_power_for_phase(
     **kwargs,
 ):
     input_coordinate_system = CoordinateSystem(lengths=(0, 0), n_points=(1, 1))
-    input_wave = WaveFunction(E_0=E_0, psi=np.ones((1, 1)), coordinates=input_coordinate_system)
+    input_wave = WaveFunction(
+        E_0=E_0, psi=np.ones((1, 1)), coordinates=input_coordinate_system
+    )
     # Based on equation e_41 from the simulation notes:
     if mode == "analytical":
         x_1 = starting_power
@@ -475,7 +573,9 @@ def find_power_for_phase(
         elif cavity_type == "analytical":
             C_1 = CavityAnalyticalPropagator(power_1=x_1, **kwargs)
         else:
-            raise ValueError(f"Unknown cavity type {cavity_type}. must be either 'numerical' or 'analytical'")
+            raise ValueError(
+                f"Unknown cavity type {cavity_type}. must be either 'numerical' or 'analytical'"
+            )
         mask_1 = C_1.phase_and_amplitude_mask(input_wave=input_wave)
         y_1 = np.angle(mask_1[0, 0])
         y_2_supposed = -desired_phase
@@ -489,7 +589,9 @@ def find_power_for_phase(
         mask_2 = C_2.phase_and_amplitude_mask(input_wave=input_wave)
         y_2_resulted = np.real(np.angle(mask_2[0, 0]))
         if print_progress:
-            print(f"for power_1 = {x_2:.1e} the resulted phase is {y_2_resulted / np.pi:.2f}pi={y_2_resulted:.2f} rads")
+            print(
+                f"for power_1 = {x_2:.1e} the resulted phase is {y_2_resulted / np.pi:.2f}pi={y_2_resulted:.2f} rads"
+            )
         return x_2
     elif mode == "numerical":
         # Brute force search:
@@ -503,12 +605,16 @@ def find_power_for_phase(
             elif cavity_type == "analytical":
                 C = CavityAnalyticalPropagator(power_1=P, **kwargs)
             else:
-                raise ValueError("cavity_type must be either 'numerical' or 'analytical'")
+                raise ValueError(
+                    "cavity_type must be either 'numerical' or 'analytical'"
+                )
             phase_and_amplitude_mask = C.phase_and_amplitude_mask(input_wave=input_wave)
             resulted_phase = np.real(np.angle(phase_and_amplitude_mask[0, 0]))
             phases.append(resulted_phase)
             if print_progress:
-                print(f"For P={P:.2e} the resulted phase is {resulted_phase / np.pi:.2f}pi={resulted_phase:.2f} rads")
+                print(
+                    f"For P={P:.2e} the resulted phase is {resulted_phase / np.pi:.2f}pi={resulted_phase:.2f} rads"
+                )
             Es.append(P)
             P *= 1.01
 
@@ -520,7 +626,9 @@ def find_power_for_phase(
             plt.title("phase of x=y=0 as a function of power_1")
             plt.show()
         if print_progress:
-            print(f"For P={Es[-1]:.2e} the phase is phi_original_function={resulted_phase:.2f}")
+            print(
+                f"For P={Es[-1]:.2e} the phase is phi_original_function={resulted_phase:.2f}"
+            )
         return Es[-1]
 
 
@@ -531,10 +639,18 @@ def find_power_for_phase(
 class CoordinateSystem:
     def __init__(
         self,
-        axes: Optional[Tuple[np.ndarray, ...]] = None,  # The axes of the wave function, assumed to be evenly spaced
-        lengths: Optional[Tuple[int, ...]] = None,  # the lengths of the sample in the x, y directions
-        n_points: Optional[Tuple[int, ...]] = None,  # the number of points in the x, y directions
-        dxdydz: Optional[Tuple[float, ...]] = None,  # the step size in the x, y directions
+        axes: Optional[
+            Tuple[np.ndarray, ...]
+        ] = None,  # The axes of the wave function, assumed to be evenly spaced
+        lengths: Optional[
+            Tuple[int, ...]
+        ] = None,  # the lengths of the sample in the x, y directions
+        n_points: Optional[
+            Tuple[int, ...]
+        ] = None,  # the number of points in the x, y directions
+        dxdydz: Optional[
+            Tuple[float, ...]
+        ] = None,  # the step size in the x, y directions
     ):
 
         if axes is not None:
@@ -545,11 +661,13 @@ class CoordinateSystem:
                 raise (ValueError("You can and only specify one out of n and dxdydz"))
             elif n_points is not None:
                 self.axes: Tuple[np.ndarray, ...] = tuple(
-                    np.linspace(-lengths[i] / 2, lengths[i] / 2, n_points[i]) for i in range(dim)
+                    np.linspace(-lengths[i] / 2, lengths[i] / 2, n_points[i])
+                    for i in range(dim)
                 )
             elif dxdydz is not None:
                 self.axes: Tuple[np.ndarray, ...] = tuple(
-                    np.arange(-lengths[i] / 2, lengths[i] / 2, dxdydz[i]) for i in range(dim)
+                    np.arange(-lengths[i] / 2, lengths[i] / 2, dxdydz[i])
+                    for i in range(dim)
                 )
             else:
                 raise (ValueError("You must specify either n or dxdydz"))
@@ -566,7 +684,11 @@ class CoordinateSystem:
                 for i in range(dim)
             )
         else:
-            raise (ValueError("You must specify either axes or lengths or both dxdydz and n_points"))
+            raise (
+                ValueError(
+                    "You must specify either axes or lengths or both dxdydz and n_points"
+                )
+            )
 
     @property
     def dim(self) -> int:
@@ -650,9 +772,15 @@ class CoordinateSystem:
                     centered = False
             else:
                 if len(axis) % 2:
-                    mid_value, mid_adjacent_value = axis[axis.size // 2], axis[axis.size // 2 + 1]
+                    mid_value, mid_adjacent_value = (
+                        axis[axis.size // 2],
+                        axis[axis.size // 2 + 1],
+                    )
                 else:
-                    mid_value, mid_adjacent_value = axis[axis.size // 2], axis[axis.size // 2 - 1]
+                    mid_value, mid_adjacent_value = (
+                        axis[axis.size // 2],
+                        axis[axis.size // 2 - 1],
+                    )
                 if np.abs(mid_value) > np.abs(mid_value + mid_adjacent_value) * 1e-10:
                     # and np.abs(mid_value + mid_adjacent_value) > np.abs(mid_value) * 1e-10 # (This second condition is
                     # for the case where the array is centered around 0 but like so: ..., -3dx/2, -dx/2, dx/2, 3dx/2, ...
@@ -671,9 +799,15 @@ class WaveFunction(SpatialFunction):
     def __init__(
         self,
         E_0: float,  # Energy of the particle in Joules
-        psi: Optional[np.ndarray] = None,  # The input wave function in one z=const plane
-        coordinates: Optional[CoordinateSystem] = None,  # The coordinate system of the input wave
-        mrc_file_path: Optional[str] = None,  # Path to a .mrc file containing the wave function
+        psi: Optional[
+            np.ndarray
+        ] = None,  # The input wave function in one z=const plane
+        coordinates: Optional[
+            CoordinateSystem
+        ] = None,  # The coordinate system of the input wave
+        mrc_file_path: Optional[
+            str
+        ] = None,  # Path to a .mrc file containing the wave function
     ):
         if psi is not None and coordinates is not None:
             super().__init__(psi, coordinates)
@@ -682,14 +816,22 @@ class WaveFunction(SpatialFunction):
             if len(mrc_file.data.shape) == 3:
                 psi = mrc_file.data[:, :, -1]
                 if mrc_file.data.shape[2] > 1:
-                    warn("3D data is not supported in a wave function, taking last slice only")
+                    warn(
+                        "3D data is not supported in a wave function, taking last slice only"
+                    )
             else:
                 psi = mrc_file.data
-            C = CoordinateSystem(dxdydz=np.array(mrc_file.voxel_size.tolist()[0:2]) * 1e-10,
-                                 n_points=mrc_file.header[['nx', 'ny']].tolist())
+            C = CoordinateSystem(
+                dxdydz=np.array(mrc_file.voxel_size.tolist()[0:2]) * 1e-10,
+                n_points=mrc_file.header[["nx", "ny"]].tolist(),
+            )
             super().__init__(psi, C)
         else:
-            raise (ValueError("Either psi and coordinates or mrc_file_path must be provided"))
+            raise (
+                ValueError(
+                    "Either psi and coordinates or mrc_file_path must be provided"
+                )
+            )
         self.E_0 = E_0
 
     @property
@@ -750,28 +892,40 @@ class Microscope:
         self.print_progress = print_progress
         self.n_electrons_per_square_angstrom = n_electrons_per_square_angstrom
 
-    def take_a_picture(self, input_wave: WaveFunction, add_shot_noise=True) -> SpatialFunction:
+    def take_a_picture(
+        self, input_wave: WaveFunction, add_shot_noise=True
+    ) -> SpatialFunction:
         output_wave = self.propagate(input_wave)
         image = self.expose_camera(output_wave, add_shot_noise=add_shot_noise)
         return image
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         self.propagation_steps = []
-        input_wave_psi_normalized = input_wave.psi / np.sqrt(np.sum(np.abs(input_wave.psi) ** 2))
+        input_wave_psi_normalized = input_wave.psi / np.sqrt(
+            np.sum(np.abs(input_wave.psi) ** 2)
+        )
         input_wave_psi_normalized *= np.sqrt(
-                self.n_electrons_per_square_angstrom * 1e20 * input_wave.coordinates.lengths[0] *
-                input_wave.coordinates.lengths[1]
-            )
-        input_wave = WaveFunction(input_wave.E_0, input_wave_psi_normalized, input_wave.coordinates)  # Normalized
+            self.n_electrons_per_square_angstrom
+            * 1e20
+            * input_wave.coordinates.lengths[0]
+            * input_wave.coordinates.lengths[1]
+        )
+        input_wave = WaveFunction(
+            input_wave.E_0, input_wave_psi_normalized, input_wave.coordinates
+        )  # Normalized
         for propagator in self.propagators:
             if self.print_progress:
                 print(f"Propagating with {propagator.__class__}")
             output_wave = propagator.propagate(input_wave)
-            self.propagation_steps.append(PropagationStep(input_wave, output_wave, propagator))
+            self.propagation_steps.append(
+                PropagationStep(input_wave, output_wave, propagator)
+            )
             input_wave = output_wave
         return input_wave
 
-    def expose_camera(self, output_wave: Optional[WaveFunction] = None, add_shot_noise=True) -> SpatialFunction:
+    def expose_camera(
+        self, output_wave: Optional[WaveFunction] = None, add_shot_noise=True
+    ) -> SpatialFunction:
         if len(self.propagation_steps) == 0:
             raise ValueError("You must propagate the wave first")
 
@@ -782,7 +936,9 @@ class Microscope:
         # expected_electrons_per_pixel = output_wave_intensity * (
         #     self.n_electrons_per_square_angstrom * output_wave.psi.size
         # )
-        if np.max(output_wave_intensity) > 100000000 or add_shot_noise is False:  # ARBITRARY - this prevents overflow
+        if (
+            np.max(output_wave_intensity) > 100000000 or add_shot_noise is False
+        ):  # ARBITRARY - this prevents overflow
             # of the poisson distribution
             output_wave_intensity_shot_noise = output_wave_intensity
         else:
@@ -829,11 +985,17 @@ class SamplePropagator(Propagator):
         # elif path_to_sample_file is not None:
         #     self.sample: SpatialFunction = np.load(path_to_sample_file)
         elif dummy_potential is not None:
-            self.generate_dummy_potential(dummy_potential, coordinates_for_dummy_potential)
+            self.generate_dummy_potential(
+                dummy_potential, coordinates_for_dummy_potential
+            )
         else:
-            raise ValueError("You must specify either a sample or a path to a potential file or a dummy potential")
+            raise ValueError(
+                "You must specify either a sample or a path to a potential file or a dummy potential"
+            )
 
-    def generate_dummy_potential(self, potential_type: str, coordinates_for_dummy_potential: CoordinateSystem):
+    def generate_dummy_potential(
+        self, potential_type: str, coordinates_for_dummy_potential: CoordinateSystem
+    ):
         c = coordinates_for_dummy_potential  # just abbreviation for the name
         if len(c.grids) == 2:
             X, Y = c.grids
@@ -865,19 +1027,29 @@ class SamplePropagator(Propagator):
             )
         elif potential_type == "a letter":
             potential_2d = np.load("example_letter.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
+            potential = (
+                np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10
+            )  # ARBITRARY ~ 0.1 radians
         elif potential_type == "letters":
             potential_2d = np.load("data\\static data\\letters_1024.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
+            potential = (
+                np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10
+            )  # ARBITRARY ~ 0.1 radians
         elif potential_type == "letters_256":
             potential_2d = np.load("data\\static data\\letters_256.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
+            potential = (
+                np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10
+            )  # ARBITRARY ~ 0.1 radians
         elif potential_type == "letters_128":
             potential_2d = np.load("data\\static data\\letters_128.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
+            potential = (
+                np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10
+            )  # ARBITRARY ~ 0.1 radians
         elif potential_type == "letters_64":
             potential_2d = np.load("data\\static data\\letters_64.npy")
-            potential = np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10  # ARBITRARY ~ 0.1 radians
+            potential = (
+                np.tile(potential_2d[:, :, np.newaxis], (1, 1, c.n_points[2])) * 10
+            )  # ARBITRARY ~ 0.1 radians
         else:
             raise NotImplementedError(
                 f"Potential {potential_type} is not implemented, enter 'one gaussian' or "
@@ -888,7 +1060,9 @@ class SamplePropagator(Propagator):
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         output_wave = input_wave.psi.copy()
         for i in range(self.sample.coordinates.n_points[2]):
-            output_wave = ASPW_propagation(output_wave, self.sample.coordinates.dxdydz, k_of_E(input_wave.E_0))
+            output_wave = ASPW_propagation(
+                output_wave, self.sample.coordinates.dxdydz, k_of_E(input_wave.E_0)
+            )
             output_wave = propagate_through_potential_slice(
                 output_wave,
                 self.sample.values[:, :, i],
@@ -901,7 +1075,11 @@ class SamplePropagator(Propagator):
         if layer is None:
             plt.imshow(np.sum(self.sample.values, axis=2))
         elif isinstance(layer, float):
-            plt.imshow(self.sample.values[:, :, int(np.round(self.sample.values.shape[2] * layer))])
+            plt.imshow(
+                self.sample.values[
+                    :, :, int(np.round(self.sample.values.shape[2] * layer))
+                ]
+            )
         elif isinstance(layer, int):
             plt.imshow(self.sample.values[:, :, layer])
         plt.show()
@@ -922,8 +1100,11 @@ class DummyPhaseMask(Propagator):
         self.mask_attenuation: Optional[float] = mask_attenuation
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
-        return WaveFunction(input_wave.E_0, input_wave.psi * self.generate_dummy_potential(input_wave),
-                            input_wave.coordinates)
+        return WaveFunction(
+            input_wave.E_0,
+            input_wave.psi * self.generate_dummy_potential(input_wave),
+            input_wave.coordinates,
+        )
 
     def generate_dummy_potential(self, input_wave: WaveFunction) -> np.ndarray:
         if self.phase_mask is not None:
@@ -949,10 +1130,14 @@ class LorentzNRotationPropagator(Propagator):
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         X = input_wave.coordinates.X_grid
-        phase_factor = np.exp(1j * (input_wave.E_0 / H_BAR * self.beta / C_LIGHT + np.sin(self.theta)) * X)
+        phase_factor = np.exp(
+            1j * (input_wave.E_0 / H_BAR * self.beta / C_LIGHT + np.sin(self.theta)) * X
+        )
         output_psi = input_wave.psi * phase_factor
         output_x_axis = input_wave.coordinates.x_axis / gamma_of_beta(self.beta)
-        output_coordinates = CoordinateSystem((output_x_axis, input_wave.coordinates.y_axis))
+        output_coordinates = CoordinateSystem(
+            (output_x_axis, input_wave.coordinates.y_axis)
+        )
         return WaveFunction(input_wave.E_0, output_psi, output_coordinates)
 
 
@@ -963,8 +1148,12 @@ class LensPropagator(Propagator):
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         psi_FFT = np.fft.fftn(input_wave.psi, norm="ortho")
-        fft_freq_x = np.fft.fftfreq(input_wave.psi.shape[0], input_wave.coordinates.dxdydz[0])
-        fft_freq_y = np.fft.fftfreq(input_wave.psi.shape[1], input_wave.coordinates.dxdydz[1])
+        fft_freq_x = np.fft.fftfreq(
+            input_wave.psi.shape[0], input_wave.coordinates.dxdydz[0]
+        )
+        fft_freq_y = np.fft.fftfreq(
+            input_wave.psi.shape[1], input_wave.coordinates.dxdydz[1]
+        )
         fft_freq_x = np.fft.fftshift(fft_freq_x)
         fft_freq_y = np.fft.fftshift(fft_freq_y)
 
@@ -998,13 +1187,21 @@ class AberrationsPropagator(Propagator):
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
         psi_FFT = np.fft.fftn(input_wave.psi, norm="ortho")
-        fft_freq_x = np.fft.fftfreq(input_wave.psi.shape[0], input_wave.coordinates.dx)  # this is f and not k
-        fft_freq_y = np.fft.fftfreq(input_wave.psi.shape[1], input_wave.coordinates.dy)  # this is f and not k
-        fft_freq_x, fft_freq_y = np.fft.fftshift(fft_freq_x), np.fft.fftshift(fft_freq_y)
+        fft_freq_x = np.fft.fftfreq(
+            input_wave.psi.shape[0], input_wave.coordinates.dx
+        )  # this is f and not k
+        fft_freq_y = np.fft.fftfreq(
+            input_wave.psi.shape[1], input_wave.coordinates.dy
+        )  # this is f and not k
+        fft_freq_x, fft_freq_y = np.fft.fftshift(fft_freq_x), np.fft.fftshift(
+            fft_freq_y
+        )
         aberrations_mask = self.aberrations_mask(fft_freq_x, fft_freq_y, input_wave.E_0)
         psi_FFT_aberrated = psi_FFT * aberrations_mask
         psi_aberrated = np.fft.ifftn(psi_FFT_aberrated, norm="ortho")
-        output_wave = WaveFunction(input_wave.E_0, psi_aberrated, input_wave.coordinates)
+        output_wave = WaveFunction(
+            input_wave.E_0, psi_aberrated, input_wave.coordinates
+        )
         return output_wave
 
     def aberrations_mask(self, f_x: np.array, f_y: np.array, E0: float):
@@ -1034,7 +1231,9 @@ class CavityPropagator(Propagator):
         NA_1: float = 0.1,
         NA_2: Optional[float] = -1,
         theta_polarization: float = np.pi / 2,
-        alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
+        alpha_cavity: Optional[
+            float
+        ] = None,  # tilt angle of the lattice (of the cavity)
         alpha_cavity_deviation: float = 0,
         ring_cavity: bool = False,
         ignore_past_files: bool = False,
@@ -1058,10 +1257,14 @@ class CavityPropagator(Propagator):
             if l_2 is None:
                 self.NA_2 = None
             else:
-                self.NA_2 = NA_1 * np.sqrt(self.l_2 / self.l_1)  # From equation "NA ratios" in the documentation file.
+                self.NA_2 = NA_1 * np.sqrt(
+                    self.l_2 / self.l_1
+                )  # From equation "NA ratios" in the documentation file.
         else:
             self.NA_2 = NA_2
-        self.alpha_cavity = alpha_cavity  # cavity angle with respect to microscope's x-axis. positive
+        self.alpha_cavity = (
+            alpha_cavity  # cavity angle with respect to microscope's x-axis. positive
+        )
         # # number means the part of the cavity in the positive x direction is tilted downwards toward the positive z
         # direction.
         self.theta_polarization = theta_polarization  # polarization angle of the laser
@@ -1070,14 +1273,18 @@ class CavityPropagator(Propagator):
         self.alpha_cavity_deviation = alpha_cavity_deviation
 
     def propagate(self, input_wave: WaveFunction) -> WaveFunction:
-        phase_and_amplitude_mask = self.load_or_calculate_phase_and_amplitude_mask(input_wave)
+        phase_and_amplitude_mask = self.load_or_calculate_phase_and_amplitude_mask(
+            input_wave
+        )
         output_wave = input_wave.psi * phase_and_amplitude_mask
         return WaveFunction(input_wave.E_0, output_wave, input_wave.coordinates)
 
     def load_or_calculate_phase_and_amplitude_mask(self, input_wave: WaveFunction):
         raise NotImplementedError
 
-    def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results=False) -> np.array:
+    def phase_and_amplitude_mask(
+        self, input_wave: WaveFunction, save_results=False
+    ) -> np.array:
         raise NotImplementedError
 
     def setup_to_path(self, input_wave: WaveFunction) -> np.array:
@@ -1087,12 +1294,18 @@ class CavityPropagator(Propagator):
         raise NotImplementedError
 
     def NA_lorentz_transform(self, NA):
-        return np.sin(np.arctan(np.tan(np.arcsin(NA))) / gamma_of_beta(self.beta_lattice))
+        return np.sin(
+            np.arctan(np.tan(np.arcsin(NA))) / gamma_of_beta(self.beta_lattice)
+        )
 
     @property
     def E_1(self):
         E_1_moving_wave = np.sqrt(
-            4 * self.power_1 / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_1**2)  # Based on equation e_44
+            4
+            * self.power_1
+            / (
+                pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_1**2
+            )  # Based on equation e_44
         )  # can also be written as:
         # np.sqrt(np.pi * self.power_1 / (C_LIGHT * EPSILON_ELECTRICITY)) * (2 * self.NA_1 / self.l_1)
         if self.ring_cavity:
@@ -1105,7 +1318,11 @@ class CavityPropagator(Propagator):
         if self.power_2 is None:
             return None
         else:
-            E_2_moving_wave = np.sqrt(self.power_2 * 4 / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_2**2))
+            E_2_moving_wave = np.sqrt(
+                self.power_2
+                * 4
+                / (pi * C_LIGHT * EPSILON_ELECTRICITY * self.w_0_2**2)
+            )
             if self.ring_cavity:
                 return E_2_moving_wave
             else:
@@ -1161,9 +1378,14 @@ class CavityPropagator(Propagator):
         else:
             return max(self.l_1, self.l_2)
 
-    def beta_electron2alpha_cavity(self, beta_electron: Optional[float] = None) -> float:
+    def beta_electron2alpha_cavity(
+        self, beta_electron: Optional[float] = None
+    ) -> float:
         if beta_electron is not None and self.alpha_cavity is None:
-            return np.arcsin(self.beta_lattice / beta_electron) + self.alpha_cavity_deviation
+            return (
+                np.arcsin(self.beta_lattice / beta_electron)
+                + self.alpha_cavity_deviation
+            )
         elif beta_electron is None and self.alpha_cavity is None:
             raise ValueError("Either beta_electron or alpha_cavity must be given")
         else:
@@ -1176,11 +1398,11 @@ class CavityPropagator(Propagator):
     def update_phase_masks_df(self, input_wave):
         global PHASE_MASKS_DF
         setup_dict = self.setup_to_dict(input_wave=input_wave)
-        setup_dict['file_path'] = self.setup_to_path(input_wave=input_wave)
-        setup_dict['time_calculated'] = pd.Timestamp.now()
+        setup_dict["file_path"] = self.setup_to_path(input_wave=input_wave)
+        setup_dict["time_calculated"] = pd.Timestamp.now()
         # add the setup_dict as a row to PHASE_MASKS_DF (PHASE_MASKS_DF is a gloabal variable and already exists):
         PHASE_MASKS_DF.loc[len(PHASE_MASKS_DF)] = setup_dict
-        PHASE_MASKS_DF.to_csv(r'data/phase masks/phase_masks.csv', index=False)
+        PHASE_MASKS_DF.to_csv(r"data/phase masks/phase_masks.csv", index=False)
 
 
 class CavityAnalyticalPropagator(CavityPropagator):
@@ -1193,7 +1415,9 @@ class CavityAnalyticalPropagator(CavityPropagator):
         NA_1: float = 0.1,
         NA_2: Optional[float] = -1,
         theta_polarization: float = np.pi / 2,
-        alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
+        alpha_cavity: Optional[
+            float
+        ] = None,  # tilt angle of the lattice (of the cavity)
         alpha_cavity_deviation: float = 0,
         ring_cavity: bool = True,
         starting_P_in_auto_P_search: float = 1e3,
@@ -1283,18 +1507,26 @@ class CavityAnalyticalPropagator(CavityPropagator):
             phase_and_amplitude_mask = np.load(setup_file_path)
             return phase_and_amplitude_mask
         else:
-            phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
+            phase_and_amplitude_mask = self.phase_and_amplitude_mask(
+                input_wave=input_wave
+            )
             np.save(setup_file_path, phase_and_amplitude_mask)
             return phase_and_amplitude_mask
 
-    def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results: bool = False):
+    def phase_and_amplitude_mask(
+        self, input_wave: WaveFunction, save_results: bool = False
+    ):
         phi_0 = self.phi_0(input_wave)
-        constant_phase_shift = self.constant_phase_shift(phi_0=phi_0, input_wave=input_wave)
+        constant_phase_shift = self.constant_phase_shift(
+            phi_0=phi_0, input_wave=input_wave
+        )
         if self.E_2 is not None:  # For the case of a double laser:
             attenuation_factor = self.attenuation_factor(input_wave, phi_0)
         else:
             attenuation_factor = 1
-        phase_and_amplitude_mask = attenuation_factor * np.exp(-1j * constant_phase_shift)
+        phase_and_amplitude_mask = attenuation_factor * np.exp(
+            -1j * constant_phase_shift
+        )
         if save_results:
             np.save(self.setup_to_path(input_wave), phase_and_amplitude_mask)
             self.update_phase_masks_df(input_wave)
@@ -1308,7 +1540,9 @@ class CavityAnalyticalPropagator(CavityPropagator):
     ):
         if phi_0 is None:
             phi_0 = self.phi_0(input_wave)
-        if self.E_2 is not None:  # For the case of a double laser, explanation in equation eq:e_32 in my readme file
+        if (
+            self.E_2 is not None
+        ):  # For the case of a double laser, explanation in equation eq:e_32 in my readme file
             if self.ring_cavity:
                 return phi_0 * 1 / 2
             else:
@@ -1329,7 +1563,9 @@ class CavityAnalyticalPropagator(CavityPropagator):
         x_R = x_R_gaussian(self.w_0_lattice_frame, self.lambda_laser)
         w_x = w_x_gaussian(w_0=self.w_0_lattice_frame, x=x_lattice, x_R=x_R)
         # The next two lines are based on equation e_1 in my readme file
-        beta_electron_in_lattice_frame = self.beta_electron_in_lattice_frame(input_wave.beta)
+        beta_electron_in_lattice_frame = self.beta_electron_in_lattice_frame(
+            input_wave.beta
+        )
         constant_coefficients = (
             self.power_1
             * self.lambda_laser**2
@@ -1351,7 +1587,9 @@ class CavityAnalyticalPropagator(CavityPropagator):
         phi_0 = constant_coefficients * spatial_envelope
         return phi_0
 
-    def attenuation_factor(self, input_wave: WaveFunction, phi_0: Optional[np.ndarray] = None):
+    def attenuation_factor(
+        self, input_wave: WaveFunction, phi_0: Optional[np.ndarray] = None
+    ):
         if phi_0 is None:
             phi_0 = self.phi_0(input_wave)
         return jv(0, (1 / 2) * phi_0 * self.rho(input_wave.beta))
@@ -1363,7 +1601,9 @@ class CavityAnalyticalPropagator(CavityPropagator):
         alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
         beta_lattice = self.beta_lattice
         numerator = beta_electron * np.cos(alpha_cavity)
-        denominator = gamma_of_beta(beta_lattice) * (1 - beta_electron * np.sin(alpha_cavity) * beta_lattice)
+        denominator = gamma_of_beta(beta_lattice) * (
+            1 - beta_electron * np.sin(alpha_cavity) * beta_lattice
+        )
         transformed_z_velocity = numerator / denominator
         return transformed_z_velocity
 
@@ -1387,8 +1627,8 @@ class CavityAnalyticalPropagator(CavityPropagator):
             f"DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}"
         )
 
-        hashed_str = md5(setup_str.encode('utf-8')).hexdigest()
-        path = f'data/phase masks/{hashed_str}.npy'
+        hashed_str = md5(setup_str.encode("utf-8")).hexdigest()
+        path = f"data/phase masks/{hashed_str}.npy"
 
         return path
 
@@ -1405,23 +1645,27 @@ class CavityAnalyticalPropagator(CavityPropagator):
             n_frequencies = 2
 
         setup_dict = {
-            'method': 'Numerical',
-            'n_frequencies': n_frequencies,
-            'lambda_laser_1_nm': self.l_1 * 1e9,
-            'lambda_laser_2_nm': l_2,
-            'power_1': self.power_1,
-            'power_2': power_2,
-            'NA_1': self.NA_1,
-            'NA_2': NA_2,
-            'alpha_tilt': self.beta_electron2alpha_cavity(input_wave.beta) / 2 * np.pi * 360,
-            'theta_polarization': self.theta_polarization,
-            'E_0_electron_keV': input_wave.E_0,
-            'ring_cavity': self.ring_cavity,
-            'Nx': input_wave.coordinates.x_axis.size,
-            'Ny': input_wave.coordinates.y_axis.size,
-            'DX': signif(input_wave.coordinates.limits[1]),
-            'DY': signif(input_wave.coordinates.limits[3]),
-            'time_calculated': pd.Timestamp.now()}
+            "method": "Numerical",
+            "n_frequencies": n_frequencies,
+            "lambda_laser_1_nm": self.l_1 * 1e9,
+            "lambda_laser_2_nm": l_2,
+            "power_1": self.power_1,
+            "power_2": power_2,
+            "NA_1": self.NA_1,
+            "NA_2": NA_2,
+            "alpha_tilt": self.beta_electron2alpha_cavity(input_wave.beta)
+            / 2
+            * np.pi
+            * 360,
+            "theta_polarization": self.theta_polarization,
+            "E_0_electron_keV": input_wave.E_0,
+            "ring_cavity": self.ring_cavity,
+            "Nx": input_wave.coordinates.x_axis.size,
+            "Ny": input_wave.coordinates.y_axis.size,
+            "DX": signif(input_wave.coordinates.limits[1]),
+            "DY": signif(input_wave.coordinates.limits[3]),
+            "time_calculated": pd.Timestamp.now(),
+        }
         return setup_dict
 
 
@@ -1435,7 +1679,9 @@ class CavityNumericalPropagator(CavityPropagator):
         NA_1: float = 0.1,
         NA_2: Optional[float] = -1,
         theta_polarization: float = np.pi / 2,
-        alpha_cavity: Optional[float] = None,  # tilt angle of the lattice (of the cavity)
+        alpha_cavity: Optional[
+            float
+        ] = None,  # tilt angle of the lattice (of the cavity)
         alpha_cavity_deviation: float = 0,
         ring_cavity: bool = True,
         ignore_past_files: bool = False,
@@ -1494,13 +1740,18 @@ class CavityNumericalPropagator(CavityPropagator):
         else:
             if t is None:
                 delta_w = np.abs(w_of_l(self.l_1) - w_of_l(self.l_2))
-                self.t = np.array([0, pi / (2 * delta_w), pi / delta_w], dtype=np.float64)
+                self.t = np.array(
+                    [0, pi / (2 * delta_w), pi / delta_w], dtype=np.float64
+                )
             else:
                 self.t = t.astype(np.float64)
         self.print_progress = print_progress
         self.debug_mode = debug_mode
         if n_z is None:
-            if np.abs(theta_polarization - np.pi/2) < 1e-10 and self.alpha_cavity == 0:
+            if (
+                np.abs(theta_polarization - np.pi / 2) < 1e-10
+                and self.alpha_cavity == 0
+            ):
                 # The gauge function, which is calculated at each point as an integral of the field, requries
                 # many points of integration for an accurate result. When there is no A_z componend, which is the case
                 # for theta_polarization=pi/2 and no tilt of the cavity the gauge function is zero,
@@ -1511,11 +1762,13 @@ class CavityNumericalPropagator(CavityPropagator):
         else:
             self.n_z = n_z
 
-        self.single_laser_propagation_direction_override = l_1_propagation_direction_override
+        self.single_laser_propagation_direction_override = (
+            l_1_propagation_direction_override
+        )
 
-    def load_or_calculate_phase_and_amplitude_mask(self,
-                                                   input_wave: WaveFunction,
-                                                   ignore_past_files: Optional[bool] = None):
+    def load_or_calculate_phase_and_amplitude_mask(
+        self, input_wave: WaveFunction, ignore_past_files: Optional[bool] = None
+    ):
         if ignore_past_files is None:
             ignore_past_files = self.ignore_past_files
 
@@ -1523,24 +1776,63 @@ class CavityNumericalPropagator(CavityPropagator):
 
         # If it exists exactly as is:
         if os.path.isfile(setup_path) and not ignore_past_files:
-            phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(setup_path)
+            phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(
+                setup_path
+            )
 
         # For the case it exists but with a different amplitude:
         else:
             setup_dict = self.setup_to_dict(input_wave)
             setup_series = pd.Series(setup_dict)
-            bolean_filter = [PHASE_MASKS_DF.loc[
-                i, ['method', 'n_frequencies', 'lambda_laser_1_nm', 'lambda_laser_2_nm', 'NA_1', 'NA_2',
-                    'alpha_tilt_rads', 'theta_polarization_rads', 'E_0_electron_keV', 'ring_cavity', 'Nx', 'Ny', 'N_t', 'N_z',
-                    'DX', 'DY', ]].fillna('kalimtzo').equals(
-                setup_series.loc[
-                    ['method', 'n_frequencies', 'lambda_laser_1_nm', 'lambda_laser_2_nm', 'NA_1', 'NA_2',
-                     'alpha_tilt_rads', 'theta_polarization_rads', 'E_0_electron_keV', 'ring_cavity', 'Nx', 'Ny', 'N_t', 'N_z',
-                     'DX', 'DY', ]].fillna('kalimtzo'))
-                for i in range(len(PHASE_MASKS_DF))]
+            bolean_filter = [
+                PHASE_MASKS_DF.loc[
+                    i,
+                    [
+                        "method",
+                        "n_frequencies",
+                        "lambda_laser_1_nm",
+                        "lambda_laser_2_nm",
+                        "NA_1",
+                        "NA_2",
+                        "alpha_tilt_rads",
+                        "theta_polarization_rads",
+                        "E_0_electron_keV",
+                        "ring_cavity",
+                        "Nx",
+                        "Ny",
+                        "N_t",
+                        "N_z",
+                        "DX",
+                        "DY",
+                    ],
+                ]
+                .fillna("kalimtzo")
+                .equals(
+                    setup_series.loc[
+                        [
+                            "method",
+                            "n_frequencies",
+                            "lambda_laser_1_nm",
+                            "lambda_laser_2_nm",
+                            "NA_1",
+                            "NA_2",
+                            "alpha_tilt_rads",
+                            "theta_polarization_rads",
+                            "E_0_electron_keV",
+                            "ring_cavity",
+                            "Nx",
+                            "Ny",
+                            "N_t",
+                            "N_z",
+                            "DX",
+                            "DY",
+                        ]
+                    ].fillna("kalimtzo")
+                )
+                for i in range(len(PHASE_MASKS_DF))
+            ]
 
             filtered_DF = PHASE_MASKS_DF.loc[bolean_filter]
-
 
             # power_1_pattern = "P1(.*?)_"
             # power_2_pattern = "P2(.*?)_"
@@ -1554,41 +1846,59 @@ class CavityNumericalPropagator(CavityPropagator):
 
             # If it does indeed exist in a different amplitude:
             if len(filtered_DF) > 0 and not self.ignore_past_files:
-                first_file = filtered_DF.iloc[0, :]  # There should be only one file with the same
+                first_file = filtered_DF.iloc[
+                    0, :
+                ]  # There should be only one file with the same
                 # setup, and if there are more, then they are equivalent, so anyway we can take the first one.
-                power_1_original = first_file.loc['power_1']
-                power_2_original = first_file.loc['power_2']
+                power_1_original = first_file.loc["power_1"]
+                power_2_original = first_file.loc["power_2"]
                 if np.isnan(power_2_original):
                     phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(
-                        setup_file_path=first_file.loc['file_path'],
+                        setup_file_path=first_file.loc["file_path"],
                         powers_ratio=self.power_1 / power_1_original,
                     )
                     return phase_and_amplitude_mask
                 else:
                     power_2_original = float(power_2_original)
-                    power_1_ratio, power_2_ratio = self.power_1 / power_1_original, self.power_2 / power_2_original
+                    power_1_ratio, power_2_ratio = (
+                        self.power_1 / power_1_original,
+                        self.power_2 / power_2_original,
+                    )
 
                     # If the two frequencies don't have the same ratio to the original ones or the original calculation
                     # was done using a Fourier Transform then we can't use it:
                     if self.power_1 == 0:
                         # I am not sure why did I write this, as power_1 is never zero.
-                        phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
-                    elif np.abs((power_1_ratio - power_2_ratio) / power_1_ratio) > 1e-2 or len(self.t) != 3:
-                        phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave)
+                        phase_and_amplitude_mask = self.phase_and_amplitude_mask(
+                            input_wave=input_wave
+                        )
+                    elif (
+                        np.abs((power_1_ratio - power_2_ratio) / power_1_ratio) > 1e-2
+                        or len(self.t) != 3
+                    ):
+                        phase_and_amplitude_mask = self.phase_and_amplitude_mask(
+                            input_wave=input_wave
+                        )
 
                     # If the original setup had different amplitudes but the same setup then we can use the same phase
                     # mask and just adjust the phase and attenuation factor. this is true due to the derivation in
                     # equation e_42 in the simulation notes.
                     else:
-                        phase_and_amplitude_mask = self.setup_to_phase_and_amplitude_mask(
-                            setup_file_path=first_file.loc['file_path'],
-                            powers_ratio=self.power_1 / power_1_original,
+                        phase_and_amplitude_mask = (
+                            self.setup_to_phase_and_amplitude_mask(
+                                setup_file_path=first_file.loc["file_path"],
+                                powers_ratio=self.power_1 / power_1_original,
+                            )
                         )
             else:
-                phase_and_amplitude_mask = self.phase_and_amplitude_mask(input_wave=input_wave, save_results=True)
+                phase_and_amplitude_mask = self.phase_and_amplitude_mask(
+                    input_wave=input_wave, save_results=True
+                )
         return phase_and_amplitude_mask
 
-    def setup_to_phase_and_amplitude_mask(self, setup_file_path: str, powers_ratio: float = 1):
+    def setup_to_phase_and_amplitude_mask(
+        self, setup_file_path: str, powers_ratio: float = 1
+    ):
 
         if self.power_2 is None:
             phi_values = np.load(setup_file_path)
@@ -1597,10 +1907,14 @@ class CavityNumericalPropagator(CavityPropagator):
             phi_and_C_values = np.load(setup_file_path)
             phi_const_original = phi_and_C_values[:, :, 0]
             C_original = phi_and_C_values[:, :, 1]
-            phase_and_amplitude_mask = np.exp(1j * phi_const_original * powers_ratio) * jv(0, C_original * powers_ratio)
+            phase_and_amplitude_mask = np.exp(
+                1j * phi_const_original * powers_ratio
+            ) * jv(0, C_original * powers_ratio)
         return phase_and_amplitude_mask
 
-    def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results: bool = True):
+    def phase_and_amplitude_mask(
+        self, input_wave: WaveFunction, save_results: bool = True
+    ):
         x = input_wave.coordinates.x_axis
         y = input_wave.coordinates.y_axis
 
@@ -1629,36 +1943,55 @@ class CavityNumericalPropagator(CavityPropagator):
                     input_wave.coordinates.y_axis[min_y_idx:second_half_first_idx],
                 )
             )
-            reduced_input_wave = WaveFunction(input_wave.E_0,
-                                              input_wave.psi[0:second_half_first_idx, min_y_idx:second_half_first_idx],
-                                              reduced_coordinates_system)
+            reduced_input_wave = WaveFunction(
+                input_wave.E_0,
+                input_wave.psi[
+                    0:second_half_first_idx, min_y_idx:second_half_first_idx
+                ],
+                reduced_coordinates_system,
+            )
             reduced_phi = self.phi(reduced_input_wave)
             total_phi = np.zeros(
-                (input_wave.coordinates.n_points[0], input_wave.coordinates.n_points[1], reduced_phi.shape[2])
+                (
+                    input_wave.coordinates.n_points[0],
+                    input_wave.coordinates.n_points[1],
+                    reduced_phi.shape[2],
+                )
             )
-            total_phi[:second_half_first_idx, min_y_idx:second_half_first_idx, :] = reduced_phi
-            total_phi[second_half_first_idx:, min_y_idx:second_half_first_idx, :] = np.flip(
-                reduced_phi[1:-1, :, :], axis=0
+            total_phi[
+                :second_half_first_idx, min_y_idx:second_half_first_idx, :
+            ] = reduced_phi
+            total_phi[
+                second_half_first_idx:, min_y_idx:second_half_first_idx, :
+            ] = np.flip(reduced_phi[1:-1, :, :], axis=0)
+            total_phi[
+                :second_half_first_idx, second_half_first_idx : len(x) - min_y_idx, :
+            ] = np.flip(reduced_phi[:, 1:-1, :], axis=1)
+            total_phi[
+                second_half_first_idx:, second_half_first_idx : len(x) - min_y_idx, :
+            ] = np.flip(reduced_phi[1:-1, 1:-1, :], axis=(0, 1))
+            phase_and_amplitude_mask = self.phase_and_amplitude_mask_quadrant(
+                input_wave, save_results, total_phi
             )
-            total_phi[:second_half_first_idx, second_half_first_idx : len(x) - min_y_idx, :] = np.flip(
-                reduced_phi[:, 1:-1, :], axis=1
-            )
-            total_phi[second_half_first_idx:, second_half_first_idx : len(x) - min_y_idx, :] = np.flip(
-                reduced_phi[1:-1, 1:-1, :], axis=(0, 1)
-            )
-            phase_and_amplitude_mask = self.phase_and_amplitude_mask_quadrant(input_wave, save_results, total_phi)
 
             return phase_and_amplitude_mask
 
     def phase_and_amplitude_mask_quadrant(
-        self, input_wave: WaveFunction, save_results: bool = True, phi: Optional[np.ndarray] = None
+        self,
+        input_wave: WaveFunction,
+        save_results: bool = True,
+        phi: Optional[np.ndarray] = None,
     ):
         if phi is None:
             phi = self.phi(input_wave)
         phase_factor = np.exp(1j * phi)
-        if self.E_2 is None:  # If there is only one mode, then the phase is constant in time and there is no amplitude
+        if (
+            self.E_2 is None
+        ):  # If there is only one mode, then the phase is constant in time and there is no amplitude
             # modulation.
-            phase_and_amplitude_mask = phase_factor[:, :, 0]  # Assumes the phase is constant in time
+            phase_and_amplitude_mask = phase_factor[
+                :, :, 0
+            ]  # Assumes the phase is constant in time
             if save_results:
                 np.save(self.setup_to_path(input_wave=input_wave), phi[:, :, 0])
                 self.update_phase_masks_df(input_wave)
@@ -1669,9 +2002,15 @@ class CavityNumericalPropagator(CavityPropagator):
                 phi_const = 1 / 2 * (phi[:, :, 0] + phi[:, :, 2])
                 varphi = np.arctan2(phi[:, :, 0] - phi_const, phi[:, :, 1] - phi_const)
                 sin_varphi = np.sin(varphi)
-                problematic_elements = np.abs(sin_varphi) < 1e-3  # This e-3 clipping value will not affect the result.
-                sin_varphi_no_small_values = np.where(problematic_elements, 1, sin_varphi)
-                cos_varphi_no_small_values = np.where(problematic_elements, np.cos(varphi), 1)
+                problematic_elements = (
+                    np.abs(sin_varphi) < 1e-3
+                )  # This e-3 clipping value will not affect the result.
+                sin_varphi_no_small_values = np.where(
+                    problematic_elements, 1, sin_varphi
+                )
+                cos_varphi_no_small_values = np.where(
+                    problematic_elements, np.cos(varphi), 1
+                )
                 C_computed_with_sin = np.where(
                     problematic_elements,
                     0,
@@ -1685,16 +2024,25 @@ class CavityNumericalPropagator(CavityPropagator):
                 C = C_computed_with_sin + C_computed_with_cos
                 phase_and_amplitude_mask = jv(0, C) * np.exp(1j * phi_const)
                 if save_results:
-                    np.save(self.setup_to_path(input_wave=input_wave), np.stack((phi_const, C), axis=2))
+                    np.save(
+                        self.setup_to_path(input_wave=input_wave),
+                        np.stack((phi_const, C), axis=2),
+                    )
                     self.update_phase_masks_df(input_wave)
             else:
                 # NOT ACCURATE UNLESS N_T IS BIG!
                 energy_bands = np.fft.fft(phase_factor, axis=-1, norm="forward")
                 phase_and_amplitude_mask = energy_bands[:, :, 0]
                 if save_results:
-                    np.save(self.setup_to_path(input_wave=input_wave), phase_and_amplitude_mask)
+                    np.save(
+                        self.setup_to_path(input_wave=input_wave),
+                        phase_and_amplitude_mask,
+                    )
         if self.debug_mode:
-            np.save("data\\debugging arrays\\phase_amplitude_mask.npy", phase_and_amplitude_mask)
+            np.save(
+                "data\\debugging arrays\\phase_amplitude_mask.npy",
+                phase_and_amplitude_mask,
+            )
         return phase_and_amplitude_mask
 
     def phi(self, input_wave: WaveFunction):
@@ -1722,12 +2070,21 @@ class CavityNumericalPropagator(CavityPropagator):
 
         return phi_values
 
-    def phi_single_batch(self, x_y_t: List[np.array], beta_electron: float, save_to_file: bool = False):
+    def phi_single_batch(
+        self, x_y_t: List[np.array], beta_electron: float, save_to_file: bool = False
+    ):
         # the axes x, y, t are in a list to be able to use the divide_calculation_to_batches function, which is
         # generalized for any sequence of axes in a list
         x, y, t = x_y_t
         phi_integrand, Z = self.phi_integrand(x, y, t, beta_electron, save_to_file)
-        prefactor = -(E_CHARGE**2) / (2 * M_ELECTRON * gamma_of_beta(beta_electron) * beta_electron * C_LIGHT * H_BAR)
+        prefactor = -(E_CHARGE**2) / (
+            2
+            * M_ELECTRON
+            * gamma_of_beta(beta_electron)
+            * beta_electron
+            * C_LIGHT
+            * H_BAR
+        )
         phi = prefactor * np.trapz(phi_integrand, x=Z, axis=0)
         return phi
 
@@ -1741,9 +2098,13 @@ class CavityNumericalPropagator(CavityPropagator):
     ):
         # WITHOUT THE PREFACTORS: this is the integrand of the integral over z of the phase shift.
         Z, X, Y, T = self.generate_coordinates_lattice(x, y, t, beta_electron)
-        A = self.rotated_gaussian_beam_A(Z=Z, X=X, Y=Y, T=T, beta_electron=beta_electron, save_to_file=save_to_file)
+        A = self.rotated_gaussian_beam_A(
+            Z=Z, X=X, Y=Y, T=T, beta_electron=beta_electron, save_to_file=save_to_file
+        )
 
-        if self.theta_polarization == np.pi / 2 and self.alpha_cavity == 0:  # No need to calculate G for the case when
+        if (
+            self.theta_polarization == np.pi / 2 and self.alpha_cavity == 0
+        ):  # No need to calculate G for the case when
             # there is no A_z component:
             grad_G = np.zeros((1, 1, 1, 1, 3))
         else:
@@ -1761,9 +2122,18 @@ class CavityNumericalPropagator(CavityPropagator):
         # Notice that the elements of grad_G are (z, x, y) and not (x, y, z).
         integrand = (
             (1 - beta_electron**2)
-            * safe_abs_square(self.potential_envelope2vector_components(A, "z", beta_electron) - grad_G[:, :, :, :, 0])
-            + safe_abs_square(self.potential_envelope2vector_components(A, "x", beta_electron) - grad_G[:, :, :, :, 1])
-            + safe_abs_square(self.potential_envelope2vector_components(A, "y", beta_electron) - grad_G[:, :, :, :, 2])
+            * safe_abs_square(
+                self.potential_envelope2vector_components(A, "z", beta_electron)
+                - grad_G[:, :, :, :, 0]
+            )
+            + safe_abs_square(
+                self.potential_envelope2vector_components(A, "x", beta_electron)
+                - grad_G[:, :, :, :, 1]
+            )
+            + safe_abs_square(
+                self.potential_envelope2vector_components(A, "y", beta_electron)
+                - grad_G[:, :, :, :, 2]
+            )
         )
 
         if save_to_file:
@@ -1799,7 +2169,9 @@ class CavityNumericalPropagator(CavityPropagator):
         # cos_alpha because the beam is tilted, and so does the spot size itself.
         Z += X * np.tan(alpha_cavity)  # This make the Z coordinates centered around
         # the cavity axis - which depend on the angle of the cavity and the x coordinate.
-        T += Z / (C_LIGHT * beta_electron)  # This makes T be the time of the electron that passed through z=0 at
+        T += Z / (
+            C_LIGHT * beta_electron
+        )  # This makes T be the time of the electron that passed through z=0 at
         # time t and then got to Z after/before: Z/(beta * c) time. (that is, t=t(z))
 
         return Z, X, Y, T
@@ -1826,32 +2198,53 @@ class CavityNumericalPropagator(CavityPropagator):
         if self.ring_cavity:
             standing_wave = False
             if self.single_laser_propagation_direction_override is not None:
-                forward_propagation_l_1 = self.single_laser_propagation_direction_override
+                forward_propagation_l_1 = (
+                    self.single_laser_propagation_direction_override
+                )
             else:
-                forward_propagation_l_1 = self.E_2 is None or self.l_1 < self.l_2  # if l_1 is the shorter wavelength
+                forward_propagation_l_1 = (
+                    self.E_2 is None or self.l_1 < self.l_2
+                )  # if l_1 is the shorter wavelength
             # then it propagates forward
         else:
             standing_wave = True
             forward_propagation_l_1 = None
         # numba syntax:
-        A = gaussian_beam_numba_looped(x=X_tilde, y=Y, z=Z_tilde, E=self.E_1, lambda_laser=self.l_1, NA=self.NA_1, t=T,
-                                standing_wave=standing_wave, forward_propagation=forward_propagation_l_1)
+        A = gaussian_beam_numba_looped(
+            x=X_tilde,
+            y=Y,
+            z=Z_tilde,
+            E=self.E_1,
+            lambda_laser=self.l_1,
+            NA=self.NA_1,
+            t=T,
+            standing_wave=standing_wave,
+            forward_propagation=forward_propagation_l_1,
+        )
         if save_to_file:
             np.save("data\\debugging arrays\\A_1.npy", A)
         if self.E_2 is not None:
-            A_2 = gaussian_beam_numba_looped(x=X_tilde, y=Y, z=Z_tilde, E=self.E_2, lambda_laser=self.l_2, NA=self.NA_2,
-                                             t=T, standing_wave=standing_wave,
-                                             forward_propagation=not forward_propagation_l_1)
-        # # non-numba syntax:
-        # A = gaussian_beam(x=X_tilde, y=Y, z=Z_tilde, E=self.E_1, lambda_laser=self.l_1, NA=self.NA_1, t=T,
-        #                   mode="potential", standing_wave=standing_wave, forward_propagation=forward_propagation_l_1,
-        #                   complex=False)
-        # if save_to_file:
-        #     np.save("data\\debugging arrays\\A_1.npy", A)
-        # if self.E_2 is not None:
-        #     A_2 = gaussian_beam(x=X_tilde, y=Y, z=Z_tilde, E=self.E_2, lambda_laser=self.l_2, NA=self.NA_2, t=T,
-        #                         mode="potential", standing_wave=standing_wave,
-        #                         forward_propagation=not forward_propagation_l_1, complex=False)
+            A_2 = gaussian_beam_numba_looped(
+                x=X_tilde,
+                y=Y,
+                z=Z_tilde,
+                E=self.E_2,
+                lambda_laser=self.l_2,
+                NA=self.NA_2,
+                t=T,
+                standing_wave=standing_wave,
+                forward_propagation=not forward_propagation_l_1,
+            )
+            # # non-numba syntax:
+            # A = gaussian_beam(x=X_tilde, y=Y, z=Z_tilde, E=self.E_1, lambda_laser=self.l_1, NA=self.NA_1, t=T,
+            #                   mode="potential", standing_wave=standing_wave, forward_propagation=forward_propagation_l_1,
+            #                   complex=False)
+            # if save_to_file:
+            #     np.save("data\\debugging arrays\\A_1.npy", A)
+            # if self.E_2 is not None:
+            #     A_2 = gaussian_beam(x=X_tilde, y=Y, z=Z_tilde, E=self.E_2, lambda_laser=self.l_2, NA=self.NA_2, t=T,
+            #                         mode="potential", standing_wave=standing_wave,
+            #                         forward_propagation=not forward_propagation_l_1, complex=False)
             A += A_2
             if save_to_file:
                 np.save("data\\debugging arrays\\A_2.npy", A_2)
@@ -1866,25 +2259,42 @@ class CavityNumericalPropagator(CavityPropagator):
         # z axis we also have the time component increasing with Z, so subtracting the lattice from itself will give
         # dG=G(z+dz, t(z+dz))-G(z, t(z)), while we want dG=G(z+dz, t(z))-G(z, t(z))-G
 
-        dr = self.min_l / 10000  # ARBITRARY I checked manually, and at around 400 the value of
+        dr = (
+            self.min_l / 10000
+        )  # ARBITRARY I checked manually, and at around 400 the value of
         # the derivative stabilizes, so 10000 is a safe margin. Anyway I don't think we are not close to precision
         # error problems.
 
-        z_component_factor = np.cos(self.beta_electron2alpha_cavity(beta_electron)) * np.cos(self.theta_polarization)
+        z_component_factor = np.cos(
+            self.beta_electron2alpha_cavity(beta_electron)
+        ) * np.cos(self.theta_polarization)
 
         if A_z is None:
-            A_z = self.rotated_gaussian_beam_A(Z, X, Y, T, beta_electron) * z_component_factor
+            A_z = (
+                self.rotated_gaussian_beam_A(Z, X, Y, T, beta_electron)
+                * z_component_factor
+            )
 
         # The values of A, but shifted a bit, for the gradient calculation:
-        A_z_dX = self.rotated_gaussian_beam_A(Z, X + dr, Y, T, beta_electron) * z_component_factor
-        A_z_dY = self.rotated_gaussian_beam_A(Z, X, Y + dr, T, beta_electron) * z_component_factor
+        A_z_dX = (
+            self.rotated_gaussian_beam_A(Z, X + dr, Y, T, beta_electron)
+            * z_component_factor
+        )
+        A_z_dY = (
+            self.rotated_gaussian_beam_A(Z, X, Y + dr, T, beta_electron)
+            * z_component_factor
+        )
         A_z_dZ = (
-            self.rotated_gaussian_beam_A(Z, X, Y, T - dr / (beta_electron * C_LIGHT), beta_electron)
+            self.rotated_gaussian_beam_A(
+                Z, X, Y, T - dr / (beta_electron * C_LIGHT), beta_electron
+            )
             * z_component_factor
         )  # Explanation in eq:e_26 in my readme file
 
         G = self.G_gauge(A_z, Z)
-        G_dZ = self.G_gauge(A_z_dZ, Z) + A_z_dZ * dr  # Explanation in eq:e_26 in my readme file
+        G_dZ = (
+            self.G_gauge(A_z_dZ, Z) + A_z_dZ * dr
+        )  # Explanation in eq:e_26 in my readme file
         G_dX = self.G_gauge(A_z_dX, Z)
         G_dY = self.G_gauge(A_z_dY, Z)
 
@@ -1921,8 +2331,8 @@ class CavityNumericalPropagator(CavityPropagator):
             f"Nx{input_wave.coordinates.x_axis.size}_Ny{input_wave.coordinates.y_axis.size}_Nt{len(self.t)}_"
             f"Nz_{self.n_z}_DX{input_wave.coordinates.limits[1]:.4g}_DY{input_wave.coordinates.limits[3]:.4g}"
         )
-        hashed_str = md5(setup_str.encode('utf-8')).hexdigest()
-        path = f'data/phase masks/{hashed_str}.npy'
+        hashed_str = md5(setup_str.encode("utf-8")).hexdigest()
+        path = f"data/phase masks/{hashed_str}.npy"
         return path
 
     def setup_to_dict(self, input_wave: WaveFunction) -> dict:
@@ -1938,56 +2348,56 @@ class CavityNumericalPropagator(CavityPropagator):
             n_frequencies = 2
 
         setup_dict = {
-            'method': 'Numerical',
-            'n_frequencies': n_frequencies,
-            'lambda_laser_1_nm': signif(self.l_1 * 1e9),
-            'lambda_laser_2_nm': l_2,
-            'power_1': signif(self.power_1),
-            'power_2': signif(power_2),
-            'NA_1': signif(self.NA_1),
-            'NA_2': signif(NA_2),
-            'alpha_tilt_rads': signif(self.beta_electron2alpha_cavity(input_wave.beta)),
-            'theta_polarization_rads': signif(self.theta_polarization),
-            'E_0_electron_keV': signif(keV_of_Joules(input_wave.E_0)),
-            'ring_cavity': self.ring_cavity,
-            'Nx': input_wave.coordinates.x_axis.size,
-            'Ny': input_wave.coordinates.y_axis.size,
-            'N_t': len(self.t),
-            'N_z': self.n_z,
-            'DX': signif(input_wave.coordinates.limits[1]),
-            'DY': signif(input_wave.coordinates.limits[3]),
-            'time_calculated': pd.Timestamp.now()}
+            "method": "Numerical",
+            "n_frequencies": n_frequencies,
+            "lambda_laser_1_nm": signif(self.l_1 * 1e9),
+            "lambda_laser_2_nm": l_2,
+            "power_1": signif(self.power_1),
+            "power_2": signif(power_2),
+            "NA_1": signif(self.NA_1),
+            "NA_2": signif(NA_2),
+            "alpha_tilt_rads": signif(self.beta_electron2alpha_cavity(input_wave.beta)),
+            "theta_polarization_rads": signif(self.theta_polarization),
+            "E_0_electron_keV": signif(keV_of_Joules(input_wave.E_0)),
+            "ring_cavity": self.ring_cavity,
+            "Nx": input_wave.coordinates.x_axis.size,
+            "Ny": input_wave.coordinates.y_axis.size,
+            "N_t": len(self.t),
+            "N_z": self.n_z,
+            "DX": signif(input_wave.coordinates.limits[1]),
+            "DY": signif(input_wave.coordinates.limits[3]),
+            "time_calculated": pd.Timestamp.now(),
+        }
         return setup_dict
-
 
     def generate_z_vector(self, x, beta_electron):
         integral_limit_in_spot_size_units = 3  # ARBITRARY - but should be enough
 
         # if self.n_z is None:
-            # raise ValueError("currently n_z must be manually defined - recommended value is at least 10,000,"
-            #                  "and preferably 15,000")
-            # # This function generates a linearly spaced z values in units of the spot size with a number of points that
-            # # is required for accurate integration of A in the widest integration range (between -5 and 5 w(x) for the
-            # # maximal w(x)). based on equation e_40 in the simulation notes.
-            # alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
-            #
-            # max_z_integration_interval = (
-            #     w_x_gaussian(
-            #         w_0=w0_of_NA(self.NA_max, self.max_l),
-            #         x=np.max(np.abs(x)) / np.cos(alpha_cavity),
-            #         l_laser=self.max_l,
-            #     )
-            #     / np.cos(alpha_cavity)
-            #     * (3 * integral_limit_in_spot_size_units)
-            # )
-            # if len(self.t) > 1:
-            #     dz = self.min_l / (1 + 1 / beta_electron) / 4  # ARBITRARY - This value was determined by playing
-            #     # with the simulation and checking that the results are stable. the derivation is still not existent and
-            #     # I need to write it down.
-            # else:  # If there is only one laser then we sample it only in one point in time and there are no
-            #     # oscillations so we are integrating just a gaussian, and so a very small amount of points is needed.
-            #     dz = self.min_l / (1 + 1 / beta_electron) / 4  # dz = self.w_0_min / 5  # Arbitrary 5
-            # required_n_z_for_integration_over_maximal_interval = int(max_z_integration_interval / dz)
+        # raise ValueError("currently n_z must be manually defined - recommended value is at least 10,000,"
+        #                  "and preferably 15,000")
+        # # This function generates a linearly spaced z values in units of the spot size with a number of points that
+        # # is required for accurate integration of A in the widest integration range (between -5 and 5 w(x) for the
+        # # maximal w(x)). based on equation e_40 in the simulation notes.
+        # alpha_cavity = self.beta_electron2alpha_cavity(beta_electron)
+        #
+        # max_z_integration_interval = (
+        #     w_x_gaussian(
+        #         w_0=w0_of_NA(self.NA_max, self.max_l),
+        #         x=np.max(np.abs(x)) / np.cos(alpha_cavity),
+        #         l_laser=self.max_l,
+        #     )
+        #     / np.cos(alpha_cavity)
+        #     * (3 * integral_limit_in_spot_size_units)
+        # )
+        # if len(self.t) > 1:
+        #     dz = self.min_l / (1 + 1 / beta_electron) / 4  # ARBITRARY - This value was determined by playing
+        #     # with the simulation and checking that the results are stable. the derivation is still not existent and
+        #     # I need to write it down.
+        # else:  # If there is only one laser then we sample it only in one point in time and there are no
+        #     # oscillations so we are integrating just a gaussian, and so a very small amount of points is needed.
+        #     dz = self.min_l / (1 + 1 / beta_electron) / 4  # dz = self.w_0_min / 5  # Arbitrary 5
+        # required_n_z_for_integration_over_maximal_interval = int(max_z_integration_interval / dz)
         # else:
         required_n_z_for_integration_over_maximal_interval = self.n_z
         # The denominator is chosen such that the G_gauge function is accurate. In general the spacing dz should be
@@ -2001,7 +2411,9 @@ class CavityNumericalPropagator(CavityPropagator):
         )
         return z
 
-    def potential_envelope2vector_components(self, A: np.ndarray, component_index: str, beta_electron):
+    def potential_envelope2vector_components(
+        self, A: np.ndarray, component_index: str, beta_electron
+    ):
         # This is the rotated field vector: the vector is achieved by starting with a polarized light in the z axis,
         # then rotating it in the y-z plane by theta_polarization (from z towards y) and then rotating it in the
         # z-x plane by alpha_cavity (from x towards z).
@@ -2031,8 +2443,9 @@ class CavityNumericalPropagator(CavityPropagator):
         cax = divider.append_axes("right", size="5%", pad=0.05)
         fig.colorbar(mask_phase, cax=cax, orientation="vertical")
 
-        mask_attenuation = ax[1].imshow(np.abs(mask)**2,
-                                           extent=input_wave.coordinates.limits)
+        mask_attenuation = ax[1].imshow(
+            np.abs(mask) ** 2, extent=input_wave.coordinates.limits
+        )
         ax[1].set_title(f"intensity attenuation")
         divider = make_axes_locatable(ax[1])
         cax = divider.append_axes("right", size="5%", pad=0.05)
