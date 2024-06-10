@@ -14,6 +14,8 @@ import re
 from hashlib import md5
 import mrcfile as mrc
 import pandas as pd
+from numba import njit, prange
+from tqdm import tqdm
 
 M_ELECTRON = 9.1093837e-31
 C_LIGHT = 299792458
@@ -23,7 +25,7 @@ EPSILON_ELECTRICITY = 8.8541878128e-12
 FINE_STRUCTURE_CONST = E_CHARGE**2 / (4 * np.pi * EPSILON_ELECTRICITY * H_BAR * C_LIGHT)
 np.seterr(all="raise")
 try:
-    PHASE_MASKS_DF = pd.read_csv(r'data/phase masks/phase_masks.csv', index_col=False)
+    PHASE_MASKS_DF = pd.read_csv(r'data/phase masks/phase_masks.csv', index_col=False, dtype={'ring_cavity': bool})
 except FileNotFoundError:
     PHASE_MASKS_DF = pd.DataFrame(columns=['file_path', 'n_frequencies', 'method', 'lambda_laser_1_nm', 'lambda_laser_2_nm', 'power_1', 'power_2', 'NA_1', 'NA_2', 'alpha_tilt_rads', 'theta_polarization_rads', 'E_0_electron_keV','ring_cavity', 'Nx', 'Ny', 'N_t', 'N_z', 'DX', 'DY', 'time_calculated'])
 
@@ -228,6 +230,79 @@ def signif(x, p=4):
         x_positive = np.where(np.isfinite(x_array) & (x_array != 0), np.abs(x_array), 10**(p-1))
         mags = 10 ** (p - 1 - np.floor(np.log10(x_positive)))
         return np.round(x_array * mags) / mags
+
+@njit(parallel=True)
+def gaussian_beam_numba(x: np.ndarray,
+                        y: np.ndarray,
+                        z: np.ndarray,
+                        E: float,
+                        lambda_laser: float,
+                        NA: float,
+                        t: np.ndarray,
+                        forward_propagation: bool,
+                        standing_wave: bool) -> np.ndarray:
+    w_0 = lambda_laser / (np.pi * NA)
+    x_R = pi * w_0**2 / lambda_laser
+    w_x = w_0 * np.sqrt(1 + (x / x_R) ** 2)
+    gouy_phase = np.arctan(x / x_R)
+    R_x_inverse = x / (x**2 + x_R**2)
+    k = 2 * pi / lambda_laser
+    other_phase = k * x + k * (z**2 + y**2) / 2 * R_x_inverse
+    potential_factor = 1 / (C_LIGHT * k)  # potential_factor = 1/omega
+
+    if forward_propagation is True:
+        propagation_sign = -1
+    else:
+        propagation_sign = 1
+
+    time_phase = C_LIGHT * k * t
+    spatial_phase = other_phase - gouy_phase
+
+    envelope = E * (w_0 / w_x) * np.exp(
+        np.clip(a=-(y ** 2 + z ** 2) / w_x ** 2, a_min=-200, a_max=None))
+    if standing_wave:
+        return envelope * potential_factor * np.cos(spatial_phase) * np.cos(time_phase)  # * 2
+    else:
+        return envelope * potential_factor * np.cos(propagation_sign * spatial_phase + time_phase)
+
+
+@njit(parallel=True)
+def gaussian_beam_numba_looped(x: np.ndarray,
+                        y: np.ndarray,
+                        z: np.ndarray,
+                        E: float,
+                        lambda_laser: float,
+                        NA: float,
+                        t: np.ndarray,
+                        forward_propagation: bool,
+                        standing_wave: bool) -> np.ndarray:
+    result_array = np.zeros_like(x)
+    w_0 = lambda_laser / (np.pi * NA)
+    x_R = pi * w_0**2 / lambda_laser
+    w_x = w_0 * np.sqrt(1 + (x / x_R) ** 2)
+    gouy_phase = np.arctan(x / x_R)
+    R_x_inverse = x / (x**2 + x_R**2)
+    k = 2 * pi / lambda_laser
+    other_phase = k * x + k * (z**2 + y**2) / 2 * R_x_inverse
+    potential_factor = 1 / (C_LIGHT * k)  # potential_factor = 1/omega
+
+    if forward_propagation is True:
+        propagation_sign = -1
+    else:
+        propagation_sign = 1
+
+    for i in prange(result_array.shape[0]):
+        time_phase = C_LIGHT * k * t[i, ...]
+        spatial_phase = other_phase[i, ...] - gouy_phase[i, ...]
+        envelope = E * (w_0 / w_x[i, ...]) * np.exp(
+            np.clip(a=-(y[i, ...] ** 2 + z[i, ...] ** 2) / w_x[i, ...] ** 2, a_min=-200, a_max=None))  # The clipping
+        # is to prevent underflow errors.
+        if standing_wave:
+            result_array[i, ...] = potential_factor * envelope * np.cos(spatial_phase) * np.cos(time_phase)
+        else:
+            result_array[i, ...] = potential_factor * envelope * np.cos(propagation_sign * spatial_phase + time_phase)
+
+    return result_array
 
 
 def gaussian_beam(
@@ -1457,11 +1532,11 @@ class CavityNumericalPropagator(CavityPropagator):
             bolean_filter = [PHASE_MASKS_DF.loc[
                 i, ['method', 'n_frequencies', 'lambda_laser_1_nm', 'lambda_laser_2_nm', 'NA_1', 'NA_2',
                     'alpha_tilt_rads', 'theta_polarization_rads', 'E_0_electron_keV', 'ring_cavity', 'Nx', 'Ny', 'N_t', 'N_z',
-                    'DX', 'DY', ]].equals(
+                    'DX', 'DY', ]].fillna('kalimtzo').equals(
                 setup_series.loc[
                     ['method', 'n_frequencies', 'lambda_laser_1_nm', 'lambda_laser_2_nm', 'NA_1', 'NA_2',
                      'alpha_tilt_rads', 'theta_polarization_rads', 'E_0_electron_keV', 'ring_cavity', 'Nx', 'Ny', 'N_t', 'N_z',
-                     'DX', 'DY', ]])
+                     'DX', 'DY', ]].fillna('kalimtzo'))
                 for i in range(len(PHASE_MASKS_DF))]
 
             filtered_DF = PHASE_MASKS_DF.loc[bolean_filter]
@@ -1525,7 +1600,7 @@ class CavityNumericalPropagator(CavityPropagator):
             phase_and_amplitude_mask = np.exp(1j * phi_const_original * powers_ratio) * jv(0, C_original * powers_ratio)
         return phase_and_amplitude_mask
 
-    def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results: bool = False):
+    def phase_and_amplitude_mask(self, input_wave: WaveFunction, save_results: bool = True):
         x = input_wave.coordinates.x_axis
         y = input_wave.coordinates.y_axis
 
@@ -1576,7 +1651,7 @@ class CavityNumericalPropagator(CavityPropagator):
             return phase_and_amplitude_mask
 
     def phase_and_amplitude_mask_quadrant(
-        self, input_wave: WaveFunction, save_results: bool = False, phi: Optional[np.ndarray] = None
+        self, input_wave: WaveFunction, save_results: bool = True, phi: Optional[np.ndarray] = None
     ):
         if phi is None:
             phi = self.phi(input_wave)
@@ -1586,6 +1661,7 @@ class CavityNumericalPropagator(CavityPropagator):
             phase_and_amplitude_mask = phase_factor[:, :, 0]  # Assumes the phase is constant in time
             if save_results:
                 np.save(self.setup_to_path(input_wave=input_wave), phi[:, :, 0])
+                self.update_phase_masks_df(input_wave)
         else:
             if len(self.t) == 3:
                 # This assumes that if there are exactly 3 time steps, then they are [0, pi/(2delta_w), pi/delta_w]:
@@ -1757,15 +1833,25 @@ class CavityNumericalPropagator(CavityPropagator):
         else:
             standing_wave = True
             forward_propagation_l_1 = None
-        A = gaussian_beam(x=X_tilde, y=Y, z=Z_tilde, E=self.E_1, lambda_laser=self.l_1, NA=self.NA_1, t=T,
-                          mode="potential", standing_wave=standing_wave, forward_propagation=forward_propagation_l_1,
-                          complex=False)
+        # numba syntax:
+        A = gaussian_beam_numba_looped(x=X_tilde, y=Y, z=Z_tilde, E=self.E_1, lambda_laser=self.l_1, NA=self.NA_1, t=T,
+                                standing_wave=standing_wave, forward_propagation=forward_propagation_l_1)
         if save_to_file:
             np.save("data\\debugging arrays\\A_1.npy", A)
         if self.E_2 is not None:
-            A_2 = gaussian_beam(x=X_tilde, y=Y, z=Z_tilde, E=self.E_2, lambda_laser=self.l_2, NA=self.NA_2, t=T,
-                                mode="potential", standing_wave=standing_wave,
-                                forward_propagation=not forward_propagation_l_1, complex=False)
+            A_2 = gaussian_beam_numba_looped(x=X_tilde, y=Y, z=Z_tilde, E=self.E_2, lambda_laser=self.l_2, NA=self.NA_2,
+                                             t=T, standing_wave=standing_wave,
+                                             forward_propagation=not forward_propagation_l_1)
+        # # non-numba syntax:
+        # A = gaussian_beam(x=X_tilde, y=Y, z=Z_tilde, E=self.E_1, lambda_laser=self.l_1, NA=self.NA_1, t=T,
+        #                   mode="potential", standing_wave=standing_wave, forward_propagation=forward_propagation_l_1,
+        #                   complex=False)
+        # if save_to_file:
+        #     np.save("data\\debugging arrays\\A_1.npy", A)
+        # if self.E_2 is not None:
+        #     A_2 = gaussian_beam(x=X_tilde, y=Y, z=Z_tilde, E=self.E_2, lambda_laser=self.l_2, NA=self.NA_2, t=T,
+        #                         mode="potential", standing_wave=standing_wave,
+        #                         forward_propagation=not forward_propagation_l_1, complex=False)
             A += A_2
             if save_to_file:
                 np.save("data\\debugging arrays\\A_2.npy", A_2)

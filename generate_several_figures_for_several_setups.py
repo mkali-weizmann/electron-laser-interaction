@@ -9,8 +9,8 @@ OUTPUT_IMAGES = []
 columns = ['NA_1', 'polarization_pies', 'ring_cavity', 'E_0', 'second_laser', 'alpha_cavity_deviation_degrees', 'n_electrons', 'resolution', 'focal_length_mm', 'Cs_mm', 'defocus_nm', 'n_z', 'power_1', 'custom_title']
 list_of_combinations = [
                         # [0.2, 1/2,      True,          300,    False,          0,                               20,             1024,          3.3,               3,       0,           None,   -1, None],
-                          [0.2, 1/2,      True,          300,    True,           0,                               20,             1024,          3.3,               3,       0,           None,   -1, None],
-                          [0.2, 1/2,      False,         300,    True,           0,                               20,             1024,          3.3,               3,       0,           None,   -1, None],
+                          [0.2, 1/2,      True,          300,    True,           0,                               20,             512,          3.3,               3,       0,           None,   -1, None],
+                        # [0.2, 1/2,      False,         300,    True,           0,                               20,             1024,          3.3,               3,       0,           None,   -1, None],
                         # [0.2, 1/2,      False,          300,    True,          0,                               20,             1024,          3.3,               3,       0,           None,   -1, None],
                         # [0.01, 1/2,      False,         300,    False,         0,                               20,             1024,          3.3,               3,       0,           None,   -1, None],
                         # [0.1,  1/2,      True,          300,    True,          0,                               20,             1024,          3.3,               3,       0,           None,   -1, None],
@@ -214,5 +214,5 @@ def compare_images_noise(image_1, image_2, perfect_image):
     plt.legend()
     plt.show()
 
-compare_images_noise(OUTPUT_IMAGES[0], OUTPUT_IMAGES[1], -PERFECT_IMAGE)
+# compare_images_noise(OUTPUT_IMAGES[0], OUTPUT_IMAGES[1], -PERFECT_IMAGE)
 
