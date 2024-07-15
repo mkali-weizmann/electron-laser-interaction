@@ -353,7 +353,7 @@ class Seminar(Slide):  # , ZoomedScene  # MovingCameraScene
 
         self.next_slide()
         abstract_image = ImageMobject(data).scale(0.6)  #
-        # self.play(FadeIn(abstract_image, shift=DOWN))
+        self.play(FadeIn(abstract_image, shift=DOWN))
 
         self.play(FadeOut(title_intro))  # abstract_image
         # self.next_slide()
