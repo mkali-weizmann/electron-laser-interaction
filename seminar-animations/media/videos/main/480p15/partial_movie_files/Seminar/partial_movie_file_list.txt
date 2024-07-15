@@ -1,0 +1,11 @@
+# This file is used internally by FFMPEG.
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/1185818338_2268332985_631829896.mp4'
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/1185818338_266123414_4131132508.mp4'
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/624642324_9357862_1228846964.mp4'
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/624642324_182420438_55488351.mp4'
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/624642324_1072750351_3416429200.mp4'
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/624642324_3117986842_2965750633.mp4'
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/624642324_2267284824_3037226897.mp4'
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/624642324_1587891764_2174582404.mp4'
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/624642324_1994306664_1614139878.mp4'
+file 'file:/home/akali/projects/electron-laser-interaction/seminar-animations/media/videos/main/480p15/partial_movie_files/Seminar/624642324_1587025979_1913016792.mp4'
