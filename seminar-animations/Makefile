@@ -3,7 +3,10 @@ video:
 	python -m manim_slides convert Seminar slides/presentation.html
 	make wip
 
-wip:
+pull:
+	git pull
+
+push:
 	git add .
 	git commit -m "Auto commit."
 	git push
