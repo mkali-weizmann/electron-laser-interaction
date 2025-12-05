@@ -315,7 +315,7 @@ def create_focus_arrow_object(point: np.ndarray):
 class Microscope(MovingCameraScene, VoiceoverScene):
 # class Microscope(Slide, MovingCameraScene):  # , ZoomedScene
     def construct(self):
-        self.set_speech_service(GTTSService(transcription_model='base'))
+        # self.set_speech_service(GTTSService(transcription_model='base'))
         self.set_speech_service(
             AzureService(
                 voice="en-US-AriaNeural",
@@ -1287,8 +1287,8 @@ class Microscope(MovingCameraScene, VoiceoverScene):
             for updater in object_updaters[i]:
                 obj.add_updater(updater)
 
-# m = Microscope()
-# m.construct()
+m = Microscope()
+m.construct()
 
 # manim -pql slides/scene.py Microscope
 # manim-slides convert Microscope slides/presentation.html
