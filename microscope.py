@@ -1401,7 +1401,15 @@ class CavityPropagator(Propagator):
         setup_dict["file_path"] = self.setup_to_path(input_wave=input_wave)
         setup_dict["time_calculated"] = pd.Timestamp.now()
         # add the setup_dict as a row to PHASE_MASKS_DF (PHASE_MASKS_DF is a gloabal variable and already exists):
-        PHASE_MASKS_DF.loc[len(PHASE_MASKS_DF)] = setup_dict
+        new_row = pd.DataFrame([setup_dict])
+        import warnings
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=".*DataFrame concatenation with empty or all-NA entries is deprecated.*",
+                category=FutureWarning,
+            )
+            PHASE_MASKS_DF = pd.concat([PHASE_MASKS_DF, new_row], ignore_index=True)
         PHASE_MASKS_DF.to_csv(r"data/phase masks/phase_masks.csv", index=False)
 
 
@@ -2179,10 +2187,10 @@ class CavityNumericalPropagator(CavityPropagator):
 
     def rotated_gaussian_beam_A(
         self,
-        Z: [float, np.ndarray],
-        X: [float, np.ndarray],
-        Y: [float, np.ndarray],
-        T: [float, np.ndarray],
+        Z: Union[float, np.ndarray],
+        X: Union[float, np.ndarray],
+        Y: Union[float, np.ndarray],
+        T: Union[float, np.ndarray],
         beta_electron: Optional[float] = None,
         save_to_file: bool = False,
     ) -> Union[np.ndarray, float]:
@@ -2310,7 +2318,7 @@ class CavityNumericalPropagator(CavityPropagator):
     @staticmethod
     def G_gauge(A_z: np.ndarray, Z: np.ndarray) -> np.ndarray:
         # Assumes the first axis is Z axis (This way the integration is the fastest)
-        G_gauge_values = integrate.cumtrapz(A_z, x=Z, axis=0, initial=0)
+        G_gauge_values = integrate.cumulative_trapezoid(A_z, x=Z, axis=0, initial=0)
         return G_gauge_values  # integral over z
 
     def setup_to_path(self, input_wave: WaveFunction) -> str:
