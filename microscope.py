@@ -1206,15 +1206,15 @@ class AberrationsPropagator(Propagator):
 
     def aberrations_mask(self, f_x: np.array, f_y: np.array, E0: float):
         f_x, f_y = np.meshgrid(f_x, f_y, indexing="ij")
-        f_squared = f_x**2 + f_y**2
+        k_squared = (f_x ** 2 + f_y ** 2) * (2 * np.pi) ** 2
         phi_k = np.arctan2(f_y, f_x)
         f_defocus_aberration = self.defocus + self.astigmatism_parameter * np.cos(
             2 * (phi_k - self.astigmatism_orientation)
         )
         lambda_electron = l_of_E(E0)
         phase = np.pi * (
-            (1 / 2) * self.Cs * lambda_electron**3 * f_squared**2
-            - f_defocus_aberration * lambda_electron * f_squared
+                (1 / 2) * self.Cs * lambda_electron ** 3 * k_squared ** 2
+                - f_defocus_aberration * lambda_electron * k_squared
         )
         return np.exp(1j * phase)  # Check sign!
 
@@ -2099,9 +2099,9 @@ class CavityNumericalPropagator(CavityPropagator):
 
     def phi_integrand(
         self,
-        x: [float, np.ndarray],
-        y: [float, np.ndarray],
-        t: [float, np.ndarray],
+        x: Union[float, np.ndarray],
+        y: Union[float, np.ndarray],
+        t: Union[float, np.ndarray],
         beta_electron: float,
         save_to_file: bool = False,
     ):
