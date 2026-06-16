@@ -100,19 +100,30 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         phase_factor = np.real(np.angle(middle_phase_mask_value))
 
         lambda_electron = 2 * np.pi / k_of_beta(M.step_of_propagator(cavity).input_wave.beta)
-        focal_plane_fourier_limits = 2 * np.pi * np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3)
+        focal_plane_fourier_limits = 2 * np.pi * np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
         repetitive_title = rf"Cavity NA = {NA_1}"  # , $\theta_{{\text{{polarization}}}} = {polarization_pies * 180:.0f}^{{\circ}}$
         fig_1, ax_1 = plt.subplots(1, 1, figsize=(10, 10))
         mask_phase_array = np.angle(mask) + np.angle(aberration_mask)
         CTF = np.cos(mask_phase_array)
-        mask_phase = ax_1.imshow(CTF,
-                                 extent=focal_plane_fourier_limits,
-                                 cmap='grey')
         aberrations_phase = M.propagators[-1]
-        ax_1.set_title(f"Contrast Transfer Function\n{repetitive_title}", fontsize=title_fs)
-        ax_1.set_xlabel(r"$s_{x}\ \left[A^{-1}\right]$", fontsize=label_fs)
-        ax_1.set_ylabel(r"$s_{y}\ \left[A^{-1}\right]$", fontsize=label_fs)
-        fig_1.colorbar(mask_phase, ax=ax_1, fraction=0.046, pad=0.04)
+
+        # Angular (radial) average of the CTF as a function of the radial spatial frequency k.
+        k_x_axis = np.linspace(focal_plane_fourier_limits[0], focal_plane_fourier_limits[1], CTF.shape[1])
+        k_y_axis = np.linspace(focal_plane_fourier_limits[2], focal_plane_fourier_limits[3], CTF.shape[0])
+        K_X, K_Y = np.meshgrid(k_x_axis, k_y_axis)
+        K_radial = np.sqrt(K_X ** 2 + K_Y ** 2)
+        n_bins = min(CTF.shape) // 2
+        k_bins = np.linspace(0, K_radial.max(), n_bins + 1)
+        ctf_sum, _ = np.histogram(K_radial.ravel(), bins=k_bins, weights=CTF.ravel())
+        ctf_count, _ = np.histogram(K_radial.ravel(), bins=k_bins)
+        CTF_radial = ctf_sum / np.maximum(ctf_count, 1)
+        k_centers = 0.5 * (k_bins[:-1] + k_bins[1:])
+
+        ax_1.semilogx(k_centers, CTF_radial)
+        ax_1.set_title(f"Angular-averaged Contrast Transfer Function\n{repetitive_title}", fontsize=title_fs)
+        ax_1.set_xlabel(r"$k\ \left[A^{-1}\right]$", fontsize=label_fs)
+        ax_1.set_ylabel("CTF (angular average)", fontsize=label_fs)
+        ax_1.grid(True, which='both', alpha=0.3)
         plt.savefig(f"Figures\\examples\\dummy sample\\CTF-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
         plt.show()
 
