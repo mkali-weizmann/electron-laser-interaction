@@ -24,7 +24,7 @@ auto_set_power = True
 power_1 = 6.7000000000e+04
 focal_length_mm = 6.8
 alpha_cavity_deviation_degrees = 0.0000000000e+00
-resolution = 1064
+resolution = 2048
 n_z = 1000
 
 # Alternative wave function generation:
@@ -104,17 +104,27 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         focal_plane_fourier_limits = 2 * np.pi * np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
         repetitive_title = rf"Cavity NA = {NA_1}"  # , $\theta_{{\text{{polarization}}}} = {polarization_pies * 180:.0f}^{{\circ}}$
         mask_phase_array = np.angle(mask) + np.angle(aberration_mask)
-        CTF = np.cos(mask_phase_array)
+        CTF = np.cos(mask_phase_array)**2
         aberrations_phase = M.propagators[-1]
 
         # Angular (radial) average of the CTF as a function of the radial spatial frequency k.
+        from scipy.interpolate import RegularGridInterpolator
         k_x_axis = np.linspace(focal_plane_fourier_limits[0], focal_plane_fourier_limits[1], CTF.shape[1])
         k_y_axis = np.linspace(focal_plane_fourier_limits[2], focal_plane_fourier_limits[3], CTF.shape[0])
-        K_X, K_Y = np.meshgrid(k_x_axis, k_y_axis)
+
+        # Artificially increase the resolution of the CTF image by 4x on each axis (linear
+        # interpolation), so the radial bins below are populated by many more samples.
+        upscale = 4
+        k_x_fine = np.linspace(focal_plane_fourier_limits[0], focal_plane_fourier_limits[1], CTF.shape[1] * upscale)
+        k_y_fine = np.linspace(focal_plane_fourier_limits[2], focal_plane_fourier_limits[3], CTF.shape[0] * upscale)
+        ctf_interp = RegularGridInterpolator((k_y_axis, k_x_axis), CTF, method='linear')
+        K_Y, K_X = np.meshgrid(k_y_fine, k_x_fine, indexing='ij')
+        CTF_fine = ctf_interp((K_Y, K_X))
         K_radial = np.sqrt(K_X ** 2 + K_Y ** 2)
-        n_bins = min(CTF.shape) // 2
+
+        n_bins = min(CTF_fine.shape) // 2
         k_bins = np.linspace(0, K_radial.max(), n_bins + 1)
-        ctf_sum, _ = np.histogram(K_radial.ravel(), bins=k_bins, weights=CTF.ravel())
+        ctf_sum, _ = np.histogram(K_radial.ravel(), bins=k_bins, weights=CTF_fine.ravel())
         ctf_count, _ = np.histogram(K_radial.ravel(), bins=k_bins)
         CTF_radial = ctf_sum / np.maximum(ctf_count, 1)
         k_centers = 0.5 * (k_bins[:-1] + k_bins[1:])
@@ -125,6 +135,7 @@ ax_1.set_title("Angular-averaged Contrast Transfer Function", fontsize=title_fs)
 ax_1.set_xlabel(r"$s\ \left[A^{-1}\right]$", fontsize=label_fs)
 ax_1.set_ylabel("CTF (angular average)", fontsize=label_fs)
 ax_1.grid(True, which='both', alpha=0.3)
+ax_1.tick_params(axis='both', which='major', labelsize=label_fs)
 ax_1.legend(fontsize=label_fs)
 plt.savefig(f"Figures\\examples\\dummy sample\\CTF-radial-{polarization_pies}-{second_laser}-{n_z}.png")
 plt.show()
