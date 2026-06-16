@@ -46,6 +46,7 @@ title_fs = 30
 label_fs = 28
 
 from tqdm import tqdm
+fig_1, ax_1 = plt.subplots(1, 1, figsize=(10, 10))
 for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
     # for polarization_pies in tqdm([0], desc='Polarization', leave=False, position=1):  #  , 0.5
     for second_laser in tqdm([False], desc='Second laser', leave=False, position=2):  # True,  # , True
@@ -102,7 +103,6 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         lambda_electron = 2 * np.pi / k_of_beta(M.step_of_propagator(cavity).input_wave.beta)
         focal_plane_fourier_limits = 2 * np.pi * np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
         repetitive_title = rf"Cavity NA = {NA_1}"  # , $\theta_{{\text{{polarization}}}} = {polarization_pies * 180:.0f}^{{\circ}}$
-        fig_1, ax_1 = plt.subplots(1, 1, figsize=(10, 10))
         mask_phase_array = np.angle(mask) + np.angle(aberration_mask)
         CTF = np.cos(mask_phase_array)
         aberrations_phase = M.propagators[-1]
@@ -119,13 +119,15 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         CTF_radial = ctf_sum / np.maximum(ctf_count, 1)
         k_centers = 0.5 * (k_bins[:-1] + k_bins[1:])
 
-        ax_1.semilogx(k_centers, CTF_radial)
-        ax_1.set_title(f"Angular-averaged Contrast Transfer Function\n{repetitive_title}", fontsize=title_fs)
-        ax_1.set_xlabel(r"$k\ \left[A^{-1}\right]$", fontsize=label_fs)
-        ax_1.set_ylabel("CTF (angular average)", fontsize=label_fs)
-        ax_1.grid(True, which='both', alpha=0.3)
-        plt.savefig(f"Figures\\examples\\dummy sample\\CTF-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
-        plt.show()
+        ax_1.semilogx(k_centers, CTF_radial, label=rf"NA = {NA_1}")
+
+ax_1.set_title("Angular-averaged Contrast Transfer Function", fontsize=title_fs)
+ax_1.set_xlabel(r"$s\ \left[A^{-1}\right]$", fontsize=label_fs)
+ax_1.set_ylabel("CTF (angular average)", fontsize=label_fs)
+ax_1.grid(True, which='both', alpha=0.3)
+ax_1.legend(fontsize=label_fs)
+plt.savefig(f"Figures\\examples\\dummy sample\\CTF-radial-{polarization_pies}-{second_laser}-{n_z}.png")
+plt.show()
 
         # fig_temp, ax_temp = plt.subplots(1, 1, figsize=(10, 10))
         # focal_plane_wave = ax_temp.imshow(np.abs(M.propagation_steps[1].input_wave.psi),
