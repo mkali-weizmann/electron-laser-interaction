@@ -13,16 +13,16 @@ import scipy.integrate as integrate
 
 print_parameters = False
 NA_1 = 15.0000000000e-02
-second_laser = True
+second_laser = False
 ring_cavity = False
 polarization_pies = 0.5
 E_0 = 3.0000000000e+02
 defocus_nm = 0.0000000000e+00
-Cs_mm = 2.7e-3
+Cs_mm = 3.2e-3
 n_electrons = 20
 auto_set_power = True
 power_1 = 6.7000000000e+04
-focal_length_mm = 3.0000000000e+00
+focal_length_mm = 6.8
 alpha_cavity_deviation_degrees = 0.0000000000e+00
 resolution = 1064
 n_z = 1000
@@ -46,9 +46,9 @@ title_fs = 30
 label_fs = 28
 
 from tqdm import tqdm
-for NA_1 in tqdm([0.02, 0.05, 0.1, 0.15], desc='NA', leave=True):  #
+for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
     # for polarization_pies in tqdm([0], desc='Polarization', leave=False, position=1):  #  , 0.5
-    for second_laser in tqdm([True], desc='Second laser', leave=False, position=2):  # True,  # , True
+    for second_laser in tqdm([False], desc='Second laser', leave=False, position=2):  # True,  # , True
 #             if not second_laser and polarization_pies == 0:
 #                 continue
         first_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=True)
@@ -76,7 +76,7 @@ for NA_1 in tqdm([0.02, 0.05, 0.1, 0.15], desc='NA', leave=True):  #
                                            ring_cavity=ring_cavity,
                                            alpha_cavity_deviation=alpha_cavity_deviation_degrees / 360 * 2 * np.pi,
                                            theta_polarization=polarization_pies * np.pi,
-                                           n_z=n_z, ignore_past_files=True, print_progress=False)
+                                           n_z=n_z, ignore_past_files=False, print_progress=False)
         second_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=False)
         aberration_propagator = AberrationsPropagator(Cs=Cs_mm * 1e-3, defocus=defocus_nm * 1e-9, astigmatism_parameter=0,
                                                       astigmatism_orientation=0)
@@ -110,31 +110,31 @@ for NA_1 in tqdm([0.02, 0.05, 0.1, 0.15], desc='NA', leave=True):  #
                                  cmap='grey')
         aberrations_phase = M.propagators[-1]
         ax_1.set_title(f"Contrast Transfer Function\n{repetitive_title}", fontsize=title_fs)
-        ax_1.set_xlabel(r"Fourier plane $k_{x}$  $[\frac{1}{m}]$", fontsize=label_fs)
-        ax_1.set_ylabel(r"Fourier plane $k_{y}$  $[\frac{1}{m}]$", fontsize=label_fs)
+        ax_1.set_xlabel(r"$s_{x}\ \left[A^{-1}\right]$", fontsize=label_fs)
+        ax_1.set_ylabel(r"$s_{y}\ \left[A^{-1}\right]$", fontsize=label_fs)
         fig_1.colorbar(mask_phase, ax=ax_1, fraction=0.046, pad=0.04)
         plt.savefig(f"Figures\\examples\\dummy sample\\CTF-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
         plt.show()
 
-        fig_temp, ax_temp = plt.subplots(1, 1, figsize=(10, 10))
-        focal_plane_wave = ax_temp.imshow(np.abs(M.propagation_steps[1].input_wave.psi),
-                                   extent=focal_plane_fourier_limits,
-                                   cmap='grey', vmax=0.2)
-        ax_temp.set_title(f"Focal plane wave\n{repetitive_title}", fontsize=title_fs)
-        ax_temp.set_xlabel(r"Fourier plane $k_{x}$  $[\frac{1}{m}]$", fontsize=label_fs)
-        ax_temp.set_ylabel(r"Fourier plane $k_{y}$  $[\frac{1}{m}]$", fontsize=label_fs)
-        fig_temp.colorbar(focal_plane_wave, ax=ax_temp, fraction=0.046, pad=0.04)
-        plt.savefig(f"Figures\\examples\\dummy sample\\focal plane input wave-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
-        plt.show()
+        # fig_temp, ax_temp = plt.subplots(1, 1, figsize=(10, 10))
+        # focal_plane_wave = ax_temp.imshow(np.abs(M.propagation_steps[1].input_wave.psi),
+        #                            extent=focal_plane_fourier_limits,
+        #                            cmap='grey', vmax=0.2)
+        # ax_temp.set_title(f"Focal plane wave\n{repetitive_title}", fontsize=title_fs)
+        # ax_temp.set_xlabel(r"Fourier plane $k_{x}$  $[\frac{1}{m}]$", fontsize=label_fs)
+        # ax_temp.set_ylabel(r"Fourier plane $k_{y}$  $[\frac{1}{m}]$", fontsize=label_fs)
+        # fig_temp.colorbar(focal_plane_wave, ax=ax_temp, fraction=0.046, pad=0.04)
+        # plt.savefig(f"Figures\\examples\\dummy sample\\focal plane input wave-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
+        # plt.show()
 
-        fig_2, ax_2 = plt.subplots(1, 1, figsize=(10, 10))
-        im_intensity = ax_2.imshow(np.flip(pic.values[pic.values.shape[0]//4:3 * pic.values.shape[0]//4, pic.values.shape[1]//4:3 * pic.values.shape[1]//4]), extent=[x * 0.5 for x in input_wave.coordinates.limits], cmap='grey', vmax=vmax)
-        plt.colorbar(im_intensity, ax=ax_2, fraction=0.046, pad=0.04)
-        ax_2.set_title(f"Final image\n{repetitive_title}", fontsize=title_fs)
-        ax_2.set_xlabel(r"x (object plane) [m]", fontsize=label_fs)
-        ax_2.set_ylabel(r"y (object plane) [m]", fontsize=label_fs)
-        plt.savefig(f"Figures\\examples\\dummy sample\\final_image-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
-        plt.show()
+        # fig_2, ax_2 = plt.subplots(1, 1, figsize=(10, 10))
+        # im_intensity = ax_2.imshow(np.flip(pic.values[pic.values.shape[0]//4:3 * pic.values.shape[0]//4, pic.values.shape[1]//4:3 * pic.values.shape[1]//4]), extent=[x * 0.5 for x in input_wave.coordinates.limits], cmap='grey', vmax=vmax)
+        # plt.colorbar(im_intensity, ax=ax_2, fraction=0.046, pad=0.04)
+        # ax_2.set_title(f"Final image\n{repetitive_title}", fontsize=title_fs)
+        # ax_2.set_xlabel(r"x (object plane) [m]", fontsize=label_fs)
+        # ax_2.set_ylabel(r"y (object plane) [m]", fontsize=label_fs)
+        # plt.savefig(f"Figures\\examples\\dummy sample\\final_image-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
+        # plt.show()
 
         # fig_3, ax_3 = plt.subplots(1, 1, figsize=(10, 10))
         # mask_attenuation = ax_3.imshow(np.abs(mask) ** 2, extent=focal_plane_fourier_limits,
