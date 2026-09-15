@@ -18,15 +18,16 @@ ring_cavity = False
 polarization_pies = 0.5
 E_0 = 3.0000000000e+02
 defocus_nm = 0.0000000000e+00
+defocus_only_nm = 800
 Cs_mm = 3.2e-3
 # Typical values of a 300kV cryo-TEM with a Schottky X-FEG:
 # Cc = 2.7mm is the objective lens of a Titan Krios, from the specifications of the Titan Krios G1
 # ("Cs = 2.7 mm and Cc = 2.7 mm"): https://eicn.cnsi.ucla.edu/project/titan-krios-g1-tem/
-Cc_mm = 2.7
+Cc_mm = 0  # 2.7
 # delta_E = 0.7eV is the energy spread of the source, from "Atomic resolution cryo-EM at 200 keV"
 # ("Dashed and dashed/dotted lines correspond to Schottky (thermionic) FEG machines (delta_E = 0.7 eV)",
 # where a cold FEG has "delta_E = 0.3 eV"): https://pmc.ncbi.nlm.nih.gov/articles/PMC13324606/
-delta_E_eV = 0.7
+delta_E_eV = 0  # 0.7
 # For comparison, the CEOS page of the envelope itself quotes Cc = 2.15mm and delta_E = 0.7eV, at 200kV.
 n_electrons = 20
 auto_set_power = True
@@ -104,7 +105,7 @@ def angular_average_CTF(CTF, focal_plane_fourier_limits):
     CTF_radial[smooth_range] = gaussian_filter1d(CTF_radial[smooth_range], sigma=1.1)
     return k_centers, CTF_radial
 
-
+# %%
 fig_1, ax_1 = plt.subplots(1, 1, figsize=(12, 5))
 for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
     # for polarization_pies in tqdm([0], desc='Polarization', leave=False, position=1):  #  , 0.5
@@ -176,7 +177,6 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
 # The aberrations phase chi is isotropic (there is no astigmatism here), so it is a function of the norm
 # of the spatial frequency to begin with - it is its own angular average, and there is no point in
 # generating a 2D mask and averaging it over the angles.
-defocus_only_nm = 800
 s_defocus_only = np.logspace(-3, 0, 20000)  # The same axis against which the curves above are plotted.
 # Invert that axis: the first lens maps the spatial frequency f to the focal plane position
 # f * l_of_E(E_0) * focal_length, which is divided there by lambda_electron * focal_length (and by 1e10,
@@ -190,7 +190,7 @@ chi_defocus_only = np.pi * (1 / 2 * Cs_mm * 1e-3 * l_of_E(input_wave.E_0) ** 3 *
 # itself (find_power_for_phase sets the central phase to pi/2), and without a cavity it has to be added here,
 # so that the defocus-only CTF vanishes at s -> 0 like a standard no-phase-plate CTF.
 CTF_defocus_only = (chromatic_envelope(k_defocus_only) * np.sin(chi_defocus_only)) ** 2
-ax_1.semilogx(s_defocus_only, CTF_defocus_only, label="Defocus only")
+ax_1.semilogx(s_defocus_only, CTF_defocus_only, label="Defocus only", alpha=0.5)
 
 # ax_1.axvline(1 / 20, color='tab:blue', linestyle='--')
 # ax_1.axvline(1 / 60, color='tab:orange', linestyle='--')
@@ -248,7 +248,7 @@ def plot_final_image(pic, repetitive_title, file_name):
     fig_2, ax_2 = plt.subplots(1, 1, figsize=(10, 10))
     im_intensity = ax_2.imshow(np.flip(pic.values[pic.values.shape[0] // 4:3 * pic.values.shape[0] // 4, pic.values.shape[1] // 4:3 *pic.values.shape[1] // 4]), extent=[x * 0.5 for x in input_wave.coordinates.limits], cmap='grey', vmax=vmax)
     plt.colorbar(im_intensity, ax=ax_2, fraction=0.046, pad=0.04)
-    ax_2.set_title(f"Final image\n{repetitive_title}", fontsize=title_fs)
+    ax_2.set_title(f"Final Image\n{repetitive_title}", fontsize=title_fs)
     ax_2.set_xlabel(r"x (object plane) [m]", fontsize=label_fs)
     ax_2.set_ylabel(r"y (object plane) [m]", fontsize=label_fs)
     plt.savefig(file_name)
@@ -316,12 +316,14 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         CTF = (envelope * np.cos(mask_phase_array)) ** 2
         plot_CTF_image(CTF, focal_plane_fourier_limits, repetitive_title,
                        f"Figures\\examples\\dummy sample\\CTF-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
-        plot_final_image(pic, repetitive_title,
+        # The final images are titled by what the setup is, rather than by its NA alone:
+        final_image_title = {0.05: "Existing Laser Phase Plate (NA=0.05)",
+                             0.15: "High NA Version (NA=0.15)"}.get(NA_1, repetitive_title)
+        plot_final_image(pic, final_image_title,
                          f"Figures\\examples\\dummy sample\\final_image-{NA_1 * 100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
 
 # The same two figures for the defocus-only case - no cavity at all, only the aberrations. Here the picture
 # itself is needed, so it is simulated (unlike the analytical curve of the first cell).
-defocus_only_nm = 800
 first_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=True)
 second_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=False)
 aberration_propagator = AberrationsPropagator(Cs=Cs_mm * 1e-3, defocus=defocus_only_nm * 1e-9,
@@ -341,5 +343,5 @@ envelope = chromatic_envelope(2 * np.pi * np.sqrt(fft_freq_x[:, None] ** 2 + fft
 CTF = (envelope * np.sin(np.angle(aberration_mask))) ** 2
 plot_CTF_image(CTF, focal_plane_fourier_limits, "Defocus only",
                f"Figures\\examples\\dummy sample\\CTF-defocus-only-{defocus_only_nm:.0f}nm.png")
-plot_final_image(pic, "Defocus only",
+plot_final_image(pic, "Conventional defocus-only imaging",
                  f"Figures\\examples\\dummy sample\\final_image-defocus-only-{defocus_only_nm:.0f}nm.png")
