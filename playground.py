@@ -17,12 +17,12 @@ second_laser = False
 ring_cavity = False
 polarization_pies = 0.5
 E_0 = 3.0000000000e+02
-defocus_nm = 0.0000000000e+00
 Cs_mm = 3.2
+defocus_nm = 0  # np.sqrt(Cs_mm * 1e-3 * l_of_E(Joules_of_keV(E_0))) * 1e9
 # The defocus-only setup is imaged at the Scherzer defocus, z_s = (Cs * lambda) ^ (1/2), which balances
 # the defocus term of the aberrations phase against its spherical aberration term (underfocus positive):
 # https://en.wikipedia.org/wiki/Contrast_transfer_function
-defocus_only_nm = -1e-6# np.sqrt(Cs_mm * 1e-3 * l_of_E(Joules_of_keV(E_0))) * 1e9
+defocus_only_nm = -100# np.sqrt(Cs_mm * 1e-3 * l_of_E(Joules_of_keV(E_0))) * 1e9
 # Typical values of a 300kV cryo-TEM with a Schottky X-FEG:
 # Cc = 2.7mm is the objective lens of a Titan Krios, from the specifications of the Titan Krios G1
 # ("Cs = 2.7 mm and Cc = 2.7 mm"): https://eicn.cnsi.ucla.edu/project/titan-krios-g1-tem/
@@ -96,7 +96,7 @@ def angular_average_CTF(CTF, focal_plane_fourier_limits):
     return k_centers, CTF_radial
 
 # %%
-fig_1, ax_1 = plt.subplots(1, 1, figsize=(12, 5))
+fig_1, ax_1 = plt.subplots(1, 1, figsize=(16, 5))
 for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
     # for polarization_pies in tqdm([0], desc='Polarization', leave=False, position=1):  #  , 0.5
     for second_laser in tqdm([False], desc='Second laser', leave=False, position=2):  # True,  # , True
@@ -192,7 +192,7 @@ ax_1.set_ylabel("CTF (angular average)", fontsize=label_fs)
 ax_1.grid(True, which='both', alpha=0.3)
 ax_1.tick_params(axis='both', which='major', labelsize=label_fs)
 ax_1.legend(fontsize=label_fs * 0.75)
-ax_1.set_xlim(1e-3, 1)
+ax_1.set_xlim(2e-3, 3e-1)
 ax_1.set_ylim(0, 1.1)
 # Pad the first x tick so 10^-3 doesn't collide with the 0.0 y tick.
 ax_1.tick_params(axis='x', which='major', pad=10)
