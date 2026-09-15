@@ -18,8 +18,11 @@ ring_cavity = False
 polarization_pies = 0.5
 E_0 = 3.0000000000e+02
 defocus_nm = 0.0000000000e+00
-defocus_only_nm = 800
 Cs_mm = 3.2e-3
+# The defocus-only setup is imaged at the Scherzer defocus, z_s = (Cs * lambda) ^ (1/2), which balances
+# the defocus term of the aberrations phase against its spherical aberration term (underfocus positive):
+# https://en.wikipedia.org/wiki/Contrast_transfer_function
+defocus_only_nm = np.sqrt(Cs_mm * 1e-3 * l_of_E(Joules_of_keV(E_0))) * 1e9
 # Typical values of a 300kV cryo-TEM with a Schottky X-FEG:
 # Cc = 2.7mm is the objective lens of a Titan Krios, from the specifications of the Titan Krios G1
 # ("Cs = 2.7 mm and Cc = 2.7 mm"): https://eicn.cnsi.ucla.edu/project/titan-krios-g1-tem/
@@ -342,6 +345,6 @@ focal_plane_fourier_limits = 2 * np.pi * np.array(focal_plane_wave.coordinates.l
 envelope = chromatic_envelope(2 * np.pi * np.sqrt(fft_freq_x[:, None] ** 2 + fft_freq_y[None, :] ** 2))
 CTF = (envelope * np.sin(np.angle(aberration_mask))) ** 2
 plot_CTF_image(CTF, focal_plane_fourier_limits, "Defocus only",
-               f"Figures\\examples\\dummy sample\\CTF-defocus-only-{defocus_only_nm:.0f}nm.png")
+               f"Figures\\examples\\dummy sample\\CTF-defocus-only-{defocus_only_nm:.1f}nm.png")
 plot_final_image(pic, "Conventional defocus-only imaging",
-                 f"Figures\\examples\\dummy sample\\final_image-defocus-only-{defocus_only_nm:.0f}nm.png")
+                 f"Figures\\examples\\dummy sample\\final_image-defocus-only-{defocus_only_nm:.1f}nm.png")
