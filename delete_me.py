@@ -146,14 +146,14 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         # plt.savefig(f"Figures\\examples\\dummy sample\\focal plane input wave-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
         # plt.show()
 
-        # fig_2, ax_2 = plt.subplots(1, 1, figsize=(10, 10))
-        # im_intensity = ax_2.imshow(np.flip(pic.values[pic.values.shape[0]//4:3 * pic.values.shape[0]//4, pic.values.shape[1]//4:3 * pic.values.shape[1]//4]), extent=[x * 0.5 for x in input_wave.coordinates.limits], cmap='grey', vmax=vmax)
-        # plt.colorbar(im_intensity, ax=ax_2, fraction=0.046, pad=0.04)
-        # ax_2.set_title(f"Final image\n{repetitive_title}", fontsize=title_fs)
-        # ax_2.set_xlabel(r"x (object plane) [m]", fontsize=label_fs)
-        # ax_2.set_ylabel(r"y (object plane) [m]", fontsize=label_fs)
-        # plt.savefig(f"Figures\\examples\\dummy sample\\final_image-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
-        # plt.show()
+        fig_2, ax_2 = plt.subplots(1, 1, figsize=(10, 10))
+        im_intensity = ax_2.imshow(np.flip(pic.values[pic.values.shape[0]//4:3 * pic.values.shape[0]//4, pic.values.shape[1]//4:3 * pic.values.shape[1]//4]), extent=[x * 0.5 for x in input_wave.coordinates.limits], cmap='grey', vmax=vmax)
+        plt.colorbar(im_intensity, ax=ax_2, fraction=0.046, pad=0.04)
+        ax_2.set_title(f"Final image\n{repetitive_title}", fontsize=title_fs)
+        ax_2.set_xlabel(r"x (object plane) [m]", fontsize=label_fs)
+        ax_2.set_ylabel(r"y (object plane) [m]", fontsize=label_fs)
+        plt.savefig(f"Figures\\examples\\dummy sample\\final_image-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
+        plt.show()
 
         # fig_3, ax_3 = plt.subplots(1, 1, figsize=(10, 10))
         # mask_attenuation = ax_3.imshow(np.abs(mask) ** 2, extent=focal_plane_fourier_limits,
