@@ -1167,6 +1167,22 @@ class LensPropagator(Propagator):
         return output_wave
 
 
+def chromatic_envelope(k, Cc: float, delta_E: float, E0: float):
+    # The damping of the CTF by the chromatic aberration (the temporal coherence envelope), as in
+    # https://www.ceos-gmbh.de/en/basics/phasecontrast :
+    # A(k) = exp(-1/2 * pi^2 * Cc^2 * (delta_E / E_0)^2 * lambda^2 * k^4)
+    # k is the same spatial frequency as in AberrationsPropagator.aberrations_mask, that is k = 2 * pi * f,
+    # so that the envelope is damped by the same focal spread by which the defocus term there is shifted.
+    # Cc and delta_E are in meters and in Joules (E_of_V converts eV to Joules), and Cc = 0 or delta_E = 0
+    # turns the damping off.
+    with np.errstate(under="ignore"):  # at the high frequencies, where the envelope is dead anyway, both
+        # this exponent and anything that is later multiplied by it underflow.
+        envelope = np.exp(
+            -1 / 2 * np.pi ** 2 * Cc ** 2 * (delta_E / E0) ** 2 * l_of_E(E0) ** 2 * k ** 4
+        )
+        return np.where(envelope < 1e-100, 0, envelope)
+
+
 class AberrationsPropagator(Propagator):
     def __init__(
         self,
@@ -1174,11 +1190,15 @@ class AberrationsPropagator(Propagator):
         defocus,
         astigmatism_parameter: float = 0,
         astigmatism_orientation: float = 0,
+        Cc: float = 0,  # The chromatic aberration coefficient [m], and the energy spread of the source
+        delta_E: float = 0,  # [J] - both default to 0, which is no chromatic damping at all.
     ):
         self.Cs = Cs
         self.defocus = defocus
         self.astigmatism_parameter = astigmatism_parameter
         self.astigmatism_orientation = astigmatism_orientation
+        self.Cc = Cc
+        self.delta_E = delta_E
 
     # This is somewhat inefficient, because we could add all the aberrations in the fourier plane, but I want to
     # separate the cavity calculations from the aberrations calculations, and in particular not to assume a 4f system,
@@ -1193,6 +1213,11 @@ class AberrationsPropagator(Propagator):
         fft_freq_y = np.fft.fftfreq(
             input_wave.psi.shape[1], input_wave.coordinates.dy
         )  # this is f and not k
+        # The frequencies ARE fftshifted while psi_FFT is not, because the wave that arrives here went
+        # through the two lenses, whose FFTs leave it modulated by (-1)^n: its spectrum is therefore
+        # centered around the middle of the array rather than around its first element, which is exactly
+        # where the fftshifted mask has its own center. Do not "fix" this - without the shift the
+        # unscattered beam gets the aberrations (and the chromatic damping) of the Nyquist frequency.
         fft_freq_x, fft_freq_y = np.fft.fftshift(fft_freq_x), np.fft.fftshift(
             fft_freq_y
         )
@@ -1216,7 +1241,10 @@ class AberrationsPropagator(Propagator):
                 (1 / 2) * self.Cs * lambda_electron ** 3 * k_squared ** 2
                 - f_defocus_aberration * lambda_electron * k_squared
         )
-        return np.exp(1j * phase)  # Check sign!
+        # The chromatic aberration damps the amplitude of the mask rather than shifting its phase, so
+        # unlike the aberrations above, the mask it returns is no longer of a unit modulus:
+        envelope = chromatic_envelope(np.sqrt(k_squared), self.Cc, self.delta_E, E0)
+        return envelope * np.exp(1j * phase)  # Check sign!
 
 
 class CavityPropagator(Propagator):

@@ -18,19 +18,19 @@ ring_cavity = False
 polarization_pies = 0.5
 E_0 = 3.0000000000e+02
 defocus_nm = 0.0000000000e+00
-Cs_mm = 3.2e-3
+Cs_mm = 3.2
 # The defocus-only setup is imaged at the Scherzer defocus, z_s = (Cs * lambda) ^ (1/2), which balances
 # the defocus term of the aberrations phase against its spherical aberration term (underfocus positive):
 # https://en.wikipedia.org/wiki/Contrast_transfer_function
-defocus_only_nm = np.sqrt(Cs_mm * 1e-3 * l_of_E(Joules_of_keV(E_0))) * 1e9
+defocus_only_nm = -1e-6# np.sqrt(Cs_mm * 1e-3 * l_of_E(Joules_of_keV(E_0))) * 1e9
 # Typical values of a 300kV cryo-TEM with a Schottky X-FEG:
 # Cc = 2.7mm is the objective lens of a Titan Krios, from the specifications of the Titan Krios G1
 # ("Cs = 2.7 mm and Cc = 2.7 mm"): https://eicn.cnsi.ucla.edu/project/titan-krios-g1-tem/
-Cc_mm = 0  # 2.7
+Cc_mm = 2.7  # 2.7
 # delta_E = 0.7eV is the energy spread of the source, from "Atomic resolution cryo-EM at 200 keV"
 # ("Dashed and dashed/dotted lines correspond to Schottky (thermionic) FEG machines (delta_E = 0.7 eV)",
 # where a cold FEG has "delta_E = 0.3 eV"): https://pmc.ncbi.nlm.nih.gov/articles/PMC13324606/
-delta_E_eV = 0  # 0.7
+delta_E_eV = 0.7
 # For comparison, the CEOS page of the envelope itself quotes Cc = 2.15mm and delta_E = 0.7eV, at 200kV.
 n_electrons = 20
 auto_set_power = True
@@ -62,19 +62,6 @@ input_wave = WaveFunction(E_0=Joules_of_keV(E_0), psi=phase_object, coordinates=
 vmax = None
 title_fs = 30
 label_fs = 28
-
-def chromatic_envelope(k):
-    # The damping of the CTF by the chromatic aberration (the temporal coherence envelope), as in
-    # https://www.ceos-gmbh.de/en/basics/phasecontrast :
-    # A(k) = exp(-1/2 * pi^2 * Cc^2 * (delta_E / E_0)^2 * lambda^2 * k^4)
-    # k is the same spatial frequency as in AberrationsPropagator.aberrations_mask, that is k = 2 * pi * f,
-    # so that the envelope is damped by the same focal spread that the defocus term there is shifted by.
-    with np.errstate(under='ignore'):  # microscope.py raises on underflow, and at the high frequencies,
-        # where the envelope is dead anyway, both this exponent and anything multiplied by it underflow.
-        envelope = np.exp(-1 / 2 * np.pi ** 2 * (Cc_mm * 1e-3) ** 2 * (delta_E_eV / (E_0 * 1e3)) ** 2
-                          * l_of_E(input_wave.E_0) ** 2 * k ** 4)
-        return np.where(envelope < 1e-100, 0, envelope)
-
 
 from tqdm import tqdm
 from scipy.interpolate import RegularGridInterpolator
@@ -143,7 +130,8 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
                                            n_z=n_z, ignore_past_files=False, print_progress=False)
         second_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=False)
         aberration_propagator = AberrationsPropagator(Cs=Cs_mm * 1e-3, defocus=defocus_nm * 1e-9, astigmatism_parameter=0,
-                                                      astigmatism_orientation=0)
+                                                      astigmatism_orientation=0,
+                                                      Cc=Cc_mm * 1e-3, delta_E=E_of_V(delta_E_eV))
         M = Microscope([first_lens, cavity, second_lens, aberration_propagator], n_electrons_per_square_angstrom=n_electrons)
         pic = M.take_a_picture(input_wave)
 
@@ -167,9 +155,9 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         focal_plane_fourier_limits = 2 * np.pi * np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
         repetitive_title = rf"Cavity NA = {NA_1}"  # , $\theta_{{\text{{polarization}}}} = {polarization_pies * 180:.0f}^{{\circ}}$
         mask_phase_array = np.angle(mask) + np.angle(aberration_mask)
-        # The chromatic envelope damps the transfer function itself, hence inside the square:
-        envelope = chromatic_envelope(2 * np.pi * np.sqrt(fft_freq_x[:, None] ** 2 + fft_freq_y[None, :] ** 2))
-        CTF = (envelope * np.cos(mask_phase_array)) ** 2
+        # The chromatic envelope is now the modulus of the aberrations mask, and it damps the transfer
+        # function itself, hence inside the square:
+        CTF = (np.abs(aberration_mask) * np.cos(mask_phase_array)) ** 2
         aberrations_phase = M.propagators[-1]
 
         k_centers, CTF_radial = angular_average_CTF(CTF, focal_plane_fourier_limits)
@@ -192,7 +180,8 @@ chi_defocus_only = np.pi * (1 / 2 * Cs_mm * 1e-3 * l_of_E(input_wave.E_0) ** 3 *
 # sin^2 and not cos^2 as above: the two cavity curves get their pi/2 reference phase from the cavity mask
 # itself (find_power_for_phase sets the central phase to pi/2), and without a cavity it has to be added here,
 # so that the defocus-only CTF vanishes at s -> 0 like a standard no-phase-plate CTF.
-CTF_defocus_only = (chromatic_envelope(k_defocus_only) * np.sin(chi_defocus_only)) ** 2
+CTF_defocus_only = (chromatic_envelope(k_defocus_only, Cc_mm * 1e-3, E_of_V(delta_E_eV), input_wave.E_0)
+                    * np.sin(chi_defocus_only)) ** 2
 ax_1.semilogx(s_defocus_only, CTF_defocus_only, label="Defocus only", alpha=0.5)
 
 # ax_1.axvline(1 / 20, color='tab:blue', linestyle='--')
@@ -291,7 +280,8 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
                                            n_z=n_z, ignore_past_files=False, print_progress=False)
         second_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=False)
         aberration_propagator = AberrationsPropagator(Cs=Cs_mm * 1e-3, defocus=defocus_nm * 1e-9, astigmatism_parameter=0,
-                                                      astigmatism_orientation=0)
+                                                      astigmatism_orientation=0,
+                                                      Cc=Cc_mm * 1e-3, delta_E=E_of_V(delta_E_eV))
         M = Microscope([first_lens, cavity, second_lens, aberration_propagator], n_electrons_per_square_angstrom=n_electrons)
         pic = M.take_a_picture(input_wave)
 
@@ -315,8 +305,7 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         focal_plane_fourier_limits = 2 * np.pi * np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
         repetitive_title = rf"Cavity NA = {NA_1}"  # , $\theta_{{\text{{polarization}}}} = {polarization_pies * 180:.0f}^{{\circ}}$
         mask_phase_array = np.angle(mask) + np.angle(aberration_mask)
-        envelope = chromatic_envelope(2 * np.pi * np.sqrt(fft_freq_x[:, None] ** 2 + fft_freq_y[None, :] ** 2))
-        CTF = (envelope * np.cos(mask_phase_array)) ** 2
+        CTF = (np.abs(aberration_mask) * np.cos(mask_phase_array)) ** 2
         plot_CTF_image(CTF, focal_plane_fourier_limits, repetitive_title,
                        f"Figures\\examples\\dummy sample\\CTF-{NA_1*100:.0f}-{polarization_pies}-{second_laser}-{n_z}.png")
         # The final images are titled by what the setup is, rather than by its NA alone:
@@ -330,7 +319,8 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
 first_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=True)
 second_lens = LensPropagator(focal_length=focal_length_mm * 1e-3, fft_shift=False)
 aberration_propagator = AberrationsPropagator(Cs=Cs_mm * 1e-3, defocus=defocus_only_nm * 1e-9,
-                                              astigmatism_parameter=0, astigmatism_orientation=0)
+                                              astigmatism_parameter=0, astigmatism_orientation=0,
+                                              Cc=Cc_mm * 1e-3, delta_E=E_of_V(delta_E_eV))
 M = Microscope([first_lens, second_lens, aberration_propagator], n_electrons_per_square_angstrom=n_electrons)
 pic = M.take_a_picture(input_wave)
 
@@ -342,8 +332,7 @@ focal_plane_wave = M.step_of_propagator(second_lens).input_wave
 lambda_electron = 2 * np.pi / k_of_beta(focal_plane_wave.beta)
 focal_plane_fourier_limits = 2 * np.pi * np.array(focal_plane_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
 # sin^2 and not cos^2 as above - the missing pi/2 of the cavity, as explained in the first cell.
-envelope = chromatic_envelope(2 * np.pi * np.sqrt(fft_freq_x[:, None] ** 2 + fft_freq_y[None, :] ** 2))
-CTF = (envelope * np.sin(np.angle(aberration_mask))) ** 2
+CTF = (np.abs(aberration_mask) * np.sin(np.angle(aberration_mask))) ** 2
 plot_CTF_image(CTF, focal_plane_fourier_limits, "Defocus only",
                f"Figures\\examples\\dummy sample\\CTF-defocus-only-{defocus_only_nm:.1f}nm.png")
 plot_final_image(pic, "Conventional defocus-only imaging",
