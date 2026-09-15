@@ -123,7 +123,7 @@ def beta_of_p(p: float) -> float:
 
 
 def p_of_beta(beta: float) -> float:
-    return M_ELECTRON * C_LIGHT * beta * np.sqrt(1 - beta**2)
+    return M_ELECTRON * C_LIGHT * beta / np.sqrt(1 - beta**2)  # = gamma * m * c * beta
 
 
 def gamma_of_beta(beta: float) -> float:
@@ -1171,8 +1171,8 @@ def chromatic_envelope(k, Cc: float, delta_E: float, E0: float):
     # The damping of the CTF by the chromatic aberration (the temporal coherence envelope), as in
     # https://www.ceos-gmbh.de/en/basics/phasecontrast :
     # A(k) = exp(-1/2 * pi^2 * Cc^2 * (delta_E / E_0)^2 * lambda^2 * k^4)
-    # k is the same spatial frequency as in AberrationsPropagator.aberrations_mask, that is k = 2 * pi * f,
-    # so that the envelope is damped by the same focal spread by which the defocus term there is shifted.
+    # k is the same spatial frequency as in AberrationsPropagator.aberrations_mask, that is the ordinary
+    # 1/d, so that the envelope is damped by the same focal spread by which the defocus term is shifted.
     # Cc and delta_E are in meters and in Joules (E_of_V converts eV to Joules), and Cc = 0 or delta_E = 0
     # turns the damping off.
     with np.errstate(under="ignore"):  # at the high frequencies, where the envelope is dead anyway, both
@@ -1231,7 +1231,11 @@ class AberrationsPropagator(Propagator):
 
     def aberrations_mask(self, f_x: np.array, f_y: np.array, E0: float):
         f_x, f_y = np.meshgrid(f_x, f_y, indexing="ij")
-        k_squared = (f_x ** 2 + f_y ** 2) * (2 * np.pi) ** 2
+        # k is the ordinary spatial frequency 1/d and NOT the angular one: the formula below is
+        # chi = (2 * pi / lambda) * W(theta) with theta = lambda * k (as in
+        # https://en.wikipedia.org/wiki/Contrast_transfer_function , where "k = the spatial frequency"),
+        # and that relation between the scattering angle and k only holds without the 2 * pi.
+        k_squared = f_x ** 2 + f_y ** 2
         phi_k = np.arctan2(f_y, f_x)
         f_defocus_aberration = self.defocus + self.astigmatism_parameter * np.cos(
             2 * (phi_k - self.astigmatism_orientation)

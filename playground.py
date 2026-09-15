@@ -1,5 +1,5 @@
 from microscope import *
-from microscope import k_of_beta
+
 import warnings
 with warnings.catch_warnings():
     warnings.filterwarnings(
@@ -151,8 +151,10 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         attenuation_factor = np.abs(middle_phase_mask_value)
         phase_factor = np.real(np.angle(middle_phase_mask_value))
 
-        lambda_electron = 2 * np.pi / k_of_beta(M.step_of_propagator(cavity).input_wave.beta)
-        focal_plane_fourier_limits = 2 * np.pi * np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
+        # The first lens maps the spatial frequency f to the focal plane position f * lambda * focal_length,
+        # so dividing the position back by them gives f itself - the ordinary 1/d, in A^-1, with no 2 * pi.
+        lambda_electron = l_of_E(input_wave.E_0)
+        focal_plane_fourier_limits = np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
         repetitive_title = rf"Cavity NA = {NA_1}"  # , $\theta_{{\text{{polarization}}}} = {polarization_pies * 180:.0f}^{{\circ}}$
         mask_phase_array = np.angle(mask) + np.angle(aberration_mask)
         # The chromatic envelope is now the modulus of the aberrations mask, and it damps the transfer
@@ -169,11 +171,8 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
 # of the spatial frequency to begin with - it is its own angular average, and there is no point in
 # generating a 2D mask and averaging it over the angles.
 s_defocus_only = np.logspace(-3, 0, 20000)  # The same axis against which the curves above are plotted.
-# Invert that axis: the first lens maps the spatial frequency f to the focal plane position
-# f * l_of_E(E_0) * focal_length, which is divided there by lambda_electron * focal_length (and by 1e10,
-# for A^-1), so that s = 2 * pi * f * l_of_E(E_0) / lambda_electron / 1e10.
-lambda_electron = 2 * np.pi / k_of_beta(input_wave.beta)
-k_defocus_only = s_defocus_only * 1e10 * lambda_electron / l_of_E(input_wave.E_0)  # k = 2 * pi * f
+# The axis above is the ordinary spatial frequency itself, so the only conversion left is A^-1 -> m^-1:
+k_defocus_only = s_defocus_only * 1e10
 # The aberrations phase itself, as in AberrationsPropagator.aberrations_mask:
 chi_defocus_only = np.pi * (1 / 2 * Cs_mm * 1e-3 * l_of_E(input_wave.E_0) ** 3 * k_defocus_only ** 4
                             - defocus_only_nm * 1e-9 * l_of_E(input_wave.E_0) * k_defocus_only ** 2)
@@ -192,7 +191,7 @@ ax_1.set_ylabel("CTF (angular average)", fontsize=label_fs)
 ax_1.grid(True, which='both', alpha=0.3)
 ax_1.tick_params(axis='both', which='major', labelsize=label_fs)
 ax_1.legend(fontsize=label_fs * 0.75)
-ax_1.set_xlim(2e-3, 3e-1)
+ax_1.set_xlim(2e-3, 1)
 ax_1.set_ylim(0, 1.1)
 # Pad the first x tick so 10^-3 doesn't collide with the 0.0 y tick.
 ax_1.tick_params(axis='x', which='major', pad=10)
@@ -206,24 +205,22 @@ from tqdm import tqdm
 
 def plot_CTF_image(CTF, focal_plane_fourier_limits, repetitive_title, file_name):
     fig_1, ax_1 = plt.subplots(1, 1, figsize=(10, 10))
-    # Show only the central eighth-to-each-direction of the image (a quarter-width window
-    # centered on k=0), and scale the extent accordingly.
-    n_y, n_x = CTF.shape
-    y0, y1 = 3 * n_y // 8, 5 * n_y // 8
-    x0, x1 = 3 * n_x // 8, 5 * n_x // 8
-    CTF_center = CTF[y0:y1, x0:x1]
+    # The whole array, up to the Nyquist frequency of the sampling: at the correct scaling the first
+    # Thon ring and the chromatic cutoff both fall outside of any smaller window.
     # Use a symmetric extent so both axes share the same range (and hence the same ticks).
-    half_range = np.max(np.abs(focal_plane_fourier_limits)) / 4
-    center_extent = [-half_range, half_range, -half_range, half_range]
-    mask_phase = ax_1.imshow(CTF_center,
-                             extent=center_extent,
+    half_range = np.max(np.abs(focal_plane_fourier_limits))
+    full_extent = [-half_range, half_range, -half_range, half_range]
+    mask_phase = ax_1.imshow(CTF,
+                             extent=full_extent,
                              cmap='grey')
     ax_1.set_title(f"Contrast Transfer Function\n{repetitive_title}", fontsize=title_fs)
     ax_1.set_xlabel(r"$s_{x}\ \left[A^{-1}\right]$", fontsize=label_fs)
     ax_1.set_ylabel(r"$s_{y}\ \left[A^{-1}\right]$", fontsize=label_fs)
     # Force identical, symmetric limits and ticks on both axes (imshow's equal aspect
     # otherwise expands one axis and gives the two axes different auto-ticks).
-    symmetric_ticks = np.arange(-0.3, 0.31, 0.3)
+    tick = max([t for t in (0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0) if t <= half_range * 0.8],
+               default=half_range / 2)
+    symmetric_ticks = np.array([-tick, 0, tick])
     ax_1.set_xlim(-half_range, half_range)
     ax_1.set_ylim(-half_range, half_range)
     ax_1.set_xticks(symmetric_ticks)
@@ -301,8 +298,10 @@ for NA_1 in tqdm([0.05, 0.15], desc='NA', leave=True):  #
         attenuation_factor = np.abs(middle_phase_mask_value)
         phase_factor = np.real(np.angle(middle_phase_mask_value))
 
-        lambda_electron = 2 * np.pi / k_of_beta(M.step_of_propagator(cavity).input_wave.beta)
-        focal_plane_fourier_limits = 2 * np.pi * np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
+        # The first lens maps the spatial frequency f to the focal plane position f * lambda * focal_length,
+        # so dividing the position back by them gives f itself - the ordinary 1/d, in A^-1, with no 2 * pi.
+        lambda_electron = l_of_E(input_wave.E_0)
+        focal_plane_fourier_limits = np.array(M.step_of_propagator(cavity).input_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
         repetitive_title = rf"Cavity NA = {NA_1}"  # , $\theta_{{\text{{polarization}}}} = {polarization_pies * 180:.0f}^{{\circ}}$
         mask_phase_array = np.angle(mask) + np.angle(aberration_mask)
         CTF = (np.abs(aberration_mask) * np.cos(mask_phase_array)) ** 2
@@ -329,8 +328,8 @@ fft_freq_y = np.fft.fftshift(np.fft.fftfreq(input_wave.psi.shape[1], input_wave.
 aberration_mask = M.propagators[-1].aberrations_mask(fft_freq_x, fft_freq_y, input_wave.E_0)
 
 focal_plane_wave = M.step_of_propagator(second_lens).input_wave
-lambda_electron = 2 * np.pi / k_of_beta(focal_plane_wave.beta)
-focal_plane_fourier_limits = 2 * np.pi * np.array(focal_plane_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
+lambda_electron = l_of_E(input_wave.E_0)
+focal_plane_fourier_limits = np.array(focal_plane_wave.coordinates.limits) / (lambda_electron * focal_length_mm * 1e-3) / 1e10
 # sin^2 and not cos^2 as above - the missing pi/2 of the cavity, as explained in the first cell.
 CTF = (np.abs(aberration_mask) * np.sin(np.angle(aberration_mask))) ** 2
 plot_CTF_image(CTF, focal_plane_fourier_limits, "Defocus only",
