@@ -1,5 +1,5 @@
 from microscope import *
-
+from microscope import k_of_beta
 import warnings
 with warnings.catch_warnings():
     warnings.filterwarnings(
@@ -22,7 +22,7 @@ defocus_nm = 0  # np.sqrt(Cs_mm * 1e-3 * l_of_E(Joules_of_keV(E_0))) * 1e9
 # The defocus-only setup is imaged at the Scherzer defocus, z_s = (Cs * lambda) ^ (1/2), which balances
 # the defocus term of the aberrations phase against its spherical aberration term (underfocus positive):
 # https://en.wikipedia.org/wiki/Contrast_transfer_function
-defocus_only_nm = -100# np.sqrt(Cs_mm * 1e-3 * l_of_E(Joules_of_keV(E_0))) * 1e9
+defocus_only_nm = -600# np.sqrt(Cs_mm * 1e-3 * l_of_E(Joules_of_keV(E_0))) * 1e9
 # Typical values of a 300kV cryo-TEM with a Schottky X-FEG:
 # Cc = 2.7mm is the objective lens of a Titan Krios, from the specifications of the Titan Krios G1
 # ("Cs = 2.7 mm and Cc = 2.7 mm"): https://eicn.cnsi.ucla.edu/project/titan-krios-g1-tem/
@@ -191,7 +191,7 @@ ax_1.set_ylabel("CTF (angular average)", fontsize=label_fs)
 ax_1.grid(True, which='both', alpha=0.3)
 ax_1.tick_params(axis='both', which='major', labelsize=label_fs)
 ax_1.legend(fontsize=label_fs * 0.75)
-ax_1.set_xlim(2e-3, 1)
+ax_1.set_xlim(2e-3, 3e-1)
 ax_1.set_ylim(0, 1.1)
 # Pad the first x tick so 10^-3 doesn't collide with the 0.0 y tick.
 ax_1.tick_params(axis='x', which='major', pad=10)
